@@ -100,7 +100,11 @@ data class SwipePointSerializable(
      */
     @SerializedName("borderShapeSelected")
     val borderShapeSelected: IconShape? = IconShape.Circle
-)
+) {
+    override fun toString(): String {
+        return "$action | $nestId | $angleDeg | $circleNumber"
+    }
+}
 
 
 fun SwipePointSerializable.applyColorAction(): Boolean = (
