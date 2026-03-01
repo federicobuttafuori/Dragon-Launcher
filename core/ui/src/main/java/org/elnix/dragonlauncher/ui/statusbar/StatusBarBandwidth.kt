@@ -27,10 +27,7 @@ import kotlinx.coroutines.isActive
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 
 @Composable
-fun StatusBarBandwidth(
-    element: StatusBarSerializable.Bandwidth,
-    modifier: Modifier = Modifier
-) {
+fun StatusBarBandwidth(element: StatusBarSerializable.Bandwidth) {
     var rxSpeed by remember { mutableLongStateOf(0L) }
     var txSpeed by remember { mutableLongStateOf(0L) }
 
@@ -49,7 +46,7 @@ fun StatusBarBandwidth(
     }
 
     Row(
-        modifier = modifier,
+        modifier = Modifier,
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
