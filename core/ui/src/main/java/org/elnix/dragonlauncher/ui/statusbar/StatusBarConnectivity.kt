@@ -11,7 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirplanemodeActive
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
+import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 
 @Composable
 fun StatusBarConnectivity(
@@ -34,12 +37,19 @@ fun StatusBarConnectivity(
 ) {
     val ctx = LocalContext.current
     var connectivityState by remember { mutableStateOf(ConnectivityState()) }
+    val updateFrequency by StatusBarSettingsStore.connectivityUpdateFrequency.asState()
+    val showAirplaneMode by StatusBarSettingsStore.showAirplaneMode.asState()
+    val showWifi by StatusBarSettingsStore.showWifi.asState()
+    val showBluetooth by StatusBarSettingsStore.showBluetooth.asState()
+    val showVpn by StatusBarSettingsStore.showVpn.asState()
+    val showMobileData by StatusBarSettingsStore.showMobileData.asState()
+    val showHotspot by StatusBarSettingsStore.showHotspot.asState()
 
-    // Periodic updates every 5 seconds
-    LaunchedEffect(Unit) {
+    // Periodic updates
+    LaunchedEffect(updateFrequency) {
         while (true) {
             connectivityState = readConnectivityState(ctx)
-            delay(5_000)
+            delay(updateFrequency * 1000L)
         }
     }
 
@@ -57,33 +67,49 @@ fun StatusBarConnectivity(
 //            )
 //        }
 
-        if (connectivityState.isAirplaneMode) {
+        if (connectivityState.isAirplaneMode && showAirplaneMode) {
             Icon(
-                imageVector = Icons.Default.AirplanemodeActive,
+                imageVector = Icons.Filled.AirplanemodeActive,
                 contentDescription = "Airplane",
                 modifier = Modifier.size(14.dp)
             )
         } else {
-            if (connectivityState.isWifiEnabled) {
+            if (connectivityState.isWifiEnabled && showWifi) {
                 Icon(
-                    imageVector = Icons.Default.Wifi,
+                    imageVector = Icons.Filled.Wifi,
                     contentDescription = "WiFi on",
                     modifier = Modifier.size(14.dp)
                 )
             }
 
-            if (connectivityState.isBluetoothEnabled) {
+            if (connectivityState.isBluetoothEnabled && showBluetooth) {
                 Icon(
-                    imageVector = Icons.Default.Bluetooth,
+                    imageVector = Icons.Filled.Bluetooth,
                     contentDescription = "Bluetooth",
                     modifier = Modifier.size(14.dp)
                 )
             }
 
-            if (connectivityState.mobileDataStatus.isNotEmpty()) {
+            if (connectivityState.isVpnEnabled && showVpn) {
                 Icon(
-                    imageVector = Icons.Default.SignalCellularAlt,
+                    imageVector = Icons.Filled.VpnKey,
+                    contentDescription = "VPN",
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+
+            if (connectivityState.mobileDataStatus.isNotEmpty() && showMobileData) {
+                Icon(
+                    imageVector = Icons.Filled.SignalCellularAlt,
                     contentDescription = connectivityState.mobileDataStatus,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+
+            if (connectivityState.isHotspotEnabled && showHotspot) {
+                Icon(
+                    imageVector = Icons.Filled.WifiTethering,
+                    contentDescription = "Hotspot",
                     modifier = Modifier.size(14.dp)
                 )
             }
@@ -96,6 +122,7 @@ data class ConnectivityState(
     val isWifiEnabled: Boolean = false,
     val isVpnEnabled: Boolean = false,
     val isBluetoothEnabled: Boolean = false,
+    val isHotspotEnabled: Boolean = false,
     val mobileDataStatus: String = ""
 )
 
@@ -104,6 +131,10 @@ private fun readConnectivityState(ctx: Context): ConnectivityState {
     val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     val mobileDataStatus = getMobileDataStatus(ctx, connectivityManager, resolver)
+
+    val isVpnEnabled = connectivityManager.allNetworks.any { network ->
+        connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
+    }
 
     return ConnectivityState(
         isAirplaneMode = Settings.Global.getInt(resolver, Settings.Global.AIRPLANE_MODE_ON, 0) == 1,
@@ -114,18 +145,10 @@ private fun readConnectivityState(ctx: Context): ConnectivityState {
             else -> false
         },
 
-//        isVpnEnabled = Settings.Global.getInt(
-//            resolver,
-//            Settings.Global.VPN_ALWAYS_ON_GENERIC,
-//            0
-//        ) == 1 ||
-//                Settings.Global.getInt(
-//                    resolver,
-//                    "vpn_always_on_generic",
-//                    0
-//                ) == 1,
+        isVpnEnabled = isVpnEnabled,
 
         isBluetoothEnabled = Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0) == 1,
+        isHotspotEnabled = Settings.Global.getInt(resolver, "wifi_ap_state", 0) == 13,
         mobileDataStatus = mobileDataStatus
     )
 }
@@ -168,7 +191,13 @@ private fun getMobileDataStatus(
             else -> "2G"
         }
 
-        return typeStr
+        val isRoaming = try {
+            telephonyManager.isNetworkRoaming
+        } catch (e: Exception) {
+            false
+        }
+
+        return if (isRoaming) "$typeStr (Roaming)" else typeStr
     }
 
     return "Data ON"

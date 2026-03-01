@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
+import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 
 @Composable
 fun StatusBarBandwidth(
@@ -26,6 +27,7 @@ fun StatusBarBandwidth(
 ) {
     var rxSpeed by remember { mutableLongStateOf(0L) }
     var txSpeed by remember { mutableLongStateOf(0L) }
+    val mergeBandwidth by StatusBarSettingsStore.mergeBandwidth.asState()
 
     LaunchedEffect(Unit) {
         var prevRx = TrafficStats.getTotalRxBytes()
@@ -41,13 +43,19 @@ fun StatusBarBandwidth(
         }
     }
 
+    val displayText = if (mergeBandwidth) {
+        formatSpeed(rxSpeed + txSpeed)
+    } else {
+        "↓${formatSpeed(rxSpeed)} ↑${formatSpeed(txSpeed)}"
+    }
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "↓${formatSpeed(rxSpeed)} ↑${formatSpeed(txSpeed)}",
+            text = displayText,
             style = MaterialTheme.typography.bodySmall
         )
     }
