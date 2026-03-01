@@ -150,17 +150,19 @@ class StatusBarAdapter : JsonSerializer<StatusBarSerializable>, JsonDeserializer
     ): StatusBarSerializable? {
         if (json == null || !json.isJsonObject) return null
         val obj = json.asJsonObject
+        val type = if (obj.has("type")) obj.get("type").asString else return null
+        
         return try {
-            when (obj.get("type").asString) {
+            when (type) {
                 "Time" -> StatusBarSerializable.Time(
-                    formatter = obj.get("formatter").asString,
+                    formatter = if (obj.has("formatter")) obj.get("formatter").asString else "HH:mm:ss",
                     action = if (obj.has("action") && !obj.get("action").isJsonNull) {
                         SwipeJson.decodeAction(obj.get("action").toString())
                     } else null
                 )
 
                 "Date" -> StatusBarSerializable.Date(
-                    formatter = obj.get("formatter").asString,
+                    formatter = if (obj.has("formatter")) obj.get("formatter").asString else "MMM dd",
                     action = if (obj.has("action") && !obj.get("action").isJsonNull) {
                         SwipeJson.decodeAction(obj.get("action").toString())
                     } else null
@@ -169,7 +171,6 @@ class StatusBarAdapter : JsonSerializer<StatusBarSerializable>, JsonDeserializer
                 "Bandwidth" -> StatusBarSerializable.Bandwidth(
                     merge = if (obj.has("merge")) obj.get("merge").asBoolean else false
                 )
-
 
                 "Notifications" -> StatusBarSerializable.Notifications(
                     maxIcons = if (obj.has("maxIcons")) obj.get("maxIcons").asInt else 8
@@ -190,18 +191,18 @@ class StatusBarAdapter : JsonSerializer<StatusBarSerializable>, JsonDeserializer
                 )
 
                 "Battery" -> StatusBarSerializable.Battery(
-                    showIcon = obj.get("showIcon")?.asBoolean ?: true,
-                    showPercentage = obj.get("showPercentage")?.asBoolean ?: true,
+                    showIcon = if (obj.has("showIcon")) obj.get("showIcon").asBoolean else false,
+                    showPercentage = if (obj.has("showPercentage")) obj.get("showPercentage").asBoolean else true,
                 )
 
                 "NextAlarm" -> StatusBarSerializable.NextAlarm(
-                    formatter = obj.get("formatter")?.asString ?: "HH:mm"
+                    formatter = if (obj.has("formatter")) obj.get("formatter").asString else "HH:mm"
                 )
 
                 else -> null
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            logE(STATUS_BAR_TAG, "Deserialization error for type $type: ${e.message}", e)
             null
         }
     }

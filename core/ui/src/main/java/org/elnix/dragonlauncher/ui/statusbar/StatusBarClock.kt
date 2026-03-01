@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun StatusBarDate(
     element: StatusBarSerializable.Date,
-    onAction: ((SwipeActionSerializable) -> Unit)?
+    onAction: ((SwipeActionSerializable) -> Unit)? = null
 ) {
     val ctx = LocalContext.current
 
@@ -62,7 +62,7 @@ fun StatusBarDate(
             text = dateText,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.conditional(onAction != null) {
-                clickable {
+                this.clickable {
                     action?.let { onAction!!(it) } ?: openCalendar(ctx)
                 }
             }
@@ -74,7 +74,7 @@ fun StatusBarDate(
 @Composable
 fun StatusBarTime(
     element: StatusBarSerializable.Time,
-    onAction: ((SwipeActionSerializable) -> Unit)?
+    onAction: ((SwipeActionSerializable) -> Unit)? = null
 ) {
     val ctx = LocalContext.current
 
@@ -114,7 +114,7 @@ fun StatusBarTime(
             text = timeText,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.conditional(onAction != null) {
-                clickable {
+                this.clickable {
                     action?.let { onAction!!(it) } ?: openAlarmApp(ctx)
                 }
             }

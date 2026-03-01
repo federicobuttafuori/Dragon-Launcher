@@ -129,7 +129,7 @@ fun StatusBar(
 
 
 private data class StatusBarElement(
-    val id: Int,
+    val id: String,
     val item: StatusBarSerializable
 )
 
@@ -149,7 +149,7 @@ fun EditStatusBar() {
     val bottomStatusBarPadding by StatusBarSettingsStore.bottomPadding.asState()
 
     val elements: SnapshotStateList<StatusBarElement> = remember { mutableStateListOf() }
-    var selectedElementId by remember { mutableStateOf<Int?>(null) }
+    var selectedElementId by remember { mutableStateOf<String?>(null) }
 
 
     suspend fun load() {
@@ -158,10 +158,10 @@ fun EditStatusBar() {
         val loadedElements = StatusBarJsonSettingsStore.jsonSetting.get(ctx)
         val elementsJson = StatusBarJson.decodeStatusBarElements(loadedElements)
 
-        elementsJson.forEachIndexed { index, item ->
+        elementsJson.forEach { item ->
             elements.add(
                 StatusBarElement(
-                    id = index,
+                    id = java.util.UUID.randomUUID().toString(),
                     item = item
                 )
             )
@@ -181,11 +181,9 @@ fun EditStatusBar() {
     }
 
     fun addElement(element: StatusBarSerializable) {
-        val newId = (elements.maxOfOrNull { it.id } ?: 0) + 1
-
         elements.add(
             StatusBarElement(
-                id = newId,
+                id = java.util.UUID.randomUUID().toString(),
                 item = element
             )
         )
@@ -195,8 +193,6 @@ fun EditStatusBar() {
     fun duplicateElement(element: StatusBarElement) {
         val index = elements.indexOfFirst { it.id == element.id }
         if (index == -1) return
-
-        val newId = (elements.maxOfOrNull { it.id } ?: 0) + 1
 
         val copiedItem = when (val item = element.item) {
             is StatusBarSerializable.Time -> item.copy()
@@ -212,7 +208,7 @@ fun EditStatusBar() {
         elements.add(
             index + 1,
             StatusBarElement(
-                id = newId,
+                id = java.util.UUID.randomUUID().toString(),
                 item = copiedItem
             )
         )
