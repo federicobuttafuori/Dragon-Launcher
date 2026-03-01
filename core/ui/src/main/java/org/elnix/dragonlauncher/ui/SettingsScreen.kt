@@ -107,6 +107,7 @@ import org.elnix.dragonlauncher.common.utils.circles.computePointPosition
 import org.elnix.dragonlauncher.common.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.common.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
+import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeMapSettingsStore
@@ -1201,7 +1202,7 @@ fun SettingsScreen(
                 DragonIconButton(onClick = { undo() }, enabled = undoButtonEnabled) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Undo,
-                        tint = MaterialTheme.colorScheme.primary.copy(if (undoButtonEnabled) 1f else 0.5f),
+                        tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(undoButtonEnabled),
                         contentDescription = "Undo"
                     )
                 }
@@ -1210,7 +1211,7 @@ fun SettingsScreen(
                 DragonIconButton(onClick = { redo() }, enabled = redoButtonEnabled) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Redo,
-                        tint = MaterialTheme.colorScheme.primary.copy(if (redoButtonEnabled) 1f else 0.5f),
+                        tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(redoButtonEnabled),
                         contentDescription = "Redo"
                     )
                 }
