@@ -280,13 +280,12 @@ fun EditStatusBar() {
     val reorderState = rememberReorderableLazyListState(
         onMove = { from, to ->
             try {
-                if (from.index != to.index) {
-                    val fromIdx = elements.indexOfFirst { it.id == from.key }
-                    val toIdx = elements.indexOfFirst { it.id == to.key }
+                val fromIdx = elements.indexOfFirst { it.id == from.key }
+                val toIdx = elements.indexOfFirst { it.id == to.key }
 
-                    if (fromIdx != -1 && toIdx != -1) {
-                        elements.add(toIdx, elements.removeAt(fromIdx))
-                    }
+                if (fromIdx != -1 && toIdx != -1 && fromIdx != toIdx) {
+                    val item = elements.removeAt(fromIdx)
+                    elements.add(toIdx, item)
                 }
             } catch (e: Exception) {
                 // Ignore concurrent modification during rapid drag
