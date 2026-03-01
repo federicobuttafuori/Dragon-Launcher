@@ -28,8 +28,8 @@ android {
         applicationId = "org.elnix.dragonlauncher"
         minSdk = 26
         targetSdk = 36
-        versionCode = 41
-        versionName = "2.5.4"
+        versionCode = 42
+        versionName = "2.6.0"
     }
 
 
