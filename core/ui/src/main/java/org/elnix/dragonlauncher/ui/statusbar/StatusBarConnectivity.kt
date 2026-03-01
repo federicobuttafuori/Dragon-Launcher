@@ -50,15 +50,6 @@ fun StatusBarConnectivity(
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-//        if (connectivityState.isVpnEnabled) {
-//            Icon(
-//                Icons.Default.VpnLock,
-//                "VPN",
-//                textColor,
-//                Modifier.size(14.dp)
-//            )
-//        }
-
         if (connectivityState.isAirplaneMode && element.showAirplaneMode) {
             Icon(
                 imageVector = Icons.Filled.AirplanemodeActive,
@@ -169,8 +160,7 @@ private fun getMobileDataStatus(
     val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
 
     if (capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true) {
-        // For now, just return network type without signal strength
-        // Signal strength access might require additional permissions
+        // For now, just return network type without signal strength access might require additional permissions
         val telephonyManager = ctx.getSystemService(Context.TELEPHONY_SERVICE) as android.telephony.TelephonyManager
         val networkType = try {
             telephonyManager.dataNetworkType
