@@ -353,6 +353,7 @@
     <string name="already_default_launcher">Bereits Standard-Launcher</string>
     <string name="open_default_launcher_settings">Öffnen Sie die Standard-Launcher-Einstellungen</string>
     <string name="welcome_to_dragon_launcher">Willkommen bei Dragon Launcher</string>
+    <string name="fast_minimal_powerful_gestures_infinite_custom">Schnell. Minimal. Kraftvolle Gesten. Unendliche Anpassungsmöglichkeiten</string>
     <string name="customize_apps">Passen Sie Anwendungen an</string>
     <string name="dont_customize">Passen Sie Dragon Launcher nicht an und verwenden Sie es direkt</string>
     <string name="app_aliases">App-Aliase</string>
@@ -791,5 +792,6 @@
     <string name="show_percentage">Prozentsatz anzeigen</string>
     <string name="show_percentage_desc">Zeigt den Batterieprozentsatz im Klartext an</string>
     <string name="set_status_bar_template">Statusleistenvorlage festlegen (meine) Warnung: Wenn Sie darauf klicken, wird Ihr aktuelles Setup gelöscht!</string>
+    <string name="notch_mode">Modus: Notch (Setzt einen Abstandshalter auf die Notch)</string>
 
 </resources>
