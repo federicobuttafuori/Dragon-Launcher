@@ -13,15 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -64,13 +60,11 @@ import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.StatusBarJson
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.allStatusBarSerializable
 import org.elnix.dragonlauncher.common.utils.Constants
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.isValidDateFormat
 import org.elnix.dragonlauncher.common.utils.isValidTimeFormat
@@ -111,7 +105,6 @@ enum class TimeFormat(val pattern: String, val displayName: String) {
 fun StatusBar(
     launchAction: ((SwipeActionSerializable) -> Unit)?,
 ) {
-    val ctx = LocalContext.current
     val view = LocalView.current
     val density = LocalDensity.current
 
@@ -131,7 +124,7 @@ fun StatusBar(
         val rects = insets?.displayCutout?.boundingRects ?: emptyList()
         // We focus on the top cutout for the status bar
         val topCutout = rects.find { it.top == 0 }
-        if (topCutout != null) topCutout.width() else 0
+        topCutout?.width() ?: 0
     }
 
     CompositionLocalProvider(
@@ -156,10 +149,10 @@ fun StatusBar(
                     val modifier = Modifier.conditional(
                         condition = element.width == -1,
                         block = { Modifier.weight(1f) },
-                        fallback = { 
-                            // If this is the "Auto" spacer and we have a cutout, we use cutout width
+                        fallback = {
+                            // If this is the "Auto" spacer, and we have a cutout, we use cutout width
                             // Otherwise use the defined width
-                            width(element.width.dp) 
+                            width(element.width.dp)
                         }
                     )
 
@@ -179,13 +172,6 @@ private data class StatusBarElement(
     val id: String,
     val item: StatusBarSerializable
 )
-
-fun <T> SnapshotStateList<T>.move(from: Int, to: Int) {
-    if (from == to) return
-    if (from in 0 until size && to in 0 until size) {
-        add(to, removeAt(from))
-    }
-}
 
 @Composable
 fun EditStatusBar() {
@@ -582,7 +568,7 @@ fun EditStatusBar() {
 
                             if (item.width == -2) {
                                 Text(
-                                    text = "Mode: Notch (Fixe un spacer sur l'encoche)",
+                                    text = stringResource(R.string.notch_mode),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(top = 4.dp)

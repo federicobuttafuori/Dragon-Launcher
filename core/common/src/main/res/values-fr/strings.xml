@@ -215,7 +215,7 @@
     <string name="invalid_format">Format invalide. Consultez les exemples ci-dessus.</string>
     <string name="next_alarm_at">Alarme %1$s</string>
     <string name="show_next_alarm">Montrer Prochaine alarme</string>
-    <string name="theme_selector_help">Sélectionnez un thème prédéfini, vous pouvez sauvegarder vos paramètres et proposer votre thème dans une pull request sur github</string>
+    <string name="theme_selector_help">Sélectionnez un thème prédéfini, vous pouvez sauvegarder vos paramètres et proposer votre thème dans une Pull Request sur github</string>
     <string name="open_nest_circle">Nid Cercle Ouvert</string>
     <string name="delete_circle_nest">Supprimer le nid du cercle</string>
     <string name="are_you_sure_to_delete_this_nest">Es-tu sûr de supprimer ce nid \? Cela ne peut pas être annulé, les points dessus sont perdus à jamais</string>
@@ -257,11 +257,11 @@
     <string name="border_stroke_selected">Contour de bordure sélectionnée</string>
     <string name="border_color">Couleur de bordure</string>
     <string name="border_color_selected">Couleur de bordure sélectionnée</string>
-    <string name="background_color_selected">Couleur d\'arrière plan sélectionnée</string>
+    <string name="background_color_selected">Couleur d\' arrière-plan sélectionnée</string>
     <string name="opacity">Opacité %</string>
     <string name="custom_name">Nom personnalisé</string>
     <string name="edit_action">Editer l\'action</string>
-    <string name="background_selected">Couleur d\'arrière plan sélectionnée</string>
+    <string name="background_selected">Couleur d\'arrière-plan sélectionnée</string>
     <string name="custom_action_color">Personnaliser la couleur de l\'action</string>
     <string name="icon_editor">Éditeur d’icônes</string>
     <string name="pick_image">Sélectionner une image</string>
@@ -349,7 +349,7 @@
     <string name="app_label_overlay_size">Taille de superposition des étiquettes d\'application</string>
     <string name="app_icon_overlay_size">Taille de superposition des icônes d\'application</string>
     <string name="next">Suivant</string>
-    <string name="loading_themes">Chargement des thèmes...</string>
+    <string name="loading_themes"> Chargement des thèmes…</string>
     <string name="already_default_launcher">Lanceur déjà par défaut</string>
     <string name="open_default_launcher_settings">Ouvrir les paramètres du lanceur par défaut</string>
     <string name="welcome_to_dragon_launcher">Bienvenue sur Dragon Launcher</string>
@@ -404,7 +404,7 @@
     <string name="usage_hours">%1$d heures</string>
     <string name="usage_minutes">%1$d min</string>
     <string name="usage_hours_minutes">%1$dh %2$dm</string>
-    <string name="not_used_yet">Vous n\'avez pas encore utilisé cette application aujourd\'hui, peut-être devriez vous y renoncer?</string>
+    <string name="not_used_yet">Vous n\'avez pas encore utilisé cette application aujourd\'hui, peut-être devriez-vous y renoncer?</string>
     <string name="usage_permission_needed">Permission d\'accès aux données d\'utilisation nécessaire</string>
     <string name="grant_usage_permission">Accorder la permission</string>
 
@@ -446,7 +446,7 @@
     <string name="time_limit_picker_title">Combien de temps souhaitez-vous utiliser cette app ?</string>
     <string name="time_limit_picker_subtitle">Fixez-vous une limite pour rester conscient</string>
     <string name="time_limit_minutes">%d min</string>
-    <string name="time_limit_encourage_short">Excellent choix ! Les sessions courtes aident à rester concentré 🎯</string>
+    <string name="time_limit_encourage_short">Excellent choix ! Les courtes sessions aident à rester concentré 🎯</string>
     <string name="time_limit_encourage_medium">C\'est raisonnable. Restez attentif ! 🧘</string>
     <string name="time_limit_encourage_long">C\'est assez long… Êtes-vous sûr d\'avoir besoin de tout ce temps ? 🤔</string>
     <string name="time_limit_encourage_very_long">Ça fait beaucoup de temps d\'écran. Essayez d\'abord une session plus courte ? 😅</string>
@@ -791,5 +791,5 @@
     <string name="show_percentage">Pourcentage d’émission</string>
     <string name="show_percentage_desc">Afficher le pourcentage de batterie en texte clair</string>
     <string name="set_status_bar_template">Définir le modèle de barre de statut (le mien) avertissement en cliquant dessus efface votre configuration actuelle !</string>
-
+    <string name="notch_mode">Mode: Notch (Fixe un spacer sur l\'encoche)</string>
 </resources>
