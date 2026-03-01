@@ -472,12 +472,12 @@ object ColorSettingsStore : MapSettingsStore() {
     }
 
     // For test mode backup
-    private val backupColorsMap = mutableMapOf<String, Color>()
+    private val backupColorsMap = mutableMapOf<String, Color?>()
 
     suspend fun backupColors(ctx: Context) {
         backupColorsMap.clear()
         ALL.forEach { setting ->
-            backupColorsMap[setting.key] = setting.get(ctx)
+            backupColorsMap[setting.key] = setting.getOrNull(ctx)
         }
     }
 

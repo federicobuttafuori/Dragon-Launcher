@@ -85,7 +85,7 @@ class BaseSettingObject <T, R> (
      * @param ctx
      * @return decoded nullable value of settings type [T?]
      */
-    suspend fun getNull(ctx: Context): T? {
+    suspend fun getOrNull(ctx: Context): T? {
 
         val raw = ctx.applicationContext
             .resolveDataStore(dataStoreName)
