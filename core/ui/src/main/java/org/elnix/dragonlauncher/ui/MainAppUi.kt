@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -77,7 +80,9 @@ import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.common.utils.loadChangelogs
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.enumsui.LockMethod
+
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
+import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
@@ -191,7 +196,7 @@ fun MainAppUi(
 
     val forceAppWidgetsSelector by DebugSettingsStore.forceAppWidgetsSelector.asState()
 
-    val showSetDefaultLauncherBanner by PrivateSettingsStore.showSetDefaultLauncherBanner.asState()
+    val showSetDefaultLauncherBanner by PrivateSettingsStore.showSetDefaultLauncherBanner.asStateNull()
 
     val hasSeenWelcome by PrivateSettingsStore.hasSeenWelcome.asStateNull()
 
@@ -526,7 +531,7 @@ fun MainAppUi(
         }
     }
 
-    val showSetAsDefaultBanner = showSetDefaultLauncherBanner &&
+    val showSetAsDefaultBanner = (showSetDefaultLauncherBanner == true) &&
             !isDefaultLauncher &&
             currentRoute != ROUTES.WELCOME
 
@@ -587,12 +592,15 @@ fun MainAppUi(
 
     val showStatusBar by StatusBarSettingsStore.showStatusBar.asState()
 
+    val colorTestMode by ColorModesSettingsStore.colorTestMode.asState()
+
     val elementsJson by StatusBarJsonSettingsStore.jsonSetting.asState()
 
     val elements by remember(elementsJson) {
-        ctx.logW(STATUS_BAR_TAG, "Element: $elementsJson, decoded: ${StatusBarJson.decodeStatusBarElements(elementsJson)}")
+        val decoded = StatusBarJson.decodeStatusBarElements(elementsJson)
+        ctx.logW(STATUS_BAR_TAG, "Element: $elementsJson, decoded: $decoded")
 
-        derivedStateOf { StatusBarJson.decodeStatusBarElements(elementsJson) }
+        derivedStateOf { decoded }
     }
 
     // Used internally by the app view model
@@ -619,6 +627,16 @@ fun MainAppUi(
                         ReselectAutoBackupBanner {
                             autoBackupLauncher.launch("dragonlauncher-auto-backup.json")
                         }
+                    }
+                }
+            },
+            floatingActionButton = {
+                if (colorTestMode) {
+                    FloatingActionButton(
+                        onClick = { navController.navigate(SETTINGS.COLORS) },
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.back_to_colors_settings))
                     }
                 }
             },

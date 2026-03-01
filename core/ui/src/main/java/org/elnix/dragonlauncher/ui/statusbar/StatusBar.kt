@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -47,22 +48,23 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.StatusBarJson
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.allStatusBarSerializable
 import org.elnix.dragonlauncher.common.utils.Constants
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.isValidDateFormat
 import org.elnix.dragonlauncher.common.utils.isValidTimeFormat
@@ -79,10 +81,33 @@ import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 
+enum class DateFormat(val pattern: String, val displayName: String) {
+    SHORT("MMM dd", "Short (Dec 25)"),
+    MEDIUM("MMM dd, yyyy", "Medium (Dec 25, 2023)"),
+    LONG("EEEE, MMMM dd, yyyy", "Long (Monday, December 25, 2023)"),
+    ISO("yyyy-MM-dd", "ISO (2023-12-25)"),
+    US("MM/dd/yyyy", "US (12/25/2023)"),
+    EUROPEAN("dd/MM/yyyy", "European (25/12/2023)"),
+    CUSTOM("", "Custom")
+}
+
+enum class TimeFormat(val pattern: String, val displayName: String) {
+    H12("hh:mm a", "12-hour (02:30 PM)"),
+    H24("HH:mm", "24-hour (14:30)"),
+    H12_SECONDS("hh:mm:ss a", "12-hour with seconds (02:30:45 PM)"),
+    H24_SECONDS("HH:mm:ss", "24-hour with seconds (14:30:45)"),
+    H12_SHORT("h:mm a", "12-hour short (2:30 PM)"),
+    H24_SHORT("H:mm", "24-hour short (14:30)"),
+    CUSTOM("", "Custom")
+}
+
 @Composable
 fun StatusBar(
     launchAction: ((SwipeActionSerializable) -> Unit)?,
 ) {
+    val view = LocalView.current
+    val density = LocalDensity.current
+
     val statusBarBackground by StatusBarSettingsStore.barBackgroundColor.asState()
     val statusBarText by StatusBarSettingsStore.barTextColor.asState()
 
@@ -92,6 +117,15 @@ fun StatusBar(
     val bottomStatusBarPadding by StatusBarSettingsStore.bottomPadding.asState()
 
     val elements = LocalStatusBarElements.current
+
+    // Detect exact cutout bounding rects (geometric notch detection)
+    val totalCutoutWidth = remember(view) {
+        val insets = ViewCompat.getRootWindowInsets(view)
+        val rects = insets?.displayCutout?.boundingRects ?: emptyList()
+        // We focus on the top cutout for the status bar
+        val topCutout = rects.find { it.top == 0 }
+        topCutout?.width() ?: 0
+    }
 
     CompositionLocalProvider(
         LocalContentColor provides statusBarText
@@ -109,18 +143,24 @@ fun StatusBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             elements.forEach { element ->
-
-                logD(STATUS_BAR_TAG, "Element: $element")
                 if (element !is StatusBarSerializable.Spacer) {
                     StatusBarItem(element, launchAction)
                 } else {
                     val modifier = Modifier.conditional(
                         condition = element.width == -1,
                         block = { Modifier.weight(1f) },
-                        fallback = { width(element.width.dp) }
+                        fallback = {
+                            // If this is the "Auto" spacer, and we have a cutout, we use cutout width
+                            // Otherwise use the defined width
+                            width(element.width.dp)
+                        }
                     )
 
-                    Spacer(modifier)
+                    if (element.width == -2) { // Special ID for Notch Spacer
+                         Spacer(Modifier.width(with(density) { totalCutoutWidth.toDp() }))
+                    } else {
+                         Spacer(modifier)
+                    }
                 }
             }
         }
@@ -129,7 +169,7 @@ fun StatusBar(
 
 
 private data class StatusBarElement(
-    val id: Int,
+    val id: String,
     val item: StatusBarSerializable
 )
 
@@ -149,7 +189,7 @@ fun EditStatusBar() {
     val bottomStatusBarPadding by StatusBarSettingsStore.bottomPadding.asState()
 
     val elements: SnapshotStateList<StatusBarElement> = remember { mutableStateListOf() }
-    var selectedElementId by remember { mutableStateOf<Int?>(null) }
+    var selectedElementId by remember { mutableStateOf<String?>(null) }
 
 
     suspend fun load() {
@@ -158,10 +198,10 @@ fun EditStatusBar() {
         val loadedElements = StatusBarJsonSettingsStore.jsonSetting.get(ctx)
         val elementsJson = StatusBarJson.decodeStatusBarElements(loadedElements)
 
-        elementsJson.forEachIndexed { index, item ->
+        elementsJson.forEach { item ->
             elements.add(
                 StatusBarElement(
-                    id = index,
+                    id = java.util.UUID.randomUUID().toString(),
                     item = item
                 )
             )
@@ -181,11 +221,9 @@ fun EditStatusBar() {
     }
 
     fun addElement(element: StatusBarSerializable) {
-        val newId = (elements.maxOfOrNull { it.id } ?: 0) + 1
-
         elements.add(
             StatusBarElement(
-                id = newId,
+                id = java.util.UUID.randomUUID().toString(),
                 item = element
             )
         )
@@ -196,14 +234,12 @@ fun EditStatusBar() {
         val index = elements.indexOfFirst { it.id == element.id }
         if (index == -1) return
 
-        val newId = (elements.maxOfOrNull { it.id } ?: 0) + 1
-
         val copiedItem = when (val item = element.item) {
             is StatusBarSerializable.Time -> item.copy()
             is StatusBarSerializable.Date -> item.copy()
-            StatusBarSerializable.Bandwidth -> item
+            is StatusBarSerializable.Bandwidth -> item.copy()
             is StatusBarSerializable.Notifications -> item.copy()
-            StatusBarSerializable.Connectivity -> item
+            is StatusBarSerializable.Connectivity -> item.copy()
             is StatusBarSerializable.Spacer -> item.copy()
             is StatusBarSerializable.Battery -> item.copy()
             is StatusBarSerializable.NextAlarm -> item.copy()
@@ -212,7 +248,7 @@ fun EditStatusBar() {
         elements.add(
             index + 1,
             StatusBarElement(
-                id = newId,
+                id = java.util.UUID.randomUUID().toString(),
                 item = copiedItem
             )
         )
@@ -236,12 +272,18 @@ fun EditStatusBar() {
 
     val reorderState = rememberReorderableLazyListState(
         onMove = { from, to ->
-            if (from.index in elements.indices && to.index in 0..elements.size) {
-                val tmp = elements.toMutableList()
-                val item = tmp.removeAt(from.index)
-                tmp.add(to.index, item)
-                elements.clear()
-                elements.addAll(tmp)
+            try {
+                if (from.key == to.key) return@rememberReorderableLazyListState
+
+                val fromIdx = elements.indexOfFirst { it.id == from.key }
+                val toIdx = elements.indexOfFirst { it.id == to.key }
+
+                if (fromIdx != -1 && toIdx != -1 && fromIdx != toIdx) {
+                    android.util.Log.d("StatusBarDebug", "Moving element from $fromIdx to $toIdx (IDs: ${from.key} -> ${to.key})")
+                    elements.add(toIdx, elements.removeAt(fromIdx))
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("StatusBarDebug", "Crash avoided during reorder: ${e.message}")
             }
         },
         onDragEnd = { _, _ ->
@@ -259,7 +301,6 @@ fun EditStatusBar() {
                 .height(100.dp)
                 .background(MaterialTheme.colorScheme.surface, DragonShape)
                 .reorderable(reorderState)
-                .detectReorderAfterLongPress(reorderState)
                 .background(statusBarBackground)
                 .padding(
                     start = leftStatusBarPadding.dp,
@@ -313,6 +354,11 @@ fun EditStatusBar() {
                     Box(
                         modifier = Modifier
                             .scale(scale.value)
+                            .then(
+                                if (selected) Modifier.detectReorderAfterLongPress(reorderState)
+                                else Modifier
+                            )
+                            .sizeIn(minWidth = 50.dp, minHeight = 50.dp)
                             .border(1.dp, borderColor.value, DragonShape)
                             .clip(DragonShape)
                             .background(backgroundColor.value)
@@ -324,7 +370,7 @@ fun EditStatusBar() {
                             .padding(10.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        StatusBarItem(element)
+                        StatusBarItem(element, previewMode = true)
                     }
                 }
             }
@@ -337,17 +383,88 @@ fun EditStatusBar() {
                 ) {
 
                     when (val item = element.item) {
-                        /* no-op */
-                        is StatusBarSerializable.Bandwidth, is StatusBarSerializable.Connectivity -> {}
+
+                        is StatusBarSerializable.Bandwidth -> {
+                            SwitchRow(
+                                text = stringResource(R.string.merge_bandwidth),
+                                subText = "",
+                                state = item.merge,
+                            ) {
+                                updateElement(item.copy(merge = it))
+                            }
+                        }
+
+                        is StatusBarSerializable.Connectivity -> {
+                            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                SwitchRow(
+                                    text = stringResource(R.string.show_airplane_mode),
+                                    subText = "",
+                                    state = item.showAirplaneMode,
+                                ) {
+                                    updateElement(item.copy(showAirplaneMode = it))
+                                }
+                                SwitchRow(
+                                    text = stringResource(R.string.show_wifi),
+                                    subText = "",
+                                    state = item.showWifi,
+                                ) {
+                                    updateElement(item.copy(showWifi = it))
+                                }
+                                SwitchRow(
+                                    text = stringResource(R.string.show_bluetooth),
+                                    subText = "",
+                                    state = item.showBluetooth,
+                                ) {
+                                    updateElement(item.copy(showBluetooth = it))
+                                }
+                                SwitchRow(
+                                    text = stringResource(R.string.show_vpn),
+                                    subText = "",
+                                    state = item.showVpn,
+                                ) {
+                                    updateElement(item.copy(showVpn = it))
+                                }
+                                SwitchRow(
+                                    text = stringResource(R.string.show_mobile_data),
+                                    subText = "",
+                                    state = item.showMobileData,
+                                ) {
+                                    updateElement(item.copy(showMobileData = it))
+                                }
+                                SwitchRow(
+                                    text = stringResource(R.string.show_hotspot),
+                                    subText = "",
+                                    state = item.showHotspot,
+                                ) {
+                                    updateElement(item.copy(showHotspot = it))
+                                }
+                                SliderWithLabel(
+                                    label = stringResource(R.string.connectivity_update_frequency),
+                                    value = item.updateFrequency,
+                                    valueRange = 1..60,
+                                    onReset = { updateElement(item.copy(updateFrequency = 5)) }
+                                ) {
+                                    updateElement(item.copy(updateFrequency = it))
+                                }
+                            }
+                        }
 
                         is StatusBarSerializable.Date -> {
 
                             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                Text(
-                                    text = stringResource(R.string.date_format_examples),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    DateFormat.entries.filter { it != DateFormat.CUSTOM }.forEach { format ->
+                                        DragonButton(
+                                            onClick = { updateElement(item.copy(formatter = format.pattern)) }
+                                        ) {
+                                            Text(format.displayName)
+                                        }
+                                    }
+                                }
+
                                 OutlinedTextField(
                                     label = {
                                         Text(stringResource(R.string.date_format_title))
@@ -387,11 +504,18 @@ fun EditStatusBar() {
 
                         is StatusBarSerializable.Time -> {
                             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                Text(
-                                    text = stringResource(R.string.time_format_examples),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    TimeFormat.entries.filter { it != TimeFormat.CUSTOM }.forEach { format ->
+                                        DragonButton(
+                                            onClick = { updateElement(item.copy(formatter = format.pattern)) }
+                                        ) {
+                                            Text(format.displayName)
+                                        }
+                                    }
+                                }
 
                                 OutlinedTextField(
                                     label = { Text(stringResource(R.string.time_format_title)) },
@@ -436,10 +560,19 @@ fun EditStatusBar() {
                             SliderWithLabel(
                                 label = stringResource(R.string.width),
                                 value = item.width,
-                                valueRange = -1..30,
+                                valueRange = -2..30,
                                 onReset = { updateElement(item.copy(width = -1)) }
                             ) {
                                 updateElement(item.copy(width = it))
+                            }
+
+                            if (item.width == -2) {
+                                Text(
+                                    text = stringResource(R.string.notch_mode),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
                             }
                         }
 
@@ -535,6 +668,7 @@ fun EditStatusBar() {
                             .border(1.dp, MaterialTheme.colorScheme.primary, DragonShape)
                             .clip(DragonShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .sizeIn(minWidth = 50.dp, minHeight = 50.dp)
                             .combinedClickable(
                                 onLongClick = { showHelp = true },
                                 onClick = { addElement(it) }
@@ -542,7 +676,7 @@ fun EditStatusBar() {
                             .padding(15.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        StatusBarItem(it)
+                        StatusBarItem(it, previewMode = true)
                     }
 
                     DropdownMenu(
@@ -582,6 +716,7 @@ fun EditStatusBar() {
 fun StatusBarItem(
     element: StatusBarSerializable,
     launchAction: ((SwipeActionSerializable) -> Unit)? = null,
+    previewMode: Boolean = false
 ) {
     when (element) {
         is StatusBarSerializable.Bandwidth -> {
@@ -619,7 +754,7 @@ fun StatusBarItem(
         }
 
         is StatusBarSerializable.NextAlarm -> {
-            StatusBarNextAlarm(element)
+            StatusBarNextAlarm(element, forceShowIcon = previewMode)
         }
     }
 }

@@ -60,6 +60,12 @@
     <string name="reload_color">Recharger la couleur des applications</string>
     <string name="reset_to_default_colors_explanation">Cela restaurera toutes les couleurs à leurs valeurs par défaut d’origine</string>
     <string name="make_every_colors_random_explanation">Générez des couleurs complètement aléatoires pour tous les éléments du thème</string>
+    <string name="test_colors">Tester les couleurs</string>
+    <string name="exit_test_mode">Quitter le mode test</string>
+    <string name="exit_test_mode_message">Voulez-vous enregistrer vos modifications de couleur ou les annuler ?</string>
+    <string name="save_changes">Enregistrer les modifications</string>
+    <string name="discard_changes">Annuler les modifications</string>
+    <string name="back_to_colors_settings">Retour aux paramètres de couleurs</string>
     <string name="text_color">Couleur du texte</string>
     <string name="light_theme">Thème clair</string>
     <string name="dark_theme">Thème sombre</string>
@@ -147,6 +153,19 @@
     <string name="right_padding">Rembourrage à droite</string>
     <string name="top_padding">Rembourrage supérieur</string>
     <string name="bottom_padding">Rembourrage inférieur</string>
+    <string name="connectivity_update_frequency">Fréquence de mise à jour de la connectivité (secondes)</string>
+    <string name="connectivity_indicators">Indicateurs de connectivité</string>
+    <string name="show_airplane_mode">Afficher le mode avion</string>
+    <string name="show_wifi">Afficher le WiFi</string>
+    <string name="show_bluetooth">Afficher le Bluetooth</string>
+    <string name="show_vpn">Afficher le VPN</string>
+    <string name="show_mobile_data">Afficher les données mobiles</string>
+    <string name="show_hotspot">Afficher le point d\'accès</string>
+    <string name="date_time_formats">Formats de date et heure</string>
+    <string name="custom_date_format">Format de date personnalisé</string>
+    <string name="custom_time_format">Format d\'heure personnalisé</string>
+    <string name="bandwidth">Bande passante</string>
+    <string name="merge_bandwidth">Fusionner la bande passante (Total)</string>
     <string name="down_padding">Rembourrage inférieur</string>
     <string name="wallpaper">Fond d’écran</string>
     <string name="wallpaper_help">Définissez le fond d’écran pour l’écran d’accueil/verrouillage et utilisez-le ou non dans le lanceur</string>
@@ -196,7 +215,7 @@
     <string name="invalid_format">Format invalide. Consultez les exemples ci-dessus.</string>
     <string name="next_alarm_at">Alarme %1$s</string>
     <string name="show_next_alarm">Montrer Prochaine alarme</string>
-    <string name="theme_selector_help">Sélectionnez un thème prédéfini, vous pouvez sauvegarder vos paramètres et proposer votre thème dans une pull request sur github</string>
+    <string name="theme_selector_help">Sélectionnez un thème prédéfini, vous pouvez sauvegarder vos paramètres et proposer votre thème dans une Pull Request sur github</string>
     <string name="open_nest_circle">Nid Cercle Ouvert</string>
     <string name="delete_circle_nest">Supprimer le nid du cercle</string>
     <string name="are_you_sure_to_delete_this_nest">Es-tu sûr de supprimer ce nid \? Cela ne peut pas être annulé, les points dessus sont perdus à jamais</string>
@@ -238,11 +257,11 @@
     <string name="border_stroke_selected">Contour de bordure sélectionnée</string>
     <string name="border_color">Couleur de bordure</string>
     <string name="border_color_selected">Couleur de bordure sélectionnée</string>
-    <string name="background_color_selected">Couleur d\'arrière plan sélectionnée</string>
+    <string name="background_color_selected">Couleur d\' arrière-plan sélectionnée</string>
     <string name="opacity">Opacité %</string>
     <string name="custom_name">Nom personnalisé</string>
     <string name="edit_action">Editer l\'action</string>
-    <string name="background_selected">Couleur d\'arrière plan sélectionnée</string>
+    <string name="background_selected">Couleur d\'arrière-plan sélectionnée</string>
     <string name="custom_action_color">Personnaliser la couleur de l\'action</string>
     <string name="icon_editor">Éditeur d’icônes</string>
     <string name="pick_image">Sélectionner une image</string>
@@ -330,10 +349,11 @@
     <string name="app_label_overlay_size">Taille de superposition des étiquettes d\'application</string>
     <string name="app_icon_overlay_size">Taille de superposition des icônes d\'application</string>
     <string name="next">Suivant</string>
-    <string name="loading_themes">Chargement des thèmes...</string>
+    <string name="loading_themes"> Chargement des thèmes…</string>
     <string name="already_default_launcher">Lanceur déjà par défaut</string>
     <string name="open_default_launcher_settings">Ouvrir les paramètres du lanceur par défaut</string>
     <string name="welcome_to_dragon_launcher">Bienvenue sur Dragon Launcher</string>
+    <string name="fast_minimal_powerful_gestures_infinite_custom">Rapide. Minimal. Des gestes puissants. Personnalisation infinie</string>
     <string name="customize_apps">Personnaliser les applications</string>
     <string name="dont_customize">Ne personnalisez pas et commencez à utiliser directement Dragon Launcher</string>
     <string name="app_aliases">Aliases d’applications</string>
@@ -385,7 +405,7 @@
     <string name="usage_hours">%1$d heures</string>
     <string name="usage_minutes">%1$d min</string>
     <string name="usage_hours_minutes">%1$dh %2$dm</string>
-    <string name="not_used_yet">Vous n\'avez pas encore utilisé cette application aujourd\'hui, peut-être devriez vous y renoncer?</string>
+    <string name="not_used_yet">Vous n\'avez pas encore utilisé cette application aujourd\'hui, peut-être devriez-vous y renoncer?</string>
     <string name="usage_permission_needed">Permission d\'accès aux données d\'utilisation nécessaire</string>
     <string name="grant_usage_permission">Accorder la permission</string>
 
@@ -427,7 +447,7 @@
     <string name="time_limit_picker_title">Combien de temps souhaitez-vous utiliser cette app ?</string>
     <string name="time_limit_picker_subtitle">Fixez-vous une limite pour rester conscient</string>
     <string name="time_limit_minutes">%d min</string>
-    <string name="time_limit_encourage_short">Excellent choix ! Les sessions courtes aident à rester concentré 🎯</string>
+    <string name="time_limit_encourage_short">Excellent choix ! Les courtes sessions aident à rester concentré 🎯</string>
     <string name="time_limit_encourage_medium">C\'est raisonnable. Restez attentif ! 🧘</string>
     <string name="time_limit_encourage_long">C\'est assez long… Êtes-vous sûr d\'avoir besoin de tout ce temps ? 🤔</string>
     <string name="time_limit_encourage_very_long">Ça fait beaucoup de temps d\'écran. Essayez d\'abord une session plus courte ? 😅</string>
@@ -772,5 +792,6 @@
     <string name="show_percentage">Pourcentage d’émission</string>
     <string name="show_percentage_desc">Afficher le pourcentage de batterie en texte clair</string>
     <string name="set_status_bar_template">Définir le modèle de barre de statut (le mien) avertissement en cliquant dessus efface votre configuration actuelle !</string>
+    <string name="notch_mode">Mode: Notch (Fixe un spacer sur l\'encoche)</string>
 
 </resources>

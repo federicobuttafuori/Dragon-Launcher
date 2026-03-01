@@ -60,6 +60,12 @@
     <string name="reload_color">Reload Apps Color</string>
     <string name="reset_to_default_colors_explanation">This will restore all colors to their original default values</string>
     <string name="make_every_colors_random_explanation">Generate completely random colors for all theme elements</string>
+    <string name="test_colors">Test Colors</string>
+    <string name="exit_test_mode">Exit Test Mode</string>
+    <string name="exit_test_mode_message">Do you want to save your color changes or discard them?</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="discard_changes">Discard Changes</string>
+    <string name="back_to_colors_settings">Back to Colors Settings</string>
     <string name="text_color">Text Color</string>
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
@@ -147,6 +153,19 @@
     <string name="right_padding">Right Padding</string>
     <string name="top_padding">Top Padding</string>
     <string name="bottom_padding">Bottom Padding</string>
+    <string name="connectivity_update_frequency">Connectivity Update Frequency (seconds)</string>
+    <string name="connectivity_indicators">Connectivity Indicators</string>
+    <string name="show_airplane_mode">Show Airplane Mode</string>
+    <string name="show_wifi">Show WiFi</string>
+    <string name="show_bluetooth">Show Bluetooth</string>
+    <string name="show_vpn">Show VPN</string>
+    <string name="show_mobile_data">Show Mobile Data</string>
+    <string name="show_hotspot">Show Hotspot</string>
+    <string name="date_time_formats">Date &amp; Time Formats</string>
+    <string name="custom_date_format">Custom Date Format</string>
+    <string name="custom_time_format">Custom Time Format</string>
+    <string name="bandwidth">Bandwidth</string>
+    <string name="merge_bandwidth">Merge Bandwidth (Total)</string>
     <string name="down_padding">Bottom Padding</string>
     <string name="wallpaper">Wallpaper</string>
     <string name="wallpaper_help">Set wallpaper for home/lock screen and use it or not in the launcher</string>
@@ -773,5 +792,6 @@
     <string name="show_percentage">Show percentage</string>
     <string name="show_percentage_desc">Display the battery percentage in plain text</string>
     <string name="set_status_bar_template">Set status bar template (mine) warning clicking this erases your current setup!</string>
+    <string name="notch_mode">Mode: Notch (Applies a spacer on the notch)</string>
 
 </resources>

@@ -4,6 +4,13 @@ import android.annotation.SuppressLint
 import android.net.TrafficStats
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,10 +27,7 @@ import kotlinx.coroutines.isActive
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 
 @Composable
-fun StatusBarBandwidth(
-    element: StatusBarSerializable.Bandwidth,
-    modifier: Modifier = Modifier
-) {
+fun StatusBarBandwidth(element: StatusBarSerializable.Bandwidth) {
     var rxSpeed by remember { mutableLongStateOf(0L) }
     var txSpeed by remember { mutableLongStateOf(0L) }
 
@@ -42,14 +46,53 @@ fun StatusBarBandwidth(
     }
 
     Row(
-        modifier = modifier,
+        modifier = Modifier,
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "↓${formatSpeed(rxSpeed)} ↑${formatSpeed(txSpeed)}",
-            style = MaterialTheme.typography.bodySmall
-        )
+        if (element.merge) {
+            Icon(
+                imageVector = Icons.Default.SwapVert,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = LocalContentColor.current
+            )
+            Text(
+                text = formatSpeed(rxSpeed + txSpeed),
+                style = MaterialTheme.typography.bodySmall
+            )
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowDownward,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = LocalContentColor.current
+                )
+                Text(
+                    text = formatSpeed(rxSpeed),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowUpward,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = LocalContentColor.current
+                )
+                Text(
+                    text = formatSpeed(txSpeed),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
     }
 }
 

@@ -2,6 +2,12 @@ package org.elnix.dragonlauncher.ui.statusbar
 
 import android.app.AlarmManager
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,7 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
@@ -21,7 +30,10 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun StatusBarNextAlarm(
-    element: StatusBarSerializable.NextAlarm
+    element: StatusBarSerializable.NextAlarm,
+
+    // used only for preview in settings, so I don't use the element property
+    forceShowIcon: Boolean = false
 ) {
     val ctx = LocalContext.current
     var nextAlarm by remember { mutableStateOf<NextAlarmInfo?>(null) }
@@ -44,11 +56,23 @@ fun StatusBarNextAlarm(
         }
     }
 
-    nextAlarm?.let { alarm ->
-        Text(
-            text = alarm.formattedTime,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+    if (nextAlarm != null || forceShowIcon) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Alarm,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp)
+            )
+            nextAlarm?.let { alarm ->
+                Text(
+                    text = alarm.formattedTime,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
     }
 }
 
