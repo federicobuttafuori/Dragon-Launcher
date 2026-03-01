@@ -24,9 +24,18 @@ fun StatusBarBattery(
     element: StatusBarSerializable.Battery
 ) {
     val ctx = LocalContext.current
-    var level by remember { mutableIntStateOf(100) }
+    
+    // Get initial battery level from sticky intent
+    val initialLevel = remember {
+        val intent = ctx.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val lvl = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+        if (lvl >= 0 && scale > 0) (lvl * 100) / scale else 100
+    }
 
-    DisposableEffect(Unit) {
+    var level by remember { mutableIntStateOf(initialLevel) }
+
+    DisposableEffect(ctx) {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val lvl = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
@@ -43,7 +52,11 @@ fun StatusBarBattery(
         )
 
         onDispose {
-            ctx.unregisterReceiver(receiver)
+            try {
+                ctx.unregisterReceiver(receiver)
+            } catch (e: Exception) {
+                // Ignore if already unregistered
+            }
         }
     }
 

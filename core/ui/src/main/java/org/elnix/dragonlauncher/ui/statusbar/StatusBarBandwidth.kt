@@ -4,6 +4,13 @@ import android.annotation.SuppressLint
 import android.net.TrafficStats
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,21 +48,54 @@ fun StatusBarBandwidth(
         }
     }
 
-    val displayText = if (element.merge) {
-        formatSpeed(rxSpeed + txSpeed)
-    } else {
-        "↓${formatSpeed(rxSpeed)} ↑${formatSpeed(txSpeed)}"
-    }
-
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = displayText,
-            style = MaterialTheme.typography.bodySmall
-        )
+        if (element.merge) {
+            Icon(
+                imageVector = Icons.Default.SwapVert,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = LocalContentColor.current
+            )
+            Text(
+                text = formatSpeed(rxSpeed + txSpeed),
+                style = MaterialTheme.typography.bodySmall
+            )
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowDownward,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = LocalContentColor.current
+                )
+                Text(
+                    text = formatSpeed(rxSpeed),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowUpward,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = LocalContentColor.current
+                )
+                Text(
+                    text = formatSpeed(txSpeed),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
     }
 }
 

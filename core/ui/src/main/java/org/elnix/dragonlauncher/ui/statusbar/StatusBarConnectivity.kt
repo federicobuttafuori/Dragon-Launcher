@@ -90,7 +90,7 @@ fun StatusBarConnectivity(
                 )
             }
 
-            if (connectivityState.mobileDataStatus.isNotEmpty() && element.showMobileData) {
+            if (connectivityState.isMobileDataEnabled && element.showMobileData) {
                 Icon(
                     imageVector = Icons.Filled.SignalCellularAlt,
                     contentDescription = connectivityState.mobileDataStatus,
@@ -115,6 +115,7 @@ data class ConnectivityState(
     val isVpnEnabled: Boolean = false,
     val isBluetoothEnabled: Boolean = false,
     val isHotspotEnabled: Boolean = false,
+    val isMobileDataEnabled: Boolean = false,
     val mobileDataStatus: String = ""
 )
 
@@ -122,7 +123,7 @@ private fun readConnectivityState(ctx: Context): ConnectivityState {
     val resolver = ctx.contentResolver
     val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    val mobileDataStatus = getMobileDataStatus(ctx, connectivityManager, resolver)
+    val (mobileDataEnabled, mobileDataStatus) = getMobileDataStatus(ctx, connectivityManager, resolver)
 
     val isVpnEnabled = connectivityManager.allNetworks.any { network ->
         connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
@@ -141,6 +142,7 @@ private fun readConnectivityState(ctx: Context): ConnectivityState {
 
         isBluetoothEnabled = Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0) == 1,
         isHotspotEnabled = Settings.Global.getInt(resolver, "wifi_ap_state", 0) == 13,
+        isMobileDataEnabled = mobileDataEnabled,
         mobileDataStatus = mobileDataStatus
     )
 }
@@ -149,7 +151,7 @@ private fun getMobileDataStatus(
     ctx: Context,
     connectivityManager: ConnectivityManager,
     resolver: android.content.ContentResolver
-): String {
+): Pair<Boolean, String> {
     /*  ─────────────  Mobile data status  ─────────────  */
     // 1. Check if mobile data is enabled (check multiple SIMs)
     val mobileDataEnabled = try {
@@ -160,7 +162,7 @@ private fun getMobileDataStatus(
         true // Default to enabled if unable to access
     }
 
-    if (!mobileDataEnabled) return "Data OFF"
+    if (!mobileDataEnabled) return false to "Data OFF"
 
     // 2. Get active cellular network + signal
     val activeNetwork = connectivityManager.activeNetwork
@@ -189,8 +191,8 @@ private fun getMobileDataStatus(
             false
         }
 
-        return if (isRoaming) "$typeStr (Roaming)" else typeStr
+        return true to (if (isRoaming) "$typeStr (Roaming)" else typeStr)
     }
 
-    return "Data ON"
+    return true to "Data ON"
 }
