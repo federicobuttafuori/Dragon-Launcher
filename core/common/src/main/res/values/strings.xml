@@ -793,5 +793,7 @@
     <string name="show_percentage_desc">Display the battery percentage in plain text</string>
     <string name="set_status_bar_template">Set status bar template (mine) warning clicking this erases your current setup!</string>
     <string name="notch_mode">Mode: Notch (Applies a spacer on the notch)</string>
+    <string name="google_lockdown_warning">"Google has announced that, starting in 2026/2027, all apps on certified Android devices will require the developer to submit personal identity details directly to Google. Since the developers of this app do not agree to this requirement, this app will no longer work on certified Android devices after that time. "</string>
+    <string name="solution">Solution</string>
 
 </resources>

@@ -191,7 +191,6 @@ fun DebugTab(
             DragonColumnGroup {
                 DragonButton(
                     onClick = { onShowWelcome() },
-                    colors = AppObjectsColors.buttonColors(),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
@@ -201,13 +200,23 @@ fun DebugTab(
 
                 DragonButton(
                     onClick = {
-                        scope.launch { PrivateSettingsStore.lastSeenVersionCode.set(ctx, 0) }
+                        scope.launch { PrivateSettingsStore.lastSeenVersionCodeWelcome.set(ctx, 0) }
                     },
-                    colors = AppObjectsColors.buttonColors(),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Show what's new sheet",
+                    )
+                }
+
+                DragonButton(
+                    onClick = {
+                        scope.launch { PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(ctx, 0) }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Show google lockdown warning",
                     )
                 }
             }

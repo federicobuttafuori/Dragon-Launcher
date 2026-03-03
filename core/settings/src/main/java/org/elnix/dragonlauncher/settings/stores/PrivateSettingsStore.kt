@@ -29,8 +29,15 @@ object PrivateSettingsStore : MapSettingsStore() {
         default = true
     )
 
-    val lastSeenVersionCode = Settings.int(
+    val lastSeenVersionCodeWelcome = Settings.int(
         key = "lastSeenVersionCode",
+        dataStoreName = dataStoreName,
+        default = 0,
+        allowedRange = 0..Int.MAX_VALUE
+    )
+
+    val lastSeenVersionCodeGoogleLockdownWarning = Settings.int(
+        key = "lastSeenVersionCodeGoogleLockdownWarning",
         dataStoreName = dataStoreName,
         default = 0,
         allowedRange = 0..Int.MAX_VALUE
@@ -67,7 +74,7 @@ object PrivateSettingsStore : MapSettingsStore() {
         hasSeenWelcome,
         hasInitialized,
         showSetDefaultLauncherBanner,
-        lastSeenVersionCode,
+        lastSeenVersionCodeWelcome,
         lockPinHash,
         lockMethod,
         samsungPreferSecureFolder,

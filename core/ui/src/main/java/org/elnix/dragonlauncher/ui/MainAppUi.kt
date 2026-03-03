@@ -78,12 +78,12 @@ import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.common.utils.loadChangelogs
+import org.elnix.dragonlauncher.common.utils.openUrl
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.enumsui.LockMethod
-
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
-import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
+import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
@@ -97,6 +97,7 @@ import org.elnix.dragonlauncher.ui.actions.launchSwipeAction
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.dialogs.FilePickerDialog
+import org.elnix.dragonlauncher.ui.dialogs.GoogleLockingWarning
 import org.elnix.dragonlauncher.ui.dialogs.PinUnlockDialog
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
@@ -166,7 +167,8 @@ fun MainAppUi(
     val privateSpaceState = appsViewModel.privateSpaceState
 
     // Changelogs system
-    val lastSeenVersionCode by PrivateSettingsStore.lastSeenVersionCode.asState()
+    val lastSeenVersionCodeWelcome by PrivateSettingsStore.lastSeenVersionCodeWelcome.asState()
+    val lastSeenVersionCodeGoogleLockdownWarning by PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.asState()
 
     val currentVersionCode = getVersionCode(ctx)
     var showWhatsNewBottomSheet by remember { mutableStateOf(false) }
@@ -327,9 +329,9 @@ fun MainAppUi(
         pendingAppName = null
     }
 
-    LaunchedEffect(Unit, lastSeenVersionCode, currentRoute) {
+    LaunchedEffect(Unit, lastSeenVersionCodeWelcome, currentRoute) {
         showWhatsNewBottomSheet =
-            lastSeenVersionCode < currentVersionCode && currentRoute != ROUTES.WELCOME
+            lastSeenVersionCodeWelcome < currentVersionCode && currentRoute != ROUTES.WELCOME
     }
 
     DisposableEffect(lifecycleOwner) {
@@ -812,7 +814,7 @@ fun MainAppUi(
             updates = updates
         ) {
             showWhatsNewBottomSheet = false
-            scope.launch { PrivateSettingsStore.lastSeenVersionCode.set(ctx, currentVersionCode) }
+            scope.launch { PrivateSettingsStore.lastSeenVersionCodeWelcome.set(ctx, currentVersionCode) }
         }
     }
 
@@ -895,6 +897,22 @@ fun MainAppUi(
                 }
             }
         )
+    }
+
+
+    if (lastSeenVersionCodeGoogleLockdownWarning < currentVersionCode) {
+        GoogleLockingWarning(
+            onSolution = {
+                ctx.openUrl("https://keepandroidopen.org/")
+                scope.launch {
+                    PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(ctx, currentVersionCode)
+                }
+            }
+        ) {
+            scope.launch {
+                PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(ctx, currentVersionCode)
+            }
+        }
     }
 
     // Private space optional debug info
