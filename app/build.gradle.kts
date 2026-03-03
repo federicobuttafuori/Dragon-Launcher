@@ -1,8 +1,8 @@
+import com.android.build.api.dsl.ApplicationExtension
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
@@ -18,7 +18,12 @@ fun env(name: String): String? =
     System.getenv(name) ?: dotenv.getProperty(name)
 
 
-android {
+kotlin {
+    jvmToolchain(17)
+}
+
+// Configure Android
+extensions.configure<ApplicationExtension> {
     namespace = "org.elnix.dragonlauncher"
     compileSdk {
         version = release(36)
@@ -127,10 +132,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        jvmToolchain(17)
-    }
-
     buildFeatures {
         compose = true
         buildConfig = true
@@ -138,7 +139,9 @@ android {
 
     tasks.register("printVersionName") {
         doLast {
-            val versionName = android.defaultConfig.versionName
+            val androidExt = extensions.getByType<ApplicationExtension>()
+
+            val versionName = androidExt.defaultConfig.versionName
             println("VERSION_NAME=$versionName")
         }
     }

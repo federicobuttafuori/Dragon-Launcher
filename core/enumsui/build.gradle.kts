@@ -1,10 +1,15 @@
+import com.android.build.api.dsl.LibraryExtension
+
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
-android {
+kotlin {
+    jvmToolchain(17)
+}
+
+extensions.configure<LibraryExtension> {
     namespace = "org.elnix.dragonlauncher.enumsui"
     compileSdk {
         version = release(36)
@@ -38,6 +43,7 @@ android {
     }
 
     buildTypes {
+        debug {}
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -49,10 +55,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        jvmToolchain(17)
     }
 
     buildFeatures {
