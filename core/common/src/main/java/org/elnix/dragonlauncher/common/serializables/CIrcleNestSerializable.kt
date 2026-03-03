@@ -36,10 +36,15 @@ data class CircleNest(
     @SerializedName("haptic") val haptic: Map<Int, Int> = emptyMap(),
 
     /**
-     * Haptic feedback, as default for the points in  the circle, separated from the point system
+     * How far you have to be close to the closest point to activate it. If set to 0, the value is infinite
      */
     @SerializedName("minAngleActivation") val minAngleActivation: Map<Int, Int> = emptyMap(),
 
+
+    /**
+     * The nest radius, used to override the default nests radii, if set to null, it uses the default value, otherwise it picks this
+     */
+    @SerializedName("nestRadius") val nestRadius: Int? = null
 ) {
     override fun toString(): String {
         return "Nest N°$id | contains ${dragDistances.size} circles: \n${dragDistances.map { "\n${it.key} to ${it.value}" }}"

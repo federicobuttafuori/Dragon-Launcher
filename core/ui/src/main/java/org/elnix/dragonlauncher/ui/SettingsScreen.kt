@@ -741,7 +741,7 @@ fun SettingsScreen(
                                         imageVector = Icons.Default.ChangeCircle,
                                         contentDescription = null
                                     )
-                                    Text(stringResource(R.string.toggle_drag_distances_editing))
+                                    Text(stringResource(R.string.edit_nest))
                                 },
                                 BurgerAction(
                                     onClick = {

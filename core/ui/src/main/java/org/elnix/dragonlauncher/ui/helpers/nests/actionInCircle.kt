@@ -192,8 +192,10 @@ fun DrawScope.actionsInCircle(
 
                 val newCircles = mutableListOf<UiCircle>()
 
+                val subRadius = nest.nestRadius?.dp?.toPx() ?: subNestDefaultRadius
+
                 nest.dragDistances.filter { it.key != -1 }.forEach { (index, _) ->
-                    val radius = (subNestDefaultRadius / depth) * circlesWidthIncrement * (index + 1)
+                    val radius = (subRadius / depth) * circlesWidthIncrement * (index + 1)
                     newCircles.add(
                         UiCircle(index, radius)
                     )

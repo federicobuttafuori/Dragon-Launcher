@@ -23,23 +23,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.base.ktx.px
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.utils.UiCircle
+import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.vibrate
 import org.elnix.dragonlauncher.enumsui.NestEditMode
 import org.elnix.dragonlauncher.enumsui.NestEditMode.DRAG
 import org.elnix.dragonlauncher.enumsui.NestEditMode.HAPTIC
 import org.elnix.dragonlauncher.enumsui.NestEditMode.MIN_ANGLE
+import org.elnix.dragonlauncher.enumsui.NestEditMode.RADIUS
+import org.elnix.dragonlauncher.settings.stores.SwipeMapSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.components.generic.ActionRow
+import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.defaultDragDistance
 import org.elnix.dragonlauncher.ui.defaultHapticFeedback
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
@@ -66,6 +71,9 @@ fun NestEditingScreen(
         backgroundColor = MaterialTheme.colorScheme.background
     )
 
+    val subNestDefaultRadius by SwipeMapSettingsStore.subNestDefaultRadius.asState()
+    var tempRadius by remember { mutableStateOf(currentNest.nestRadius) }
+
 
     val dragDistancesState = remember(currentNest.id) {
         mutableStateMapOf<Int, Int>().apply {
@@ -85,10 +93,17 @@ fun NestEditingScreen(
         }
     }
 
-    val circles = dragDistancesState.map { (id, radius) ->
+    val circlesRealSize = dragDistancesState.map { (id, radius) ->
         UiCircle(
             id = id,
             radius = radius.toFloat()
+        )
+    }
+
+    val circlesPreview = dragDistancesState.map { (id, radius) ->
+        UiCircle(
+            id = id,
+            radius = (tempRadius ?: subNestDefaultRadius).dp.px
         )
     }
 
@@ -150,11 +165,26 @@ fun NestEditingScreen(
                     .fillMaxSize()
                     .weight(1f)
             ) {
+
+                circlesSettingsOverlay(
+                    drawParams = drawParams,
+                    center = Offset(
+                        x = 5.dp.toPx(),
+                        y = 25.dp.toPx()
+                    ),
+                    depth = 1,
+                    circles = circlesPreview,
+                    selectedPoint = null,
+                    nestId = nestId,
+                    preventBgErasing = true
+                )
+
+
                 circlesSettingsOverlay(
                     drawParams = drawParams,
                     center = center,
                     depth = 1,
-                    circles = circles,
+                    circles = circlesRealSize,
                     selectedPoint = null,
                     nestId = nestId,
                     preventBgErasing = true
@@ -162,7 +192,7 @@ fun NestEditingScreen(
 
 
                 // Show the min angle to activate
-                circles.forEach { circle ->
+                circlesRealSize.forEach { circle ->
                     val arcRadius = circle.radius + 10
 
                     val rect = Rect(
@@ -281,6 +311,30 @@ fun NestEditingScreen(
                                     minAngleState[index] = newValue
                                 }
                             }
+                    }
+
+                    RADIUS -> {
+                        SliderWithLabel(
+                            label = stringResource(R.string.nest_radius),
+                            value = tempRadius ?: subNestDefaultRadius,
+                            valueRange = 0..50,
+                            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                            onReset = {
+                                pendingNestUpdate = nests.map {
+                                    if (it.id == nestId) it.copy(nestRadius = null)
+                                    else it
+                                }
+                                tempRadius = subNestDefaultRadius
+                            },
+                            onDragStateChange = { isDragging ->
+                                if (!isDragging) {
+                                    pendingNestUpdate = nests.map {
+                                        if (it.id == nestId) it.copy(nestRadius = tempRadius)
+                                        else it
+                                    }
+                                }
+                            }
+                        ) { newValue -> tempRadius = newValue }
                     }
                 }
             }

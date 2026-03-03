@@ -2,6 +2,7 @@ package org.elnix.dragonlauncher.enumsui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.TextRotationAngleup
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -11,5 +12,6 @@ enum class NestEditMode(
 ) {
     DRAG(Icons.Default.DragIndicator),
     HAPTIC(Icons.Default.Vibration),
-    MIN_ANGLE(Icons.Default.TextRotationAngleup)
+    MIN_ANGLE(Icons.Default.TextRotationAngleup),
+    RADIUS(Icons.Default.Radar)
 }
