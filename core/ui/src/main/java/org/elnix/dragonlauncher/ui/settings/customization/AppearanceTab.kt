@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Polyline
 import androidx.compose.material.icons.filled.SignalCellular4Bar
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Wallpaper
@@ -146,6 +147,13 @@ fun AppearanceTab(
                 title = stringResource(R.string.widgets_floating_apps),
                 icon = Icons.Default.Widgets
             ) { navController.navigate(SETTINGS.FLOATING_APPS) }
+        }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.angle_line),
+                icon = Icons.Default.Polyline
+            ) { navController.navigate(SETTINGS.ANGLE_LINE_EDIT) }
         }
 
         item { TextDivider(stringResource(R.string.app_display)) }

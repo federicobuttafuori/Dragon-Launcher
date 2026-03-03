@@ -798,5 +798,7 @@
     <string name="dismiss">Dismiss</string>
     <string name="nest_radius">Nest Radius</string>
     <string name="edit_nest">Edit nest</string>
+    <string name="angle_line">Angle Line</string>
+    <string name="angle_line_help">Customize the appearance of the line that appear when you drag on the main screen</string>
 
 </resources>

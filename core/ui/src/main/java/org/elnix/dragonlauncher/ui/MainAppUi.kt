@@ -121,8 +121,10 @@ import org.elnix.dragonlauncher.ui.remembers.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
+import org.elnix.dragonlauncher.ui.settings.customization.AngleLineTab
 import org.elnix.dragonlauncher.ui.settings.customization.AppearanceTab
 import org.elnix.dragonlauncher.ui.settings.customization.BehaviorTab
+import org.elnix.dragonlauncher.ui.settings.customization.ColorSelectorTab
 import org.elnix.dragonlauncher.ui.settings.customization.DrawerTab
 import org.elnix.dragonlauncher.ui.settings.customization.FloatingAppsTab
 import org.elnix.dragonlauncher.ui.settings.customization.IconPackTab
@@ -130,7 +132,6 @@ import org.elnix.dragonlauncher.ui.settings.customization.NestEditingScreen
 import org.elnix.dragonlauncher.ui.settings.customization.StatusBarTab
 import org.elnix.dragonlauncher.ui.settings.customization.ThemesTab
 import org.elnix.dragonlauncher.ui.settings.customization.WallpaperTab
-import org.elnix.dragonlauncher.ui.settings.customization.colors.ColorSelectorTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.debug.LogsTab
 import org.elnix.dragonlauncher.ui.settings.debug.SettingsDebugTab
@@ -733,6 +734,7 @@ fun MainAppUi(
                     noAnimComposable(SETTINGS.LOGS) { LogsTab(::goDebug) }
                     noAnimComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::goDebug) }
                     noAnimComposable(SETTINGS.LANGUAGE) { LanguageTab(::goAdvSettingsRoot) }
+                    noAnimComposable(SETTINGS.ANGLE_LINE_EDIT) { AngleLineTab(::goAppearance) }
                     noAnimComposable(SETTINGS.BACKUP) { BackupTab(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
 

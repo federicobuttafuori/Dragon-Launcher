@@ -64,7 +64,7 @@ fun MainScreenOverlay(
     nestId: Int,
     isDragging: Boolean,
     surface: IntSize,
-    onLaunch: (SwipePointSerializable) -> Unit
+    onLaunch: ((SwipePointSerializable) -> Unit)?
 ) {
     val ctx = LocalContext.current
     val nests = LocalNests.current
@@ -254,7 +254,7 @@ fun MainScreenOverlay(
     LaunchedEffect(isDragging) {
         if (!isDragging) {
             if (currentAction != null) {
-                onLaunch(currentAction!!)
+                onLaunch?.invoke(currentAction!!)
             }
             hoveredPoint = null
             currentAction = null

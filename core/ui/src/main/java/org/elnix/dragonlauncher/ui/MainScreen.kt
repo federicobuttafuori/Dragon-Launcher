@@ -342,7 +342,7 @@ fun MainScreen(
                             height = (floatingAppObject.spanY * cellSizePx).toDp
                         )
                         .graphicsLayer {
-                            rotationZ = floatingAppObject.angle.toFloat()
+                            rotationZ = floatingAppObject.angle
                             transformOrigin = TransformOrigin.Center
                         },
                     onLaunchAction = {

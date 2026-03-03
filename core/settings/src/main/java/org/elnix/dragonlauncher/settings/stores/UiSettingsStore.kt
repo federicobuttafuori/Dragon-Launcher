@@ -155,6 +155,30 @@ object UiSettingsStore : MapSettingsStore() {
         allowedRange = 1..10
     )
 
+    val lineJson = Settings.string(
+        key = "lineJson",
+        dataStoreName = dataStoreName,
+        default = ""
+    )
+
+    val angleLineJson = Settings.string(
+        key = "angleLineJson",
+        dataStoreName = dataStoreName,
+        default = ""
+    )
+
+    val startLineJson = Settings.string(
+        key = "startLineJson",
+        dataStoreName = dataStoreName,
+        default = ""
+    )
+
+    val endLineJson = Settings.string(
+        key = "endLineJson",
+        dataStoreName = dataStoreName,
+        default = ""
+    )
+
     override val ALL: List<BaseSettingObject<*,*>> = listOf(
         rgbLoading,
         rgbLine,
@@ -178,6 +202,8 @@ object UiSettingsStore : MapSettingsStore() {
         wallpaperDimMainScreen,
         wallpaperDimDrawerScreen,
         promptForShortcutsWhenAddingApp,
-        maxNestsDepth
+        maxNestsDepth,
+        angleLineJson,
+        lineJson, angleLineJson, startLineJson, endLineJson
     )
 }
