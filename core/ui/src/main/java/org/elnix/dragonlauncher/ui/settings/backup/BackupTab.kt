@@ -294,7 +294,8 @@ fun BackupTab(onBack: () -> Unit) {
 
                             BackupActions.REMOVE -> {
                                 scope.launch {
-                                    BackupSettingsStore.autoBackupUri.set(ctx, null)
+                                    BackupSettingsStore.autoBackupUri.reset(ctx)
+                                    BackupSettingsStore.autoBackupEnabled.reset(ctx)
                                 }
                             }
 
