@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.settings
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
@@ -13,6 +12,7 @@ import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.IconShapeGson
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
+import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 
 /**
@@ -57,9 +57,7 @@ object Settings {
             default = default,
             preferenceKey = booleanPreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getBooleanStrict(raw, default)
-            }
+            decode = { raw -> getBooleanStrict(raw, default) }
         )
 
     fun int(
@@ -74,9 +72,7 @@ object Settings {
             default = default,
             preferenceKey = intPreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getIntStrict(raw, default).coerceIn(allowedRange)
-            }
+            decode = { raw -> getIntStrict(raw, default).coerceIn(allowedRange) }
         )
 
 
@@ -92,9 +88,7 @@ object Settings {
             default = default,
             preferenceKey = floatPreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getFloatStrict(raw, default).coerceIn(allowedRange)
-            }
+            decode = { raw -> getFloatStrict(raw, default).coerceIn(allowedRange) }
         )
 
     fun long(
@@ -109,9 +103,7 @@ object Settings {
             default = default,
             preferenceKey = longPreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getLongStrict(raw, default).coerceIn(allowedRange)
-            }
+            decode = { raw -> getLongStrict(raw, default).coerceIn(allowedRange) }
         )
 
     fun double(
@@ -126,9 +118,7 @@ object Settings {
             default = default,
             preferenceKey = doublePreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getDoubleStrict(raw, default).coerceIn(allowedRange)
-            }
+            decode = { raw -> getDoubleStrict(raw, default).coerceIn(allowedRange) }
         )
 
 
@@ -143,9 +133,7 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getStringStrict(raw, default)
-            }
+            decode = { raw -> getStringStrict(raw, default) }
         )
 
     fun stringSet(
@@ -159,9 +147,7 @@ object Settings {
             default = default,
             preferenceKey = stringSetPreferencesKey(key),
             encode = { it },
-            decode = { raw ->
-                getStringSetStrict(raw, default)
-            }
+            decode = { raw -> getStringSetStrict(raw, default) }
         )
 
     fun <E : Enum<E>> enum(
@@ -176,32 +162,21 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { it.name },
-            decode = { raw ->
-                getEnumStrict(raw, default, enumClass)
-
-            }
+            decode = { raw -> getEnumStrict(raw, default, enumClass) }
         )
 
     fun color(
         key: String,
         dataStoreName: DataStoreName,
         default: Color
-    ): BaseSettingObject<Color, Int> =
+    ): BaseSettingObject<Color, String> =
         BaseSettingObject(
             key = key,
             dataStoreName = dataStoreName,
             default = default,
-            preferenceKey = intPreferencesKey(key),
-            encode = {
-                val a = it.toArgb()
-//                logD(SETTINGS_TAG, "Encoded $it -> $a")
-                a
-            },
-            decode = { raw ->
-                val a = getColorStrict(raw, default)
-//                logD(SETTINGS_TAG, "key: $key; Decoded $raw -> $a (${a.toHexWithAlpha()})")
-                a
-            }
+            preferenceKey = stringPreferencesKey(key),
+            encode = { it.toHexWithAlpha(false) },
+            decode = { raw -> getColorStrict(raw, default) }
         )
 
     fun swipeAction(
@@ -214,17 +189,8 @@ object Settings {
             dataStoreName = dataStoreName,
             default = default,
             preferenceKey = stringPreferencesKey(key),
-            encode = { raw ->
-
-                val encoded = SwipeJson.encodeAction(raw)
-//                logD(SETTINGS_TAG, "Encoded $raw -> $a")
-                encoded
-             },
-            decode = { raw ->
-                val decoded = getSwipeActionSerializableStrict(raw, default)
-//                logD(SETTINGS_TAG, "Decoded $raw -> $a")
-                decoded
-            }
+            encode = { raw -> SwipeJson.encodeAction(raw) },
+            decode = { raw -> getSwipeActionSerializableStrict(raw, default) }
         )
 
 
@@ -238,16 +204,8 @@ object Settings {
             dataStoreName = dataStoreName,
             default = default,
             preferenceKey = stringPreferencesKey(key),
-            encode = { value ->
-                val encoded = IconShapeGson.encode(value)
-//                logD(SETTINGS_TAG, "Encoded IconShape $value -> $encoded")
-                encoded
-            },
-            decode = { raw ->
-                val decoded = IconShapeGson.decode(raw, default)
-//                logD(SETTINGS_TAG, "Decoded IconShape $raw -> $decoded")
-                decoded
-            }
+            encode = { value -> IconShapeGson.encode(value) },
+            decode = { raw -> IconShapeGson.decode(raw, default) }
         )
 }
 
