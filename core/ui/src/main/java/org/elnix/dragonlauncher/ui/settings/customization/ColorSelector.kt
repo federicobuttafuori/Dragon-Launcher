@@ -942,7 +942,7 @@ fun ColorSelectorTab(
 }
 
 private data class ColorEdit(
-    val setting: BaseSettingObject<Color, Int>,
+    val setting: BaseSettingObject<Color, String>,
     val label: String,
     val defaultColor: Color
 )

@@ -393,7 +393,7 @@ object ColorSettingsStore : MapSettingsStore() {
 
     /* ───────────── Registry ───────────── */
 
-    override val ALL: List<BaseSettingObject<Color, Int>>
+    override val ALL: List<BaseSettingObject<Color, String>>
         get() = listOf(
             this.primaryColor,
             this.onPrimaryColor,

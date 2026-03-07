@@ -12,7 +12,7 @@ import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 
 @Composable
 fun SettingsColorPicker(
-    settingObject: BaseSettingObject<Color, Int>,
+    settingObject: BaseSettingObject<Color, String>,
     defaultColor: Color,
     label: String
 ) {
