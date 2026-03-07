@@ -10,6 +10,7 @@ import androidx.glance.LocalContext
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.RowScope
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
@@ -20,7 +21,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun GlanceStatusBarItem(
+fun RowScope.GlanceStatusBarItem(
     element: StatusBarSerializable,
     modifier: GlanceModifier = GlanceModifier
 ) {
@@ -32,7 +33,7 @@ fun GlanceStatusBarItem(
             if (element.width == -1) {
                 Spacer(modifier = GlanceModifier.defaultWeight())
             } else {
-                val w = if (element.width < 0) 0 else element.width
+                val w = if (element.width < 0) 1 else element.width
                 Spacer(modifier = GlanceModifier.width(w.dp))
             }
         }
