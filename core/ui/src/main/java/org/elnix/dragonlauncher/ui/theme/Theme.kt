@@ -86,6 +86,15 @@ fun DragonLauncherTheme(
         "SansSerif" -> FontFamily.SansSerif
         "Monospace" -> FontFamily.Monospace
         "Cursive" -> FontFamily.Cursive
+        "Inter" -> FontFamily(Font(R.font.inter))
+        "Montserrat" -> FontFamily(Font(R.font.montserrat))
+        "Outfit" -> FontFamily(Font(R.font.outfit))
+        "PoiretOne" -> FontFamily(Font(R.font.poiretone))
+        "Quicksand" -> FontFamily(Font(R.font.quicksand))
+        "Raleway" -> FontFamily(Font(R.font.raleway))
+        "RobotoCondensed" -> FontFamily(Font(R.font.robotocondensed))
+        "SpaceGrotesk" -> FontFamily(Font(R.font.spacegrotesk))
+        "Urbanist" -> FontFamily(Font(R.font.urbanist))
         else -> FontFamily.Default
     }
 

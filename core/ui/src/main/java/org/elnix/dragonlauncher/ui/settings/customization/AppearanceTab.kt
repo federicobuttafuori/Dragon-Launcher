@@ -441,7 +441,17 @@ fun AppearanceTab(
                             "SansSerif",
                             "Serif",
                             "Monospace",
-                            "Cursive"
+                            "Cursive",
+                            "Inter",
+                            "Montserrat",
+                            "Outfit",
+                            "PoiretOne",
+                            "Quicksand",
+                            "Rajdhani",
+                            "Raleway",
+                            "RobotoCondensed",
+                            "SpaceGrotesk",
+                            "Urbanist"
                         ).forEach { font ->
                             SwitchRow(
                                 text = font,
