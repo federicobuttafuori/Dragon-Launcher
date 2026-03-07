@@ -21,7 +21,7 @@ fun ThemeJsonPopup(
     json: JSONObject,
     onDismiss: () -> Unit
 ) {
-    val themeString: String = json.toString(4)
+    val themeString: String = json.toString(2)
 
     CustomAlertDialog(
         modifier = Modifier.padding(15.dp),
