@@ -213,17 +213,6 @@ fun MainScreen(
         )
     }
 
-//
-//    LaunchedEffect(Unit) {
-//        appLifecycleViewModel.homeEvents.collect {
-//            // HOME while already on MAIN
-//            // Decide locally what it means
-//
-//            if (homeAction != null) {
-//                launchAction(dummySwipePoint(homeAction))
-//            }
-//        }
-//    }
 
     /**
      * 1. Tests if the current nest is the main, if not, go back one nest
