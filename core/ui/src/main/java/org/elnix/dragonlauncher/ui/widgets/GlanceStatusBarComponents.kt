@@ -7,12 +7,8 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
 import androidx.glance.layout.RowScope
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.padding
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.width
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -50,10 +46,10 @@ fun RowScope.GlanceStatusBarItem(
 
 @Composable
 private fun GlanceTimeItem(element: StatusBarSerializable.Time, modifier: GlanceModifier) {
-    val pattern = if (element.formatter.isEmpty()) "HH:mm" else element.formatter
+    val pattern = element.formatter.ifEmpty { "HH:mm" }
     val timeStr = try {
         LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern))
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
     }
     Text(text = timeStr, style = TextStyle(color = GlanceTheme.colors.onSurface), modifier = modifier)
@@ -61,10 +57,10 @@ private fun GlanceTimeItem(element: StatusBarSerializable.Time, modifier: Glance
 
 @Composable
 private fun GlanceDateItem(element: StatusBarSerializable.Date, modifier: GlanceModifier) {
-    val pattern = if (element.formatter.isEmpty()) "MMM dd" else element.formatter
+    val pattern = element.formatter.ifEmpty { "MMM dd" }
     val dateStr = try {
         LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern))
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM dd"))
     }
     Text(text = dateStr, style = TextStyle(color = GlanceTheme.colors.onSurface), modifier = modifier)
@@ -75,7 +71,7 @@ private fun GlanceBatteryItem(element: StatusBarSerializable.Battery, modifier: 
     val context = LocalContext.current
     val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
     val level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-    
+
     if (element.showPercentage) {
         Text(text = "$level%", style = TextStyle(color = GlanceTheme.colors.onSurface), modifier = modifier)
     }
