@@ -9,10 +9,10 @@ object DragonLogManager {
 
     fun init(ctx: android.content.Context) {
         // Arbre pour Logcat (uniquement en debug)
-        if (android.util.Log.isLoggable("DragonLauncher", Log.DEBUG)) {
+        if (Log.isLoggable("DragonLauncher", Log.DEBUG)) {
             Timber.plant(Timber.DebugTree())
         }
-        
+
         // Initialisation de l'arbre pour les fichiers
         fileTree = FileLoggingTree(ctx)
         updateLoggingState()
@@ -38,11 +38,11 @@ object DragonLogManager {
         }
     }
 
-    fun getAllLogFiles(context: android.content.Context): List<java.io.File> {
+    fun getAllLogFiles(): List<java.io.File> {
         return fileTree?.getAllLogFiles() ?: emptyList()
     }
 
-    fun clearLogs(ctx: android.content.Context) {
+    fun clearLogs() {
         fileTree?.clearAllLogs()
     }
 

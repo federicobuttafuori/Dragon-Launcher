@@ -22,19 +22,39 @@ inline fun Any.logE(tag: String = this::class.java.simpleName, throwable: Throwa
     Timber.tag(tag).e(throwable, message())
 }
 
-// Simple versions for static strings
+
+
+// Old version, kept for compatibility until all calls are removed from code
+
+@Deprecated(
+    message = "Use modern version with lambda",
+    replaceWith = ReplaceWith("logD(tag) { message }")
+)
 fun Any.logD(tag: String = this::class.java.simpleName, message: String) {
     Timber.tag(tag).d(message)
 }
 
-fun Any.logI(tag: String = this::class.java.simpleName, message: String) {
+
+@Deprecated(
+    message = "Use modern version with lambda",
+    replaceWith = ReplaceWith("logI(tag) { message }")
+)fun Any.logI(tag: String = this::class.java.simpleName, message: String) {
     Timber.tag(tag).i(message)
 }
 
+
+@Deprecated(
+    message = "Use modern version with lambda",
+    replaceWith = ReplaceWith("logW(tag) { message }")
+)
 fun Any.logW(tag: String = this::class.java.simpleName, message: String) {
     Timber.tag(tag).w(message)
 }
 
+@Deprecated(
+    message = "Use modern version with lambda",
+    replaceWith = ReplaceWith("logE(tag) { message }")
+)
 fun Any.logE(tag: String = this::class.java.simpleName, message: String, throwable: Throwable? = null) {
     Timber.tag(tag).e(throwable, message)
 }
