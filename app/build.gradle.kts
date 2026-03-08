@@ -203,9 +203,17 @@ tasks.register("downloadExtensionsRegistry") {
     doLast {
         println("Downloading extensions registry from $registryUrl...")
         outputFile.parentFile.mkdirs()
-        URI(registryUrl).toURL().openStream().use { input: InputStream ->
-            outputFile.outputStream().use { output: OutputStream ->
-                input.copyTo(output)
+        try {
+            URI(registryUrl).toURL().openStream().use { input: InputStream ->
+                outputFile.outputStream().use { output: OutputStream ->
+                    input.copyTo(output)
+                }
+            }
+        } catch (e: Exception) {
+            println("WARNING: Failed to download extensions registry: ${e.message}")
+            // Create an empty registry if download fails to avoid runtime errors
+            if (!outputFile.exists()) {
+                outputFile.writeText("{\"extensions\": []}")
             }
         }
     }

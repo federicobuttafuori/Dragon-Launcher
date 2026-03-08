@@ -33,6 +33,7 @@ import org.elnix.dragonlauncher.ui.components.ExpandableSection
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import java.util.Locale
 
 @Composable
@@ -45,7 +46,7 @@ fun ExtensionsTab(
 
     LaunchedEffect(Unit) {
         val registry = loadExtensionRegistry(context)
-        extensions = registry?.extensions ?: emptyList()
+        extensions = registry ?: emptyList()
         isLoading = false
     }
 
@@ -99,7 +100,6 @@ private fun ManualInstallSection() {
     )
 
     DragonColumnGroup(
-        title = stringResource(R.string.extension_manual_install_title),
         modifier = Modifier.padding(16.dp)
     ) {
         Column(
@@ -107,13 +107,19 @@ private fun ManualInstallSection() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
+                text = stringResource(R.string.extension_manual_install_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
                 text = stringResource(R.string.extension_manual_install_desc),
                 style = MaterialTheme.typography.bodySmall
             )
             DragonButton(
-                onClick = { launcher.launch(arrayOf("application/vnd.android.package-archive")) },
-                text = stringResource(R.string.select_apk)
-            )
+                onClick = { launcher.launch(arrayOf("application/vnd.android.package-archive")) }
+            ) {
+                Text(stringResource(R.string.select_apk))
+            }
         }
     }
 }
@@ -125,14 +131,15 @@ private fun ExtensionItem(extension: ExtensionModel) {
     val description = extension.description[currentLanguage] ?: extension.description["en"] ?: ""
     
     var isInstalled by remember { mutableStateOf(false) }
+    val sectionState = rememberExpandableSection(extension.name)
 
     LaunchedEffect(Unit) {
-        isInstalled = ExtensionManager.isExtensionInstalled(context, extension.packageName)
+        val pkg = extension.packageName ?: extension.id
+        isInstalled = ExtensionManager.isExtensionInstalled(context, pkg)
     }
 
     ExpandableSection(
-        title = extension.name,
-        modifier = Modifier.fillMaxWidth()
+        state = sectionState
     ) {
         Column(
             modifier = Modifier
@@ -174,13 +181,15 @@ private fun ExtensionItem(extension: ExtensionModel) {
                             ExtensionManager.installExtension(context, extension)
                         } else {
                             // Uninstall logic (via Intent)
+                            val pkg = extension.packageName ?: extension.id
                             val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                .apply { data = android.net.Uri.parse("package:${extension.packageName}") }
+                                .apply { data = android.net.Uri.parse("package:$pkg") }
                             context.startActivity(intent)
                         }
                     },
-                    text = if (isInstalled) stringResource(R.string.uninstall) else stringResource(R.string.install),
-                )
+                ) {
+                    Text(if (isInstalled) stringResource(R.string.uninstall) else stringResource(R.string.install))
+                }
             }
         }
     }

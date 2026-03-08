@@ -19,7 +19,6 @@
     <string name="extensions">Extensions</string>
     <string name="extensions_description">Téléchargez et gérez des fonctionnalités supplémentaires pour Dragon Launcher.</string>
     <string name="install">Installer</string>
-    <string name="uninstall">Désinstaller</string>
     <string name="permissions">Permissions</string>
     <string name="no_extensions_found">Aucune extension trouvée dans le registre.</string>
     <string name="extension_manual_install_title">Installation Manuelle</string>

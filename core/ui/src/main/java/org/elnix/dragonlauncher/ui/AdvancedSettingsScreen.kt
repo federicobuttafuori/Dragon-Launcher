@@ -231,6 +231,14 @@ fun AdvancedSettingsScreen(
         }
 
         item {
+            SettingItemWithExternalOpen(
+                title = stringResource(R.string.extensions),
+                icon = Icons.Default.Extension,
+                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher-Extensions") }
+            ) { navController.navigate(SETTINGS.EXTENSIONS) }
+        }
+
+        item {
             SettingsItem(
                 title = stringResource(R.string.wellbeing),
                 icon = Icons.Default.SelfImprovement
@@ -385,16 +393,6 @@ fun AdvancedSettingsScreen(
                 icon = Icons.AutoMirrored.Filled.Notes,
                 onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") }
             ) { navController.navigate(SETTINGS.CHANGELOGS) }
-
-        }
-
-        item {
-
-            SettingItemWithExternalOpen(
-                title = stringResource(R.string.extensions),
-                icon = Icons.Default.Extension,
-                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher-Extensions") }
-            ) { navController.navigate(SETTINGS.EXTENSIONS) }
 
         }
 
