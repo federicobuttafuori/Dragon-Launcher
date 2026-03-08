@@ -536,79 +536,11 @@ fun AdvancedSettingsScreen(
                 val infoStyle = MaterialTheme.typography.labelSmall
                 val infoColor = MaterialTheme.colorScheme.onBackground.alphaMultiplier(0.7f)
 
-                val density = LocalDensity.current
-                val windowInfo = LocalWindowInfo.current
-                val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                val memInfo = ActivityManager.MemoryInfo()
-                am.getMemoryInfo(memInfo)
-
-                val currentLauncher = detectSystemLauncher(ctx)
-                val isDefault = ctx.isDefaultLauncher
-
-                val deviceDetails = buildString {
-                    appendLine("System: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.PRODUCT})")
-                    appendLine("OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
-                    if (Build.VERSION.SECURITY_PATCH.isNotEmpty()) {
-                        appendLine("Security Patch: ${Build.VERSION.SECURITY_PATCH}")
-                    }
-                    appendLine("Arch: ${Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"}")
-                    appendLine("Display: ${windowInfo.containerSize.width.dp}x${windowInfo.containerSize.height.dp}dp (${density.density} dpi)")
-                    appendLine(
-                        "RAM: %.1fGB used / %.1fGB total (%d%% available)".format(
-                            (memInfo.totalMem - memInfo.availMem) / 1024.0 / 1024 / 1024,
-                            memInfo.totalMem / 1024.0 / 1024 / 1024,
-                            memInfo.availMem * 100 / memInfo.totalMem
-                        )
-                    )
-                    appendLine("Default Launcher: ${if (isDefault) "Yes" else "No ($currentLauncher)"}")
-                    appendLine("App version: $versionName ($versionCode)")
-                    
-                    val extensions = listOf(
-                        "org.elnix.dragonlauncher.extension.internet" to "Internet",
-                        "org.elnix.dragonlauncher.extension.shizuku" to "Shizuku"
-                    ).mapNotNull { (pkg, name) ->
-                        if (ExtensionManager.isExtensionInstalled(ctx, pkg)) name else null
-                    }
-                    if (extensions.isNotEmpty()) {
-                        appendLine("Extensions: ${extensions.joinToString(", ")}")
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Device Information",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-
-                    Spacer(Modifier.width(8.dp))
-
-                    DragonIconButton(
-                        onClick = {
-                            ctx.copyToClipboard(deviceDetails)
-                            ctx.showToast("Device details copied to clipboard")
-                        },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy device info",
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
                 val debugModeAlreadyEnabledText = stringResource(R.string.debug_mode_already_enabled)
                 val deviceInfoCopiedToClipboard = stringResource(R.string.device_info_copied_to_clipboard)
 
                 Text(
-                    text = deviceDetails,
+                    text = "Dragon Launcher $versionName ($versionCode)",
                     style = infoStyle,
                     textAlign = TextAlign.Center,
                     color = infoColor,

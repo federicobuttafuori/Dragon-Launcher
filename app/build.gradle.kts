@@ -194,6 +194,7 @@ tasks.register<Copy>("copyChangelogsToAssets") {
 // Download the extensions registry from GitHub
 tasks.register("downloadExtensionsRegistry") {
     description = "Downloads the extensions registry JSON from GitHub"
+    outputs.upToDateWhen { false } // Ignore cache for this task
     val registryUrl = "https://raw.githubusercontent.com/Elnix90/Dragon-Launcher-Extensions/main/extensions-registry.json"
     val outputFile = file("src/main/assets/extensions-registry.json")
 
