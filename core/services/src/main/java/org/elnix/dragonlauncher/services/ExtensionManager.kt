@@ -2,6 +2,7 @@ package org.elnix.dragonlauncher.services
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -9,6 +10,7 @@ import org.elnix.dragonlauncher.common.serializables.ExtensionModel
 import org.elnix.dragonlauncher.common.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.common.utils.openUrl
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 
 object ExtensionManager {
     private const val INTERNET_EXTENSION_PKG = "org.elnix.dragonlauncher.extension.internet"
@@ -63,12 +65,32 @@ object ExtensionManager {
         val pmCompat = PackageManagerCompat(context.packageManager, context)
         Log.d("ExtensionManager", "Checking extension installed for: $packageNameOrId")
 
+        val disableSigCheck = kotlinx.coroutines.runBlocking {
+            DebugSettingsStore.disableExtensionSignatureCheck.get(context)
+        }
+
         // 1. Direct check with provided packageName or ID (The correct way)
         try {
-            if (pmCompat.isPackageInstalled(packageNameOrId)) {
-                Log.d("ExtensionManager", "Direct package present: $packageNameOrId")
-                return true
+            val pInfo = context.packageManager.getPackageInfo(packageNameOrId, 0)
+            
+            // Signature check
+            if (!disableSigCheck) {
+                @Suppress("DEPRECATION")
+                val myPkgInfo = context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_SIGNATURES)
+                @Suppress("DEPRECATION")
+                val targetPkgInfo = context.packageManager.getPackageInfo(packageNameOrId, PackageManager.GET_SIGNATURES)
+                
+                val mySignatures = myPkgInfo.signatures
+                val targetSignatures = targetPkgInfo.signatures
+                
+                if (mySignatures.firstOrNull()?.toCharsString() != targetSignatures.firstOrNull()?.toCharsString()) {
+                    Log.w("ExtensionManager", "Signature mismatch for $packageNameOrId! Blocking detection. Enable 'Disable extension signature check' in debug to bypass.")
+                    return false
+                }
             }
+
+            Log.d("ExtensionManager", "Direct package present: $packageNameOrId")
+            return true
         } catch (e: Exception) {
             // ignore
         }

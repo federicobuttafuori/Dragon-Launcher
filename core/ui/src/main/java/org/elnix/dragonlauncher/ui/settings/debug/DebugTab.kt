@@ -87,6 +87,10 @@ fun DebugTab(
     val debugInfosSectionState = rememberExpandableSection(stringResource(R.string.debug_infos))
     val packageSearchSectionState = rememberExpandableSection("Package Search")
     val storeResetSectionState = rememberExpandableSection(stringResource(R.string.store_reset))
+    val dangerousActionsSectionState = rememberExpandableSection("Dangerous Actions")
+    val testOverlaysSectionState = rememberExpandableSection("Test Overlays")
+    val accessibilitySectionState = rememberExpandableSection("Accessibility & System")
+    val uiDebugSectionState = rememberExpandableSection("UI & Flow Debug")
 
     var packageQuery by remember { mutableStateOf("") }
     var packageResult by remember { mutableStateOf<String?>(null) }
@@ -113,6 +117,14 @@ fun DebugTab(
                 scope.launch { DebugSettingsStore.debugEnabled.set(ctx, it) }
                 navController.popBackStack()
             }
+        }
+
+        item {
+            SettingsSwitchRow(
+                setting = DebugSettingsStore.disableExtensionSignatureCheck,
+                title = "Disable extension signature check",
+                description = "Allow extensions not signed with the official key (DANGEROUS)"
+            )
         }
 
         item { TextDivider("Debug things") }
