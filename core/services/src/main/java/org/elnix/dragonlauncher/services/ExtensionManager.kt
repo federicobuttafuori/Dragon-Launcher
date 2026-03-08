@@ -34,7 +34,31 @@ object ExtensionManager {
         }
     }
 
+    fun installApk(context: Context, uri: Uri) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/vnd.android.package-archive")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            context.showToast("Failed to install APK: ${e.message}")
+        }
+    }
+
     fun isExtensionInstalled(context: Context, packageName: String): Boolean {
-        return PackageManagerCompat(context.packageManager, context).isPackageInstalled(packageName)
+        val pmCompat = PackageManagerCompat(context.packageManager, context)
+        
+        // 1. Direct check with provided packageName
+        if (pmCompat.isPackageInstalled(packageName)) return true
+        
+        // 2. Fallback: Scan for any package containing "dragon.launcher" that matches our extension
+        // This is useful if the packageName in the registry is slightly off or if we want to be more flexible
+        return try {
+            val installedPackages = context.packageManager.getInstalledPackages(0)
+            installedPackages.any { it.packageName.contains("dragon.launcher") && it.packageName.contains(packageName.split(".").last()) }
+        } catch (e: Exception) {
+            false
+        }
     }
 }

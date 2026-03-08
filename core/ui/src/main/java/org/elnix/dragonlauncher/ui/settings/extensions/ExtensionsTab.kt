@@ -92,9 +92,7 @@ private fun ManualInstallSection() {
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri ->
             uri?.let {
-                // Here we would handle the APK installation from URI
-                // For now, show info
-                context.showToast("APK selected: ${it.path}")
+                ExtensionManager.installApk(context, it)
             }
         }
     )

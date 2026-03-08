@@ -69,6 +69,13 @@ import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import java.io.File
 
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.vector.ImageVector
+
 @Composable
 fun LogsTab(
     onBack: () -> Unit
@@ -79,11 +86,9 @@ fun LogsTab(
     var logs by remember { mutableStateOf("") }
     var selectedFile by remember { mutableStateOf<File?>(null) }
 
-    val logFiles by produceState(initialValue = emptyList(), ctx) {
-        while (true) {
-            value = DragonLogManager.getAllLogFiles()
-            delay(2000)
-        }
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val logFiles by produceState(initialValue = emptyList(), ctx, refreshTrigger) {
+        value = DragonLogManager.getAllLogFiles()
     }
 
     var showDeleteDialog by remember { mutableStateOf<File?>(null) }
@@ -157,8 +162,15 @@ fun LogsTab(
             DragonLogManager.clearLogs()
             selectedFile = null
             logs = ""
+            refreshTrigger++
         },
         resetText = "Clear all logs",
+        otherIcons = arrayOf(
+            ({
+                refreshTrigger++
+                ctx.showToast("Refreshing...")
+            } to Icons.Default.Refresh)
+        ),
         content = {
 
             Column(
