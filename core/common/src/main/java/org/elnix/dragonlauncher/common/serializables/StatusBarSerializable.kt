@@ -50,6 +50,7 @@ sealed class StatusBarSerializable {
         val showVpn: Boolean = true,
         val showMobileData: Boolean = true,
         val showHotspot: Boolean = true,
+        val showUsb: Boolean = true,
         val updateFrequency: Int = 5,
         val iconSize: Int = 18
     ) : StatusBarSerializable()
