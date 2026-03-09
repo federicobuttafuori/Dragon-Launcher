@@ -6,6 +6,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.utils.SETTINGS
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.UUID
 
 
