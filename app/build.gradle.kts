@@ -146,6 +146,10 @@ extensions.configure<ApplicationExtension> {
         buildConfig = true
     }
 
+    packaging {
+        jniLibs.keepDebugSymbols.add("**/*.so")
+    }
+
     dependenciesInfo {
         // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
         includeInApk = false

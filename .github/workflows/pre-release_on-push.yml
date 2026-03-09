@@ -13,6 +13,12 @@ on:
       - '**.kts'
       - '**.java'
   workflow_dispatch:
+    inputs:
+      disable_gradle_cache:
+        description: 'Disable Gradle cache'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,8 +39,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: gradle
-
+          cache: ${{ inputs.disable_gradle_cache && '' || 'gradle' }}
 
       - name: Extract versionName
         id: version
@@ -63,15 +68,15 @@ jobs:
         with:
           timeout_minutes: 15
           max_attempts: 3
-          command: ./gradlew assembleBetaRelease assembleBetaUnminifiedRelease assembleBetaDebuggableRelease assembleBetaDebug --parallel --no-daemon --build-cache -x lint
+          command: ./gradlew assembleBetaRelease assembleBetaUnminifiedRelease assembleBetaDebuggableRelease assembleBetaDebug --parallel --no-daemon ${{ inputs.disable_gradle_cache && '--no-build-cache' || '--build-cache' }} -x lint
 
       - name: Rename APKs with version
         run: |
           VER="${{ steps.version.outputs.versionName }}"
           RUN="${{ github.run_number }}"
-          MIN="DragonLauncher-v${VER}-${RUN}.apk"
-          UNMIN="DragonLauncher-v${VER}-${RUN}-unminified.apk"
-          DEBUG="DragonLauncher-v${VER}-${RUN}-debuggable.apk"
+          MIN="DragonLauncher-v${VER}-beta-${RUN}.apk"
+          UNMIN="DragonLauncher-v${VER}-beta-${RUN}-unminified.apk"
+          DEBUG="DragonLauncher-v${VER}-beta-${RUN}-debuggable.apk"
 
           mv app/build/outputs/apk/beta/release/app-beta-release.apk "$MIN"
           mv app/build/outputs/apk/beta/unminifiedRelease/app-beta-unminifiedRelease.apk "$UNMIN"

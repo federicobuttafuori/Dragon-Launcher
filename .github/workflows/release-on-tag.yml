@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      disable_gradle_cache:
+        description: 'Disable Gradle cache (useful for reproducible builds)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -36,7 +43,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: gradle
+          cache: ${{ inputs.disable_gradle_cache && '' || 'gradle' }}
 
       - name: Decode keystore
         env:
@@ -53,7 +60,7 @@ jobs:
           } >> $GITHUB_ENV
 
       - name: Build Release APK
-        run: ./gradlew assembleStableRelease assembleBetaDebuggableRelease --parallel --no-daemon --build-cache -x lint
+        run: ./gradlew assembleStableRelease assembleBetaDebuggableRelease --parallel --no-daemon ${{ inputs.disable_gradle_cache && '--no-build-cache' || '--build-cache' }} -x lint
 
       - name: Rename APK
         run: |
