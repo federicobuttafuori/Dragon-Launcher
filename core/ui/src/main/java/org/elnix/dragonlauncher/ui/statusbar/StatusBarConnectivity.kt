@@ -1,6 +1,9 @@
 package org.elnix.dragonlauncher.ui.statusbar
 
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.hardware.usb.UsbManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.provider.Settings
@@ -11,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirplanemodeActive
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WifiTethering
@@ -41,16 +45,35 @@ fun StatusBarConnectivity(
             if (previewMode) ConnectivityState(
                 isWifiEnabled = true,
                 isBluetoothEnabled = true,
-                isMobileDataEnabled = true
+                isMobileDataEnabled = true,
+                isUsbConnected = true
             ) else ConnectivityState()
         )
+    }
+
+    // USB Detection via BroadcastReceiver
+    if (!previewMode) {
+        DisposableEffect(Unit) {
+            val receiver = object : android.content.BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    if (intent.action == "android.hardware.usb.action.USB_STATE") {
+                        val connected = intent.extras?.getBoolean("connected") ?: false
+                        connectivityState = connectivityState.copy(isUsbConnected = connected)
+                    }
+                }
+            }
+            ctx.registerReceiver(receiver, IntentFilter("android.hardware.usb.action.USB_STATE"))
+            onDispose {
+                ctx.unregisterReceiver(receiver)
+            }
+        }
     }
 
     // Periodic updates
     if (!previewMode) {
         LaunchedEffect(element.updateFrequency) {
             while (true) {
-                connectivityState = readConnectivityState(ctx)
+                connectivityState = readConnectivityState(ctx, connectivityState)
                 delay(element.updateFrequency * 1000L)
             }
         }
@@ -80,6 +103,14 @@ fun StatusBarConnectivity(
                 Icon(
                     imageVector = Icons.Filled.Bluetooth,
                     contentDescription = "Bluetooth",
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+
+            if (connectivityState.isUsbConnected && element.showUsb) {
+                Icon(
+                    imageVector = Icons.Filled.Usb,
+                    contentDescription = "USB Connected",
                     modifier = Modifier.size(14.dp)
                 )
             }
@@ -118,10 +149,11 @@ data class ConnectivityState(
     val isBluetoothEnabled: Boolean = false,
     val isHotspotEnabled: Boolean = false,
     val isMobileDataEnabled: Boolean = false,
+    val isUsbConnected: Boolean = false,
     val mobileDataStatus: String = ""
 )
 
-private fun readConnectivityState(ctx: Context): ConnectivityState {
+private fun readConnectivityState(ctx: Context, currentState: ConnectivityState = ConnectivityState()): ConnectivityState {
     val resolver = ctx.contentResolver
     val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -145,6 +177,7 @@ private fun readConnectivityState(ctx: Context): ConnectivityState {
         isBluetoothEnabled = Settings.Global.getInt(resolver, Settings.Global.BLUETOOTH_ON, 0) == 1,
         isHotspotEnabled = Settings.Global.getInt(resolver, "wifi_ap_state", 0) == 13,
         isMobileDataEnabled = mobileDataEnabled,
+        isUsbConnected = currentState.isUsbConnected, // Preserved from BroadcastReceiver
         mobileDataStatus = mobileDataStatus
     )
 }

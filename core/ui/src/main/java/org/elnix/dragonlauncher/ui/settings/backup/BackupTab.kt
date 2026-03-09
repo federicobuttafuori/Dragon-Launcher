@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -56,11 +60,13 @@ import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.components.TextDivider
+import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
 import org.elnix.dragonlauncher.ui.components.generic.ActionRow
+import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
-import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsImportLauncher
@@ -232,158 +238,82 @@ fun BackupTab(onBack: () -> Unit) {
         item { TextDivider(ctx.getString(R.string.automatic_backups)) }
 
         item {
-            SwitchRow(
-                state = autoBackupEnabled,
-                text = ctx.getString(R.string.automatic_backups)
-            ) { enabled ->
-                scope.launch {
-                    BackupSettingsStore.autoBackupEnabled.set(ctx, enabled)
+            SettingsSwitchRow(
+                setting = BackupSettingsStore.autoBackupEnabled,
+                title = ctx.getString(R.string.automatic_backups),
+                description = "Automate backup generation to local storage"
+            )
+        }
+
+        if (autoBackupEnabled) {
+            item {
+                SettingsItem(
+                    title = "Backup Location",
+                    description = backupPath ?: "Tap to select destination",
+                    icon = Icons.Default.FolderOpen,
+                    onClick = {
+                        autoBackupLauncher.launch("dragonlauncher-auto-backup.json")
+                    }
+                )
+            }
+
+            if (backupPath != null) {
+                item {
+                    SettingsItem(
+                        title = "Last Backup",
+                        description = lastBackupTime.formatDateTime(),
+                        icon = Icons.Default.Restore,
+                        onClick = {
+                            scope.launch {
+                                SettingsBackupManager.triggerBackup(ctx)
+                                ctx.showToast("Backup triggered manually")
+                            }
+                        }
+                    )
+                }
+
+                item {
+                    SettingsItem(
+                        title = "Clear Auto-Backup",
+                        description = "Disable and remove linked file",
+                        icon = Icons.Default.Restore,
+                        onClick = {
+                            scope.launch {
+                                BackupSettingsStore.autoBackupUri.reset(ctx)
+                                BackupSettingsStore.autoBackupEnabled.reset(ctx)
+                                ctx.showToast("Auto-backup cleared")
+                            }
+                        }
+                    )
                 }
             }
         }
 
-        if (autoBackupEnabled) {
-            if (backupPath != null) {
-                item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        item { TextDivider(ctx.getString(R.string.auto_backup_stores)) }
+
+        item {
+            Column {
+                backupableStores.forEach { entry ->
+                    val dataStoreName = entry.key
+                    val settingsStore = entry.value
+                    val isSelected = backupStores.contains(dataStoreName.value)
+
+                    DragonSurfaceRow(
+                        onClick = {
+                            scope.launch {
+                                val updated = if (isSelected) backupStores - dataStoreName.value
+                                              else backupStores + dataStoreName.value
+                                BackupSettingsStore.backupStores.set(ctx, updated)
+                            }
+                        }
                     ) {
                         Text(
-                            text = "Backup Path: ",
-                            color = MaterialTheme.colorScheme.onBackground
+                            text = settingsStore.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f)
                         )
-                        Text(
-                            text = backupPath,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontStyle = FontStyle.Italic,
-                            modifier = Modifier
-                                .clickable {
-                                    autoBackupUri.let { uri ->
-                                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                                            setDataAndType(uri, "application/json")
-                                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                        }
-                                        ctx.startActivity(
-                                            Intent.createChooser(
-                                                intent,
-                                                "Open backup file"
-                                            )
-                                        )
-                                    }
-                                }
-                                .padding(horizontal = 4.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-            }
-
-            item {
-
-                if (backupPath != null) {
-
-                    ActionRow(
-                        actions = BackupActions.entries,
-                        selectedView = null,
-                        actionName = { it.label(ctx) }
-                    ) {
-                        when (it) {
-                            BackupActions.CHANGE -> {
-                                autoBackupLauncher.launch("dragonlauncher-auto-backup.json")
-                            }
-
-                            BackupActions.REMOVE -> {
-                                scope.launch {
-                                    BackupSettingsStore.autoBackupUri.reset(ctx)
-                                    BackupSettingsStore.autoBackupEnabled.reset(ctx)
-                                }
-                            }
-
-                            BackupActions.TRIGGER -> {
-                                scope.launch {
-                                    SettingsBackupManager.triggerBackup(ctx)
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface.copy(0.5f))
-                            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .clickable {
-                                    autoBackupLauncher.launch("dragonlauncher-auto-backup.json")
-                                },
-
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = ctx.getString(R.string.select_backup_file),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                }
-            }
-
-
-            if (backupPath != null) {
-                item {
-                    Text(
-                        text = "${ctx.getString(R.string.last_backup)} : ${lastBackupTime.formatDateTime()}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-
-
-            item { TextDivider(ctx.getString(R.string.auto_backup_stores)) }
-
-            item {
-                Column{
-                    backupableStores.forEach { entry ->
-                        val dataStoreName = entry.key
-                        val settingsStore = entry.value
-
-                        val isSelected = backupStores.contains(dataStoreName.value)
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(DragonShape)
-                                .clickable {
-                                    scope.launch {
-                                        val updated = if (isSelected) {
-                                            backupStores - dataStoreName.value
-                                        } else {
-                                            backupStores + dataStoreName.value
-                                        }
-                                        BackupSettingsStore.backupStores.set(ctx, updated)
-                                    }
-                                }
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = settingsStore.name,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = null
-                            )
-                        }
+                        Checkbox(checked = isSelected, onCheckedChange = null)
                     }
                 }
             }

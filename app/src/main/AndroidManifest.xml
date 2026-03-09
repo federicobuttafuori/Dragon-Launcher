@@ -6,6 +6,7 @@
         tools:ignore="PackageVisibilityPolicy,QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
@@ -39,6 +40,12 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- Extension Security: Launcher defines the permission -->
+    <!-- We use 'normal' protection so developers can build extensions without matching signatures -->
+    <!-- The launcher's internal code will handle the actual security check based on settings -->
+    <permission android:name="org.dragon.launcher.APP_EXTENSION"
+        android:protectionLevel="normal" />
+    <uses-permission android:name="org.dragon.launcher.APP_EXTENSION" />
 
     <application
         android:name=".MyApplication"
@@ -188,16 +195,6 @@
                 <action android:name="android.intent.action.PACKAGE_CHANGED" />
                 <data android:scheme="package" />
             </intent-filter>
-        </receiver>
-
-        <receiver android:name=".DragonWidgetReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/dragon_widget_info" />
         </receiver>
 
         <!-- Private Space receiver for Android 15+ -->

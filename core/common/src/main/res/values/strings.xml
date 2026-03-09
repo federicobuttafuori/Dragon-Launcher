@@ -16,6 +16,14 @@
     <string name="app_display">App display</string>
     <string name="color_selector">Color selector</string>
     <string name="debug">Debug</string>
+    <string name="extensions">Extensions</string>
+    <string name="extensions_description">Download and manage additional features for Dragon Launcher.</string>
+    <string name="install">Install</string>
+    <string name="permissions">Permissions</string>
+    <string name="no_extensions_found">No extensions found in registry.</string>
+    <string name="extension_manual_install_title">Manual Installation</string>
+    <string name="extension_manual_install_desc">If you don\'t have an installation extension, download the APK and select it below to install.</string>
+    <string name="select_apk">Select APK</string>
     <string name="language_english">English</string>
     <string name="language_french">French</string>
     <string name="language_german">German</string>
@@ -234,6 +242,9 @@
     <string name="auto_separate">Auto Separate</string>
     <string name="add_widget">Add Widget</string>
     <string name="widgets">Widgets</string>
+    <string name="edit">Edit</string>
+    <string name="active_widgets">Active Widgets</string>
+    <string name="options">Options</string>
     <string name="widgets_floating_apps">Widgets / Floating Apps</string>
     <string name="floating_apps_tab_help">Manage your workspace widgets and floating apps: add, reorder, resize, and position them.\n Ghosted means the widget is not clickable\nForeground means the drag gestures aren\'t registered on the widget\nYou may try a combinaison of these two to achieve the configuration you like</string>
     <string name="delete_widget">Delete widget</string>
@@ -822,6 +833,5 @@
     <string name="configure_draw_order">Configure Draw Order</string>
     <string name="device_info_copied_to_clipboard">Device Info copied to clipboard</string>
     <string name="debug_mode_already_enabled">Debug Mode is already enabled</string>
-
 
 </resources>

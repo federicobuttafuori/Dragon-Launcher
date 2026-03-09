@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Language
@@ -41,9 +42,11 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -93,6 +96,7 @@ import org.elnix.dragonlauncher.enumsui.LockMethod
 import org.elnix.dragonlauncher.settings.SettingsStoreRegistry
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.services.ExtensionManager
 import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.asState
@@ -226,6 +230,32 @@ fun AdvancedSettingsScreen(
             ) {
                 navController.navigate(SETTINGS.WORKSPACE)
             }
+        }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.widgets),
+                icon = Icons.Default.Widgets
+            ) {
+                navController.navigate(SETTINGS.WIDGETS)
+            }
+        }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.permissions),
+                icon = Icons.Default.Security
+            ) {
+                navController.navigate(SETTINGS.PERMISSIONS)
+            }
+        }
+
+        item {
+            SettingItemWithExternalOpen(
+                title = stringResource(R.string.extensions),
+                icon = Icons.Default.Extension,
+                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher-Extensions") }
+            ) { navController.navigate(SETTINGS.EXTENSIONS) }
         }
 
         item {
@@ -506,69 +536,11 @@ fun AdvancedSettingsScreen(
                 val infoStyle = MaterialTheme.typography.labelSmall
                 val infoColor = MaterialTheme.colorScheme.onBackground.alphaMultiplier(0.7f)
 
-                val density = LocalDensity.current
-                val windowInfo = LocalWindowInfo.current
-                val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                val memInfo = ActivityManager.MemoryInfo()
-                am.getMemoryInfo(memInfo)
-
-                val currentLauncher = detectSystemLauncher(ctx)
-                val isDefault = ctx.isDefaultLauncher
-
-                val deviceDetails = buildString {
-                    appendLine("System: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.PRODUCT})")
-                    appendLine("OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
-                    if (Build.VERSION.SECURITY_PATCH.isNotEmpty()) {
-                        appendLine("Security Patch: ${Build.VERSION.SECURITY_PATCH}")
-                    }
-                    appendLine("Arch: ${Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"}")
-                    appendLine("Display: ${windowInfo.containerSize.width.dp}x${windowInfo.containerSize.height.dp}dp (${density.density} dpi)")
-                    appendLine(
-                        "RAM: %.1fGB used / %.1fGB total (%d%% available)".format(
-                            (memInfo.totalMem - memInfo.availMem) / 1024.0 / 1024 / 1024,
-                            memInfo.totalMem / 1024.0 / 1024 / 1024,
-                            memInfo.availMem * 100 / memInfo.totalMem
-                        )
-                    )
-                    appendLine("Default Launcher: ${if (isDefault) "Yes" else "No ($currentLauncher)"}")
-                    appendLine("App version: $versionName ($versionCode)")
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Device Information",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-
-                    Spacer(Modifier.width(8.dp))
-
-                    DragonIconButton(
-                        onClick = {
-                            ctx.copyToClipboard(deviceDetails)
-                            ctx.showToast("Device details copied to clipboard")
-                        },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy device info",
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
                 val debugModeAlreadyEnabledText = stringResource(R.string.debug_mode_already_enabled)
                 val deviceInfoCopiedToClipboard = stringResource(R.string.device_info_copied_to_clipboard)
 
                 Text(
-                    text = deviceDetails,
+                    text = "Dragon Launcher $versionName ($versionCode)",
                     style = infoStyle,
                     textAlign = TextAlign.Center,
                     color = infoColor,

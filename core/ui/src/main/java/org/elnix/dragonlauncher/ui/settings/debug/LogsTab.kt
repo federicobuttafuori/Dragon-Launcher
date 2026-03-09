@@ -2,17 +2,23 @@
 
 package org.elnix.dragonlauncher.ui.settings.debug
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -38,18 +44,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import java.io.InputStreamReader
+import org.elnix.dragonlauncher.common.serializables.ExtensionModel
 import kotlinx.coroutines.delay
+import kotlinx.serialization.json.*
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.logging.DragonLogManager
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.common.utils.detectSystemLauncher
 import org.elnix.dragonlauncher.common.utils.formatDateTime
+import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.services.ExtensionManager
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
@@ -57,6 +71,13 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import java.io.File
+
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun LogsTab(
@@ -68,14 +89,93 @@ fun LogsTab(
     var logs by remember { mutableStateOf("") }
     var selectedFile by remember { mutableStateOf<File?>(null) }
 
-    val logFiles by produceState(initialValue = emptyList(), ctx) {
-        while (true) {
-            value = DragonLogManager.getAllLogFiles()
-            delay(2000)
-        }
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val logFiles by produceState(initialValue = emptyList(), ctx, refreshTrigger) {
+        value = DragonLogManager.getAllLogFiles()
     }
 
     var showDeleteDialog by remember { mutableStateOf<File?>(null) }
+
+    val windowInfo = LocalWindowInfo.current
+    val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val memInfo = ActivityManager.MemoryInfo()
+    am.getMemoryInfo(memInfo)
+    val currentLauncher = detectSystemLauncher(ctx)
+    val isDefault = ctx.isDefaultLauncher
+    val packageInfo = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
+    val versionName = packageInfo.versionName ?: "unknown"
+    val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) packageInfo.longVersionCode else packageInfo.versionCode.toLong()
+
+    // Build extension list by parsing the registry JSON directly (robust to field names)
+    var finalExtensionText = "No extensions installed"
+    try {
+        val registryContent = ctx.assets.open("extensions-registry.json").bufferedReader().readText()
+        val root = Json.parseToJsonElement(registryContent)
+        val lines = ArrayList<String>()
+
+        if (root is JsonArray) {
+            for (elem in root) {
+                try {
+                    val obj = elem.jsonObject
+                    val pkgValue = obj["package"]?.jsonPrimitive?.contentOrNull
+                    val nameValue = obj["name"]?.jsonPrimitive?.contentOrNull ?: "Unknown"
+
+                    if (!pkgValue.isNullOrEmpty()) {
+                        if (ExtensionManager.isExtensionInstalled(ctx, pkgValue)) {
+                            val pkgInfo = try {
+                                ctx.packageManager.getPackageInfo(pkgValue, 0)
+                            } catch (e: Exception) { null }
+                            
+                            val versionStr = pkgInfo?.versionName ?: "unknown"
+                            lines.add("$nameValue ($versionStr)")
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+        }
+
+        if (lines.isNotEmpty()) finalExtensionText = lines.joinToString("\n")
+    } catch (_: Exception) {
+        // registry not available or parse failed -> leave default text
+    }
+
+    val deviceDetails = remember {
+        buildString {
+            appendLine("--- DEVICE DETAILS ---")
+            appendLine("System: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.PRODUCT})")
+            appendLine("OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
+            if (Build.VERSION.SECURITY_PATCH.isNotEmpty()) {
+                appendLine("Security Patch: ${Build.VERSION.SECURITY_PATCH}")
+            }
+            appendLine("Arch: ${Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"}")
+            appendLine("Display: ${windowInfo.containerSize.width}x${windowInfo.containerSize.height}px")
+            appendLine(
+                "RAM: %.1fGB used / %.1fGB total (%d%% available)".format(
+                    (memInfo.totalMem - memInfo.availMem) / 1024.0 / 1024 / 1024,
+                    memInfo.totalMem / 1024.0 / 1024 / 1024,
+                    memInfo.availMem * 100 / memInfo.totalMem
+                )
+            )
+            appendLine("Default Launcher: ${if (isDefault) "Yes" else "No ($currentLauncher)"}")
+            appendLine("App version: $versionName ($versionCode)")
+
+            appendLine("\n--- EXTENSIONS ---")
+            appendLine(finalExtensionText)
+
+            appendLine("\n--- PERMISSIONS ---")
+            try {
+                val info = ctx.packageManager.getPackageInfo(ctx.packageName, PackageManager.GET_PERMISSIONS)
+                info.requestedPermissions?.forEachIndexed { index, perm ->
+                    val flags = info.requestedPermissionsFlags
+                    val granted = (flags != null && (flags[index] and 0x00000002) != 0) ||
+                            ContextCompat.checkSelfPermission(ctx, perm) == PackageManager.PERMISSION_GRANTED
+                    appendLine("${perm.substringAfterLast(".")}: ${if (granted) "GRANTED" else "DENIED"}")
+                }
+            } catch (e: Exception) {
+                appendLine("Error reading permissions: ${e.message}")
+            }
+        }
+    }
 
     SettingsLazyHeader(
         title = "Logs",
@@ -85,8 +185,15 @@ fun LogsTab(
             DragonLogManager.clearLogs()
             selectedFile = null
             logs = ""
+            refreshTrigger++
         },
         resetText = "Clear all logs",
+        otherIcons = arrayOf(
+            ({
+                refreshTrigger++
+                ctx.showToast("Refreshing...")
+            } to Icons.Default.Refresh)
+        ),
         content = {
 
             Column(
@@ -95,6 +202,42 @@ fun LogsTab(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = AppObjectsColors.cardColors()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Device Information",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            DragonIconButton(
+                                onClick = {
+                                    ctx.copyToClipboard(deviceDetails)
+                                    ctx.showToast("Device info copied")
+                                }
+                            ) {
+                                Icon(Icons.Default.ContentCopy, "Copy Info", modifier = Modifier.size(20.dp))
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        SelectionContainer {
+                            Text(
+                                text = deviceDetails,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                }
+
                 SettingsSwitchRow(
                     setting = DebugSettingsStore.enableLogging,
                     title = "Enable logging",

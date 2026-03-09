@@ -11,6 +11,8 @@ object SETTINGS {
     const val ICON_PACK = "settings/advanced/appearance/icon_pack"
     const val STATUS_BAR = "settings/advanced/appearance/status_bar"
     const val THEME = "settings/advanced/appearance/theme"
+    const val WIDGETS = "settings/advanced/widgets"
+    const val PERMISSIONS = "settings/advanced/permissions"
     const val FLOATING_APPS = "settings/advanced/appearance/floating_apps"
     const val BEHAVIOR = "settings/advanced/behavior"
     const val COLORS = "settings/advanced/appearance/colors"
@@ -24,6 +26,7 @@ object SETTINGS {
     const val SETTINGS_JSON = "settings/advanced/debug/settings_json"
     const val LANGUAGE = "settings/advanced/language"
     const val CHANGELOGS = "settings/advanced/changelogs"
+    const val EXTENSIONS = "settings/advanced/extensions"
     const val NESTS_EDIT = "settings/nest"
     const val ANGLE_LINE_EDIT = "settings/advanced/angleLineEdit"
 }
