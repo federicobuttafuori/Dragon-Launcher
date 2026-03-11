@@ -6,30 +6,21 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 
@@ -56,7 +47,10 @@ fun PermissionsTab(onBack: () -> Unit) {
         }
 
         perms.forEach { permission ->
-            permissionStates[permission] = ContextCompat.checkSelfPermission(ctx, permission) == PackageManager.PERMISSION_GRANTED
+            permissionStates[permission] = ContextCompat.checkSelfPermission(
+                ctx,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -68,12 +62,12 @@ fun PermissionsTab(onBack: () -> Unit) {
         SettingsLazyHeader(
             title = stringResource(R.string.permissions),
             onBack = onBack,
-            helpText = "Gérez ici les permissions et accès système pour Dragon Launcher.",
+            helpText = stringResource(R.string.permission_tab_help),
             onReset = null
         ) {
             item {
                 Text(
-                    text = "Accès système spéciaux",
+                    text = stringResource(R.string.special_system_access),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
@@ -87,24 +81,22 @@ fun PermissionsTab(onBack: () -> Unit) {
                         val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
                         ctx.startActivity(intent)
                     },
-                    text = "Accès aux notifications",
-                    subText = "Permet d'afficher les badges de notification sur les icônes."
+                    text = stringResource(R.string.notification_access),
+                    subText = ""
                 )
             }
 
             item {
                 SwitchRow(
-                    state = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ctx.packageManager.canRequestPackageInstalls() else true,
+                    state = ctx.packageManager.canRequestPackageInstalls(),
                     onCheck = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                                data = Uri.parse("package:${ctx.packageName}")
-                            }
-                            ctx.startActivity(intent)
+                        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                            data = "package:${ctx.packageName}".toUri()
                         }
+                        ctx.startActivity(intent)
                     },
-                    text = "Installation d'applications (APK)",
-                    subText = "Nécessaire pour installer les extensions téléchargées."
+                    text = stringResource(R.string.install_from_unknown_source_permission),
+                    subText = stringResource(R.string.install_from_unknown_source_permission_desc)
                 )
             }
 
@@ -115,26 +107,29 @@ fun PermissionsTab(onBack: () -> Unit) {
                         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                         ctx.startActivity(intent)
                     },
-                    text = "Service d'accessibilité",
-                    subText = "Utilisé pour étendre le panneau de notifications via des gestes."
+                    text = stringResource(R.string.accessibility_service),
+                    subText = stringResource(R.string.accessibility_service_desc)
+
                 )
             }
 
             item {
                 SwitchRow(
                     state = null,
+                    enabled = false,
                     onCheck = {
                         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                         ctx.startActivity(intent)
                     },
-                    text = "Accès aux statistiques d'utilisation",
-                    subText = "Requis pour les fonctionnalités de Bien-être numérique."
+                    text = stringResource(R.string.usage_access),
+                    subText = stringResource(R.string.not_implemented)
+//                    subText = stringResource(R.string.usage_access_desc)
                 )
             }
 
             item {
                 Text(
-                    text = "Permissions Android",
+                    text = stringResource(R.string.android_permissions),
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
@@ -156,13 +151,14 @@ fun PermissionsTab(onBack: () -> Unit) {
                     SwitchRow(
                         state = isGranted,
                         onCheck = {
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.fromParts("package", ctx.packageName, null)
-                            }
+                            val intent =
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", ctx.packageName, null)
+                                }
                             ctx.startActivity(intent)
                         },
                         text = permission.substringAfterLast("."),
-                        subText = "Gérer dans les paramètres système."
+                        subText = stringResource(R.string.manage_in_system_settings)
                     )
                 }
             }

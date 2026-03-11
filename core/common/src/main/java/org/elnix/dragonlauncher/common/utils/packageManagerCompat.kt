@@ -34,7 +34,7 @@ class PackageManagerCompat(private val pm: PackageManager, private val ctx: Cont
         return try {
             pm.getPackageInfo(packageName, 0)
             true
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (_: PackageManager.NameNotFoundException) {
             false
         }
     }

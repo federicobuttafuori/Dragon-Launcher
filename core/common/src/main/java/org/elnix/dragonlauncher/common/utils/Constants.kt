@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.common.utils
 
+import org.elnix.dragonlauncher.common.logging.LogTag
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 
 const val obtainiumPackageName = "dev.imranr.obtainium.fdroid"
@@ -127,21 +128,21 @@ object Constants {
             ROUTES.WELCOME,
             SETTINGS.BACKUP,
             SETTINGS.WALLPAPER,
-            SETTINGS.FLOATING_APPS
+            SETTINGS.WIDGETS_FLOATING_APPS
         )
 
         val transparentScreens = listOf(
             ROUTES.MAIN,
             ROUTES.DRAWER,
             SETTINGS.WALLPAPER,
-            SETTINGS.FLOATING_APPS
+            SETTINGS.WIDGETS_FLOATING_APPS
         )
     }
 
     object Paths {
 
         /* Themes loader utils */
-        const val themesDir = "themes"
+        const val THEMES_DIR = "themes"
         val imageExts = listOf("png", "jpg", "jpeg", "webp")
     }
 
@@ -165,37 +166,46 @@ object Constants {
 
     object Logging {
         /*  ─────────────  Tags constants  ─────────────  */
-        const val TAG = "DragonLauncherDebug"
-        const val APPS_TAG = "AppsVm"
-        const val ICONS_TAG = "IconsDebug"
-        const val BACKUP_TAG = "SettingsBackupManager"
-        const val SWIPE_TAG = "SwipeDebug"
-        const val WIDGET_TAG = "WidgetsDebug"
-        const val FLOATING_APPS_TAG = "FloatingAppsDebug"
-        const val ACCESSIBILITY_TAG = "SystemControl"
-        const val IMAGE_TAG = "ImageDebug"
-        const val SETTINGS_TAG = "SettingsDebug"
-        const val ICON_PACK_TAG = "IconsPacks"
-        const val SHAPES_TAG = "ShapesDebug"
-        const val COLORS_TAG = "ColorsDebug"
-        const val DRAWER_TAG = "DrawerDebug"
-        const val APP_LAUNCH_TAG = "AppLaunchDebug"
-        const val PRIVATE_SPACE_TAG = "PrivateSpaceDebug"
-        const val APPS_JSON_TAG = "AppsJsonDebug"
-        const val PM_COMPAT_TAG = "PmCompatDebug"
-        const val BROADCAST_TAG = "BroadcastDebug"
-        const val POINTS_TAG = "PointsDebug"
-        const val STATUS_BAR_TAG = "StatusBarDebug"
-        const val WORKSPACES_TAG = "WorkspacesDebug"
-        const val NESTS_TAG = "NestsDebug"
-        const val ANGLE_LINE_TAG = "AngleLineDebug"
-        const val LAUNCHER_WIDGET_HOLDER_TAG = "LauncherWidgetHolder"
+        val TAG = LogTag("DragonLauncherDebug")
+        val APPS_TAG = LogTag("AppsVm")
+        val ICONS_TAG = LogTag("IconsDebug")
+        val BACKUP_TAG = LogTag("SettingsBackupManager")
+        val SWIPE_TAG = LogTag("SwipeDebug")
+        val WIDGET_TAG = LogTag("WidgetsDebug")
+        val FLOATING_APPS_TAG = LogTag("FloatingAppsDebug")
+        val ACCESSIBILITY_TAG = LogTag("SystemControl")
+        val IMAGE_TAG = LogTag("ImageDebug")
+        val SETTINGS_TAG = LogTag("SettingsDebug")
+//        val ICON_PACK_TAG = LogTag("IconsPacks")
+        val SHAPES_TAG = LogTag("ShapesDebug")
+        val COLORS_TAG = LogTag("ColorsDebug")
+        val DRAWER_TAG = LogTag("DrawerDebug")
+        val APP_LAUNCH_TAG = LogTag("AppLaunchDebug")
+        val PRIVATE_SPACE_TAG = LogTag("PrivateSpaceDebug")
+//        val APPS_JSON_TAG = LogTag("AppsJsonDebug")
+        val PM_COMPAT_TAG = LogTag("PmCompatDebug")
+        val BROADCAST_TAG = LogTag("BroadcastDebug")
+//        val POINTS_TAG = LogTag("PointsDebug")
+        val STATUS_BAR_TAG = LogTag("StatusBarDebug")
+        val WORKSPACES_TAG = LogTag("WorkspacesDebug")
+        val NESTS_TAG = LogTag("NestsDebug")
+        val ANGLE_LINE_TAG = LogTag("AngleLineDebug")
+        val LAUNCHER_WIDGET_HOLDER_TAG = LogTag("LauncherWidgetHolder")
+        val PRIVATE_SPACE_UTILS = LogTag("PrivateSpaceUtils")
+        val PINNED_SHORTCUTS = LogTag("PinnedShortcuts")
+        val SECURITY_HELPER = LogTag("SecurityHelper")
+        val LOGS_TAG = LogTag("LogsTab")
+        val STARTUP_TAG = LogTag("StartupPerf")
+        val OVERLAY_REMINDER_TAG = LogTag("OverlayReminder")
     }
 
     /*  ─────────────  Links  ─────────────  */
     object Links {
 
-        const val discordInviteLink = "https://discord.gg/6UyuP8EBWS"
+        const val DISCORD_INVITE_LINK = "https://discord.gg/6UyuP8EBWS"
+        const val REDDIT_LINK = "https://www.reddit.com/r/dragonlauncher/"
+        const val MAILTO_LINK = "mailto:elnix91@proton.me"
+        const val DRAGON_WEBSITE = "https://dragonlauncher.lthb.fr/"
     }
 
     object Settings {

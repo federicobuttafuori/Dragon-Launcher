@@ -5,7 +5,9 @@ package org.elnix.dragonlauncher.ui.settings.customization
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
@@ -114,10 +116,24 @@ fun AppearanceTab(
         }
 
         item {
-            SettingsItem(
-                title = stringResource(R.string.wallpaper),
-                icon = Icons.Default.Wallpaper
-            ) { navController.navigate(SETTINGS.WALLPAPER) }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                SettingsItem(
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.wallpaper),
+                    icon = Icons.Default.Wallpaper
+                ) { navController.navigate(SETTINGS.WALLPAPER) }
+
+                SettingsItem(
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.widgets),
+                    icon = Icons.Default.Widgets
+                ) {
+                    navController.navigate(SETTINGS.WIDGETS_FLOATING_APPS)
+                }
+            }
         }
 
         item {

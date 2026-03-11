@@ -1,8 +1,8 @@
 package org.elnix.dragonlauncher.ui.dialogs
 
+import android.annotation.SuppressLint
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
-import android.os.Build
 import android.os.Process
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -38,7 +38,10 @@ import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.logging.logW
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.ICONS_TAG
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.PINNED_SHORTCUTS
 import org.elnix.dragonlauncher.common.utils.ImageUtils.loadDrawableAsBitmap
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 
@@ -63,15 +66,11 @@ fun PinnedShortcutsPickerDialog(
     val ctx = LocalContext.current
 
     val groupedShortcuts: Map<String, List<PinnedShortcutItem>> = remember {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+        try {
+            queryAllPinnedShortcuts(ctx)
+        } catch (e: Exception) {
+            logE(PINNED_SHORTCUTS) { "Failed to query pinned shortcuts: ${e.message}" }
             emptyMap()
-        } else {
-            try {
-                queryAllPinnedShortcuts(ctx)
-            } catch (e: Exception) {
-                ctx.logE("PinnedShortcuts") { "Failed to query pinned shortcuts: ${e.message}" }
-                emptyMap()
-            }
         }
     }
 
@@ -180,6 +179,7 @@ private fun ShortcutRow(
                     val bmp = loadDrawableAsBitmap(drawable, 48, 48)
                     BitmapPainter(bmp)
                 } catch (e: Exception) {
+                    logW(ICONS_TAG, e) { "Unable to load icon via loadDrawableAsBitmap" }
                     null
                 }
             }
@@ -221,6 +221,7 @@ private fun ShortcutRow(
  * Queries all pinned shortcuts across all installed apps.
  * Returns a map of appName -> list of PinnedShortcutItem.
  */
+@SuppressLint("InlinedApi")
 private fun queryAllPinnedShortcuts(
     ctx: android.content.Context
 ): Map<String, List<PinnedShortcutItem>> {
@@ -240,7 +241,6 @@ private fun queryAllPinnedShortcuts(
 
     for (pkg in packages) {
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) continue
 
             val query = LauncherApps.ShortcutQuery()
                 .setPackage(pkg)
@@ -270,9 +270,9 @@ private fun queryAllPinnedShortcuts(
                 )
             }
         } catch (e: SecurityException) {
-            ctx.logD("PinnedShortcuts") { "SecurityException for $pkg: ${e.message}" }
+            logD(PINNED_SHORTCUTS, e) { "SecurityException for $pkg: ${e.message}" }
         } catch (e: Exception) {
-            ctx.logE("PinnedShortcuts") { "Error querying shortcuts for $pkg: ${e.message}" }
+            logE(PINNED_SHORTCUTS, e) { "Error querying shortcuts for $pkg: ${e.message}" }
         }
     }
 

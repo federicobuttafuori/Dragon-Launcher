@@ -9,7 +9,6 @@ import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.logging.logI
 import org.elnix.dragonlauncher.common.logging.logW
-import org.elnix.dragonlauncher.common.serializables.SwipeJson
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
@@ -19,7 +18,6 @@ import org.elnix.dragonlauncher.settings.bases.JsonObjectSettingsStore
 import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
-import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.FileOutputStream
@@ -31,14 +29,14 @@ object SettingsBackupManager {
      */
     suspend fun triggerBackup(ctx: Context) {
         if (!BackupSettingsStore.autoBackupEnabled.get(ctx)) {
-            SettingsBackupManager.logW(BACKUP_TAG) { "Auto-backup disabled" }
+            logW(BACKUP_TAG) { "Auto-backup disabled" }
             return
         }
 
         try {
             val uriString = BackupSettingsStore.autoBackupUri.get(ctx)
             if (uriString.isBlank()) {
-                SettingsBackupManager.logW(BACKUP_TAG) { "No backup URI set" }
+                logW(BACKUP_TAG) { "No backup URI set" }
                 return
             }
 
@@ -61,7 +59,7 @@ object SettingsBackupManager {
             exportSettings(ctx, uri, selectedStores)
 
             PrivateSettingsStore.lastBackupTime.set(ctx, System.currentTimeMillis())
-            SettingsBackupManager.logI(BACKUP_TAG) { "Auto-backup completed to $path" }
+            logI(BACKUP_TAG) { "Auto-backup completed to $path" }
 
         } catch (e: Exception) {
             logE(BACKUP_TAG) { "Auto-backup failed" }
@@ -105,11 +103,8 @@ object SettingsBackupManager {
             val dataStoreName = entry.key
             val settingsStore = entry.value
 
-//            logD(BACKUP_TAG, "RequestedStores: $requestedStores \n allStores: $allStores \n entry: $entry")
-
-
             if (dataStoreName.backupKey in requestedStores.map { it.backupKey }) {
-                SettingsBackupManager.logW(BACKUP_TAG) { "$dataStoreName ,backup : ${settingsStore.exportForBackup(ctx)}" }
+                logW(BACKUP_TAG) { "$dataStoreName ,backup : ${settingsStore.exportForBackup(ctx)}" }
                 settingsStore.exportForBackup(ctx)?.let {
                     json.put(dataStoreName.backupKey, it)
                 }
@@ -135,7 +130,7 @@ object SettingsBackupManager {
         json: JSONObject,
         requestedStores: Set<DataStoreName>
     ) {
-        SettingsBackupManager.logD(BACKUP_TAG) { json.toString() }
+        logD(BACKUP_TAG) { json.toString() }
 
         allStores.forEach { entry ->
             val dataStoreName = entry.key
@@ -171,28 +166,39 @@ object SettingsBackupManager {
             }
         }
 
-        SettingsBackupManager.logE(BACKUP_TAG) { json.optJSONArray("actions")?.toString() ?: "No actions" }
-
-        // LEGACY format: fallback for "actions" array
-        json.optJSONArray("actions")?.let { actionsArray ->
-            SettingsBackupManager.logD(BACKUP_TAG) { "Fallback to legacy system (actions)" }
-            val legacyPoints = SwipeJson.decodeLegacy(actionsArray.toString())
-            SwipeSettingsStore.savePoints(ctx, legacyPoints)
+        // If the swipe store is in the requested, set has initialized to true, as it may think that you haven't set it
+        if (DataStoreName.SWIPE in requestedStores) {
+            PrivateSettingsStore.hasInitialized.set(ctx, true)
         }
 
-        // NEW LEGACY format: fallback for "new_actions" (points and nests)
-        json.optJSONObject("new_actions")?.let { newActionsObj ->
-            SettingsBackupManager.logD(BACKUP_TAG) { "Fallback to legacy system (new_actions)" }
-            
-            newActionsObj.optJSONArray("points")?.let { pointsArray ->
-                val legacyPoints = SwipeJson.decodePoints(pointsArray.toString())
-                SwipeSettingsStore.savePoints(ctx, legacyPoints)
-            }
-            
-            newActionsObj.optJSONArray("nests")?.let { nestsArray ->
-                val legacyNests = SwipeJson.decodeNests(nestsArray.toString())
-                SwipeSettingsStore.saveNests(ctx, legacyNests)
-            }
-        }
+
+
+
+
+        // FUCK LEGACY 🤎
+//        logE(BACKUP_TAG) { json.optJSONArray("actions")?.toString() ?: "No actions" }
+//
+//        // LEGACY format: fallback for "actions" array
+//        json.optJSONArray("actions")?.let { actionsArray ->
+//            logD(BACKUP_TAG) { "Fallback to legacy system (actions)" }
+//            val legacyPoints = SwipeJson.decodeLegacy(actionsArray.toString())
+//            SwipeSettingsStore.savePoints(ctx, legacyPoints)
+//        }
+//
+//
+//        // NEW LEGACY format: fallback for "new_actions" (points and nests)
+//        json.optJSONObject("new_actions")?.let { newActionsObj ->
+//            logD(BACKUP_TAG) { "Fallback to legacy system (new_actions)" }
+//
+//            newActionsObj.optJSONArray("points")?.let { pointsArray ->
+//                val legacyPoints = SwipeJson.decodePoints(pointsArray.toString())
+//                SwipeSettingsStore.savePoints(ctx, legacyPoints)
+//            }
+//
+//            newActionsObj.optJSONArray("nests")?.let { nestsArray ->
+//                val legacyNests = SwipeJson.decodeNests(nestsArray.toString())
+//                SwipeSettingsStore.saveNests(ctx, legacyNests)
+//            }
+//        }
     }
 }

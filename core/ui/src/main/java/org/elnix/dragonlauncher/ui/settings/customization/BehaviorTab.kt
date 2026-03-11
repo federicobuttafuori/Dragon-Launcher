@@ -3,6 +3,12 @@
 package org.elnix.dragonlauncher.ui.settings.customization
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,14 +40,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.allShapesWithoutRandom
+import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.enumsui.LockMethod
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
+import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateAppsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
@@ -65,7 +74,10 @@ import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 @Suppress("VariableNeverRead")
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun BehaviorTab(onBack: () -> Unit) {
+fun BehaviorTab(
+    navController: NavController,
+    onBack: () -> Unit
+) {
     val ctx = LocalContext.current
     val appLifecycleViewModel = LocalAppLifecycleViewModel.current
 
@@ -98,6 +110,8 @@ fun BehaviorTab(onBack: () -> Unit) {
 
     val superWarningState = rememberExpandableSection(stringResource(R.string.super_warning_mode)
     ) { currentLockMethod != LockMethod.NONE }
+
+    val forceAppLanguageSelector by DebugSettingsStore.forceAppLanguageSelector.asState()
 
 
     SettingsLazyHeader(
@@ -275,6 +289,20 @@ fun BehaviorTab(onBack: () -> Unit) {
                     }
                 )
             }
+        }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.settings_language_title),
+                icon = Icons.Default.Language,
+                onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !forceAppLanguageSelector) {
+                        openSystemLanguageSettings(ctx)
+                    } else {
+                        navController.navigate(SETTINGS.LANGUAGE)
+                    }
+                }
+            )
         }
 
         item {
@@ -514,13 +542,6 @@ fun BehaviorTab(onBack: () -> Unit) {
                                 LockMethod.DEVICE_UNLOCK -> {
                                     // Test biometric authentication immediately
                                     val activity = ctx.findFragmentActivity()
-                                    ctx.logD(
-                                        "AdvSettings"
-                                    ) {
-                                        "DEVICE_UNLOCK selected: activity=$activity, isAvailable=${
-                                            SecurityHelper.isDeviceUnlockAvailable(ctx)
-                                        }"
-                                    }
                                     if (activity != null && SecurityHelper.isDeviceUnlockAvailable(
                                             ctx
                                         )
@@ -560,4 +581,12 @@ fun BehaviorTab(onBack: () -> Unit) {
             confirmButton = {}
         )
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private fun openSystemLanguageSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+    }
+    context.startActivity(intent)
 }

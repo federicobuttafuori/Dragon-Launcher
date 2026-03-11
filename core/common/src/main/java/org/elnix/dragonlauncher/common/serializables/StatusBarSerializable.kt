@@ -104,11 +104,11 @@ object StatusBarJson {
     fun decodeStatusBarElements(json: String?): List<StatusBarSerializable> {
         if (json == null || json.isBlankJson) return emptyList()
 
-        StatusBarJson.logD(STATUS_BAR_TAG) { json }
+        logD(STATUS_BAR_TAG) { json }
         return try {
             jsonConfig.decodeFromString(json)
         } catch (e: Throwable) {
-            StatusBarJson.logE(STATUS_BAR_TAG) { "Decode failed for JSON: $json - ${e.message}" }
+            logE(STATUS_BAR_TAG) { "Decode failed for JSON: $json - ${e.message}" }
             emptyList()
         }
     }

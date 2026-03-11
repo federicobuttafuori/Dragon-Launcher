@@ -1,5 +1,7 @@
 package org.elnix.dragonlauncher.ui.dialogs
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,14 +28,10 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
-import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.common.utils.showToast
-import android.content.Intent
-import android.util.Log
-import android.content.pm.PackageManager
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.settings.asState
-import org.elnix.dragonlauncher.ui.dialogs.CustomAlertDialog
 import java.io.File
 
 @Composable
@@ -56,7 +54,7 @@ fun FontPickerDialog(onDismiss: () -> Unit) {
                     ?.map { it.nameWithoutExtension }
                     ?.sorted() ?: emptyList()
             } else emptyList()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
         base + extFonts
@@ -80,7 +78,7 @@ fun FontPickerDialog(onDismiss: () -> Unit) {
                             .clip(DragonShape)
                             .clickable {
                                 scope.launch {
-                                    // If font file exists locally, apply it. Otherwise request from extensions.
+                                    // If font file exists locally, apply it. Otherwise, request from extensions.
                                     val extDir = File(ctx.getExternalFilesDir(null), "fonts")
                                     val ttf = File(extDir, "$font.ttf")
                                     val otf = File(extDir, "$font.otf")
@@ -91,15 +89,15 @@ fun FontPickerDialog(onDismiss: () -> Unit) {
                                         // Not present locally: try to request from the specific fonts extension (Additional Fonts)
                                         try {
                                             val pm = ctx.packageManager
-                                            val fontsExtPkg = "org.dragon.launcher.fonts"
+                                            val fontsExtPkg = "org.elnix.dragonlauncher.fonts"
                                             
                                             val isInstalled = try {
                                                 pm.getPackageInfo(fontsExtPkg, 0)
                                                 true
-                                            } catch (e: Exception) { false }
+                                            } catch (_: Exception) { false }
 
                                             if (isInstalled) {
-                                                val i = Intent("org.dragon.launcher.ACTION_GET_FONTS").apply {
+                                                val i = Intent("org.elnix.dragonlauncher.ACTION_GET_FONTS").apply {
                                                     putExtra("FONT_NAME", font)
                                                     setPackage(fontsExtPkg)
                                                 }
@@ -178,7 +176,7 @@ fun fontNameToFont(name: String, context: android.content.Context? = null): Font
                 return FontFamily(Font(fontFile))
             }
         } catch (e: Exception) {
-            android.util.Log.e("FontPicker", "Error loading custom font $name: ${e.message}")
+            Log.e("FontPicker", "Error loading custom font $name: ${e.message}")
         }
     }
 

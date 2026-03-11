@@ -10,20 +10,14 @@ import android.provider.Settings
 import android.system.Os.kill
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.automirrored.filled.Notes
@@ -32,7 +26,6 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.GridOn
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Restore
@@ -40,7 +33,6 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -58,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -69,7 +60,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.common.utils.Constants.Links.discordInviteLink
+import org.elnix.dragonlauncher.common.utils.Constants.Links.DISCORD_INVITE_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.Links.DRAGON_WEBSITE
+import org.elnix.dragonlauncher.common.utils.Constants.Links.MAILTO_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.Links.REDDIT_LINK
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.alphaMultiplier
@@ -102,10 +96,9 @@ fun AdvancedSettingsScreen(
 
     val scope = rememberCoroutineScope()
 
-    val versionCode = getVersionCode(ctx)
+    val versionCode = ctx.getVersionCode()
 
     val isDebugModeEnabled by DebugSettingsStore.debugEnabled.asState()
-    val forceAppLanguageSelector by DebugSettingsStore.forceAppLanguageSelector.asState()
 
 
     val allApps by appsViewModel.allApps.collectAsState()
@@ -161,20 +154,6 @@ fun AdvancedSettingsScreen(
 
         item {
             SettingsItem(
-                title = stringResource(R.string.settings_language_title),
-                icon = Icons.Default.Language,
-                onClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !forceAppLanguageSelector) {
-                        openSystemLanguageSettings(ctx)
-                    } else {
-                        navController.navigate(SETTINGS.LANGUAGE)
-                    }
-                }
-            )
-        }
-
-        item {
-            SettingsItem(
                 title = stringResource(R.string.backup_restore),
                 icon = Icons.Default.Restore
             ) {
@@ -202,12 +181,14 @@ fun AdvancedSettingsScreen(
 
         item {
             SettingsItem(
-                title = stringResource(R.string.widgets),
-                icon = Icons.Default.Widgets
+                title = stringResource(R.string.wellbeing),
+                icon = Icons.Default.SelfImprovement
             ) {
-                navController.navigate(SETTINGS.WIDGETS)
+                navController.navigate(SETTINGS.WELLBEING)
             }
         }
+
+        item { TextDivider(stringResource(R.string.advanced)) }
 
         item {
             SettingsItem(
@@ -226,14 +207,6 @@ fun AdvancedSettingsScreen(
             ) { navController.navigate(SETTINGS.EXTENSIONS) }
         }
 
-        item {
-            SettingsItem(
-                title = stringResource(R.string.wellbeing),
-                icon = Icons.Default.SelfImprovement
-            ) {
-                navController.navigate(SETTINGS.WELLBEING)
-            }
-        }
 
         item {
             SettingsItem(
@@ -264,9 +237,8 @@ fun AdvancedSettingsScreen(
 
         item {
             SettingsItem(
-                title = "Logs",
-                icon = Icons.AutoMirrored.Filled.Notes,
-                modifier = Modifier.animateItem()
+                title = stringResource(R.string.logs),
+                icon = Icons.AutoMirrored.Filled.Notes
             ) {
                 navController.navigate(SETTINGS.LOGS)
             }
@@ -275,6 +247,8 @@ fun AdvancedSettingsScreen(
 
         item { TextDivider(stringResource(R.string.about)) }
 
+
+        // Social links
         item {
             Row(
                 modifier = Modifier
@@ -283,52 +257,62 @@ fun AdvancedSettingsScreen(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Row(
+
+                val githubIcon = if (backgroundColor.luminance() < 0.5) {
+                    R.drawable.github_invertocat_white
+                } else {
+                    R.drawable.github_invertocat_black
+                }
+                Icon(
+                    painter = painterResource(githubIcon),
+                    contentDescription = "Github Icon",
+                    tint = Color.Unspecified,
                     modifier = Modifier
                         .weight(1f)
                         .clip(DragonShape)
-                        .clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") },
-                    horizontalArrangement = Arrangement.Center
-                ) {
+                        .clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") }
+                )
 
-                    val githubIcon = if (backgroundColor.luminance() < 0.5) {
-                        R.drawable.github_invertocat_white
-                    } else {
-                        R.drawable.github_invertocat_black
-                    }
 
-                    val githubLogo = if (backgroundColor.luminance() < 0.5) {
-                        R.drawable.github_logo_white
-                    } else {
-                        R.drawable.github_logo
-                    }
-
-                    Icon(
-                        painter = painterResource(githubIcon),
-                        contentDescription = "Github Icon",
-                        tint = Color.Unspecified
-                    )
-
-                    Image(
-                        painter = painterResource(githubLogo),
-                        contentDescription = "Github Logo"
-                    )
-                }
-
-                Spacer(Modifier.width(12.dp))
-
-                Row(
+                Icon(
+                    painterResource(R.drawable.discord_symbol_blurple),
+                    contentDescription = "Discord icon",
+                    tint = Color.Unspecified,
                     modifier = Modifier
                         .weight(1f)
                         .clip(DragonShape)
-                        .clickable { ctx.openUrl(discordInviteLink) },
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.discord_logo_blurple),
-                        contentDescription = "Discord Logo"
-                    )
-                }
+                        .clickable { ctx.openUrl(DISCORD_INVITE_LINK) }
+                )
+
+                Icon(
+                    painterResource(R.drawable.reddit_icon_fullcolor),
+                    contentDescription = "Reddit icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(REDDIT_LINK) }
+                )
+
+                Icon(
+                    painterResource(R.drawable.dragon_launcher_foreground),
+                    contentDescription = "Website icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(DRAGON_WEBSITE) }
+                )
+
+                Icon(
+                    painterResource(R.drawable.protonmail_icon),
+                    contentDescription = "Proton Mail icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(MAILTO_LINK) }
+                )
             }
         }
 
@@ -361,7 +345,13 @@ fun AdvancedSettingsScreen(
                     onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest") },
                     onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
                 ) {
-                    onLaunchAction(SwipeActionSerializable.LaunchApp(obtainiumPackageName, false, 0))
+                    onLaunchAction(
+                        SwipeActionSerializable.LaunchApp(
+                            obtainiumPackageName,
+                            false,
+                            0
+                        )
+                    )
                 }
             } else {
                 SettingsItem(
@@ -394,6 +384,8 @@ fun AdvancedSettingsScreen(
             )
         }
 
+
+        // Contributors
         item {
             ContributorItem(
                 name = "Elnix90",
@@ -404,54 +396,26 @@ fun AdvancedSettingsScreen(
         }
 
         item {
-            Row(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.yoanndev90),
-                    contentDescription = "YoannDev90 profile picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            ctx.openUrl("https://github.com/YoannDev90")
-                        }
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Fit
-                )
-                Image(
-                    painter = painterResource(R.drawable.lucky_the_cookie),
-                    contentDescription = "LuckyTheCookie profile picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            ctx.openUrl("https://lthb.fr")
-                        }
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Fit
-                )
-                Image(
-                    painter = painterResource(R.drawable.acress1),
-                    contentDescription = "Acress1 profile picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            ctx.openUrl("https://github.com/acress1")
-                        }
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Fit
-                )
-            }
+            ContributorItem(
+                name = "YoannDev90",
+                imageRes = R.drawable.yoanndev90,
+                description = stringResource(R.string.yoann_desc),
+                githubUrl = "https://lthb.fr"
+            )
         }
 
+        item {
+            ContributorItem(
+                name = "Lucky",
+                imageRes = R.drawable.lucky_the_cookie,
+                description = stringResource(R.string.lucky_desc),
+                githubUrl = "https://github.com/YoannDev90"
+            )
+        }
+
+
+
+        // Version name (clickable to access debug / copy)
         item {
             Column(
                 modifier = Modifier
@@ -462,8 +426,10 @@ fun AdvancedSettingsScreen(
                 val infoStyle = MaterialTheme.typography.labelSmall
                 val infoColor = MaterialTheme.colorScheme.onBackground.alphaMultiplier(0.7f)
 
-                val debugModeAlreadyEnabledText = stringResource(R.string.debug_mode_already_enabled)
-                val deviceInfoCopiedToClipboard = stringResource(R.string.device_info_copied_to_clipboard)
+                val debugModeAlreadyEnabledText =
+                    stringResource(R.string.debug_mode_already_enabled)
+                val versionNameCopiedToClipboard =
+                    stringResource(R.string.version_copied_to_clipboard)
 
                 Text(
                     text = "Dragon Launcher $versionName ($versionCode)",
@@ -482,7 +448,7 @@ fun AdvancedSettingsScreen(
 
                                 timesClickedOnVersion == 0 -> {
                                     ctx.copyToClipboard(versionName)
-                                    ctx.showToast(deviceInfoCopiedToClipboard)
+                                    ctx.showToast(versionNameCopiedToClipboard)
                                     timesClickedOnVersion += 1
                                 }
 
@@ -517,13 +483,4 @@ fun AdvancedSettingsScreen(
             }
         }
     }
-}
-
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private fun openSystemLanguageSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
-        data = Uri.fromParts("package", context.packageName, null)
-    }
-    context.startActivity(intent)
 }

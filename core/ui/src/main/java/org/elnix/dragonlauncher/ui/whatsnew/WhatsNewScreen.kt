@@ -25,10 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.utils.Update
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.openUrl
-import org.elnix.dragonlauncher.common.utils.Update
 
 
 // I hate the behavior of this shitty modal sheet that force showing the system bars, even in fullscreen
@@ -42,7 +42,7 @@ fun WhatsNewBottomSheet(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
-    val versionCode = getVersionCode(ctx)
+    val versionCode = ctx.getVersionCode()
 
     ModalBottomSheet(
         containerColor = MaterialTheme.colorScheme.surface,

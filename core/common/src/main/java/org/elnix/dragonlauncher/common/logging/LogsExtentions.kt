@@ -6,18 +6,25 @@ import timber.log.Timber
  * Extension for optimized logging with Timber.
  * Uses inline and lambda for performance when logging complex strings.
  */
-inline fun Any.logD(tag: String = this::class.java.simpleName, message: () -> String) {
-    Timber.tag(tag).d(message())
+
+// Used to force consistency across logs, to avoid Yoan's vibecoding to create logs with hard coded tags
+data class LogTag(
+    val tag: String
+)
+
+
+inline fun logD(tag: LogTag, throwable: Throwable? = null, message: () -> String) {
+    Timber.tag(tag.tag).d(throwable, message())
 }
 
-inline fun Any.logI(tag: String = this::class.java.simpleName, message: () -> String) {
-    Timber.tag(tag).i(message())
+inline fun logI(tag: LogTag, throwable: Throwable? = null, message: () -> String) {
+    Timber.tag(tag.tag).i(throwable, message())
 }
 
-inline fun Any.logW(tag: String = this::class.java.simpleName, message: () -> String) {
-    Timber.tag(tag).w(message())
+inline fun logW(tag: LogTag, throwable: Throwable? = null, message: () -> String) {
+    Timber.tag(tag.tag).w(throwable,message())
 }
 
-inline fun Any.logE(tag: String = this::class.java.simpleName, throwable: Throwable? = null, message: () -> String) {
-    Timber.tag(tag).e(throwable, message())
+inline fun logE(tag: LogTag, throwable: Throwable? = null, message: () -> String) {
+    Timber.tag(tag.tag).e(throwable, message())
 }

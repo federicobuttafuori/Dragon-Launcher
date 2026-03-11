@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<device-admin>
-    <uses-policies>
-        <!-- Device admin is only used to prevent system to kill app somehow-->
-        <force-lock />
-    </uses-policies>
-</device-admin>

@@ -3,7 +3,6 @@
 package org.elnix.dragonlauncher.ui.settings.debug
 
 import android.content.Intent
-import android.os.Build
 import android.provider.Settings
 import android.system.Os.kill
 import androidx.compose.foundation.BorderStroke
@@ -11,13 +10,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,32 +29,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.detectSystemLauncher
+import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.services.SystemControl
-import org.elnix.dragonlauncher.services.SystemControl.activateDeviceAdmin
-import org.elnix.dragonlauncher.services.SystemControl.isDeviceAdminActive
 import org.elnix.dragonlauncher.settings.allStores
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
-import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
-import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
@@ -62,11 +55,6 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.wellbeing.OverlayReminderService
-
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.foundation.layout.padding
 
 @Composable
 fun DebugTab(
@@ -108,20 +96,12 @@ fun DebugTab(
         resetText = null
     ) {
         item {
-            DragonColumnGroup {
-                SettingsSwitchRow(
-                    setting = DebugSettingsStore.debugEnabled,
-                    title = stringResource(R.string.activate_debug_mode),
-                    description = stringResource(R.string.activate_debug_mode_desc)
-                ) {
-                    scope.launch { DebugSettingsStore.debugEnabled.set(ctx, it) }
-                }
-
-                SettingsSwitchRow(
-                    setting = DebugSettingsStore.disableExtensionSignatureCheck,
-                    title = "Disable extension signature check",
-                    description = "Allow extensions not signed with the official key (DANGEROUS)"
-                )
+            SettingsSwitchRow(
+                setting = DebugSettingsStore.debugEnabled,
+                title = stringResource(R.string.activate_debug_mode),
+                description = stringResource(R.string.activate_debug_mode_desc)
+            ) {
+                scope.launch { DebugSettingsStore.debugEnabled.set(ctx, it) }
             }
         }
 
@@ -143,7 +123,12 @@ fun DebugTab(
 
                 DragonButton(
                     onClick = {
-                        scope.launch { PrivateSettingsStore.lastSeenVersionCodeWhatsNew.set(ctx, 0) }
+                        scope.launch {
+                            PrivateSettingsStore.lastSeenVersionCodeWhatsNew.set(
+                                ctx,
+                                0
+                            )
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -152,13 +137,18 @@ fun DebugTab(
 
                 DragonButton(
                     onClick = {
-                        scope.launch { PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(ctx, 0) }
+                        scope.launch {
+                            PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(
+                                ctx,
+                                0
+                            )
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Reset Google lockdown warning")
                 }
-                
+
                 DragonButton(
                     onClick = {
                         showEditAppOverrides = true
@@ -215,7 +205,7 @@ fun DebugTab(
                         onValueChange = { packageQuery = it },
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("Search package") },
-                        placeholder = { Text("e.g. org.dragon.launcher.fonts") },
+                        placeholder = { Text("e.g. org.elnix.dragonlauncher.fonts") },
                         singleLine = true,
                         colors = AppObjectsColors.outlinedTextFieldColors()
                     )
@@ -226,7 +216,7 @@ fun DebugTab(
                                 val info = ctx.packageManager.getPackageInfo(packageQuery.trim(), 0)
                                 buildString {
                                     appendLine("Package: ${info.packageName}")
-                                    appendLine("Version: ${info.versionName} (${if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode else info.versionCode})")
+                                    appendLine("Version: ${info.versionName} (${ctx.getVersionCode()}")
                                     appendLine("Enabled: ${info.applicationInfo?.enabled ?: "unknown"}")
                                     appendLine("Data Dir: ${info.applicationInfo?.dataDir ?: "unknown"}")
                                 }
@@ -270,8 +260,6 @@ fun DebugTab(
                 ) {
                     Text("Open Accessibility Services")
                 }
-
-                ActivateDeviceAdminButton()
 
                 Column(modifier = Modifier.padding(top = 8.dp)) {
                     Row(
@@ -319,7 +307,9 @@ fun DebugTab(
                         }
                     },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                     colors = AppObjectsColors.outlinedTextFieldColors()
                 )
             }
@@ -333,7 +323,15 @@ fun DebugTab(
                             ctx.showToast("Overlay permission not granted")
                             return@DragonButton
                         }
-                        OverlayReminderService.show(ctx, "TikTok", "15 min", "42 min", "10 min", true, "reminder")
+                        OverlayReminderService.show(
+                            ctx,
+                            "TikTok",
+                            "15 min",
+                            "42 min",
+                            "10 min",
+                            true,
+                            "reminder"
+                        )
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -346,7 +344,15 @@ fun DebugTab(
                             ctx.showToast("Overlay permission not granted")
                             return@DragonButton
                         }
-                        OverlayReminderService.show(ctx, "TikTok", "25 min", "58 min", "5 min", true, "time_warning")
+                        OverlayReminderService.show(
+                            ctx,
+                            "TikTok",
+                            "25 min",
+                            "58 min",
+                            "5 min",
+                            true,
+                            "time_warning"
+                        )
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -363,19 +369,24 @@ fun DebugTab(
                         onClick = { scope.launch { settingsStore.resetAll(ctx) } },
                         colors = AppObjectsColors.cancelButtonColors(),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
                     ) {
-                        Text(text = "Reset ${settingsStore.name}", color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = "Reset ${settingsStore.name}",
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
-                
+
                 SettingsSwitchRow(
                     setting = PrivateSettingsStore.hasInitialized,
                     title = stringResource(R.string.has_initialized),
                     description = "De-initializing will re-run the welcome flow.",
                     needValidationToDisable = true
                 )
-                
+
                 SettingsSwitchRow(
                     setting = PrivateSettingsStore.showSetDefaultLauncherBanner,
                     title = "Show default banner",
@@ -407,6 +418,12 @@ fun DebugTab(
                 ) {
                     Text("☠\uFE0F Uninstall Launcher")
                 }
+
+                SettingsSwitchRow(
+                    setting = DebugSettingsStore.disableExtensionSignatureCheck,
+                    title = "Disable extension signature check",
+                    description = "Allow extensions not signed with the official key (DANGEROUS)"
+                )
             }
         }
     }
@@ -420,24 +437,5 @@ fun DebugTab(
             )
             showEditAppOverrides = false
         }
-    }
-}
-
-
-@Composable
-fun ActivateDeviceAdminButton() {
-    val ctx = LocalContext.current
-    val isActive = remember(Unit) { isDeviceAdminActive(ctx) }
-    TextButton(
-        enabled = !isActive,
-        onClick = {
-            ctx.logD("Compose") { "Button clicked - context: ${ctx.packageName}" }
-            activateDeviceAdmin(ctx)
-        }
-    ) {
-        Text(
-            if (isActive) "Device Admin ✓ Active"
-            else "Activate Device Admin"
-        )
     }
 }

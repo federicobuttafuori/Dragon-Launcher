@@ -56,7 +56,7 @@ fun Context.showToast(
                 }
             }
         } catch (e: Exception) {
-            logE(TAG) { "Error while showing toast" }
+            logE(TAG, e) { "Error while showing toast" }
         }
     }
 }
@@ -284,7 +284,7 @@ fun openAlarmApp(ctx: Context) {
     if (!openAlarmApp2(ctx)) return
 
     // No alarm-capable app found
-    ctx.logD("TAG") { "No alarm app found" }
+    logD(TAG) { "No alarm app found" }
 }
 
 
@@ -311,13 +311,16 @@ fun openCalendar(ctx: Context) {
 }
 
 
-fun getVersionCode(ctx: Context): Int =
+fun Context.getVersionCode(): Int =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        ctx.packageManager.getPackageInfo(ctx.packageName, 0).longVersionCode.toInt()
+        packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
     } else {
         @Suppress("DEPRECATION")
-        ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionCode
+        packageManager.getPackageInfo(packageName, 0).versionCode
     }
+
+fun Context.getVersionName(): String =
+    packageManager.getPackageInfo(packageName, 0).versionName ?: "unknown"
 
 
 fun Long.formatDateTime(): String {
@@ -406,7 +409,6 @@ fun Color.alphaMultiplier(multiplier: Float): Color =
  */
 fun Color.semiTransparentIfDisabled(enabled: Boolean): Color =
     alphaMultiplier(if (enabled) 1f else 0.5f)
-
 
 
 /**

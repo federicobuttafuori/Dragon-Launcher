@@ -87,7 +87,7 @@ fun getSwipeActionSerializableStrict(
 ): SwipeActionSerializable {
     return when (raw) {
         is String -> SwipeJson.decodeAction(raw)
-        else -> null
+        else -> SwipeJson.decodeAction(raw.toString())
     } ?: def
 }
 

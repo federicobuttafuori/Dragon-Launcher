@@ -193,7 +193,7 @@ fun AddPointDialog(
             onDismiss = { showAppPicker = false },
             onAppSelected = { app ->
 
-                ctx.logD(Constants.Logging.APP_LAUNCH_TAG) { "Selected App: $app" }
+                logD(Constants.Logging.APP_LAUNCH_TAG) { "Selected App: $app" }
 
                 // Try to query shortcuts, but handle crashes gracefully
                 val list = if (promptForShortcuts) {

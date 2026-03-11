@@ -78,7 +78,7 @@ suspend fun loadChangelogs(
             )
 
         } catch (e: Exception) {
-            logE("Changelogs") { "Failed to parse $filename" }
+            logE(Constants.Logging.TAG, e) { "Failed to parse $filename" }
             null
         }
     }

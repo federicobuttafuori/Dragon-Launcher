@@ -82,6 +82,13 @@ object DebugSettingsStore : MapSettingsStore() {
     )
 
 
+
+    val backupStores = Settings.stringSet(
+        key = "backupStores",
+        dataStoreName = dataStoreName,
+        default = DataStoreName.entries.map { it.value }.toSet()
+    )
+
     override val ALL: List<BaseSettingObject<*,*>>
         get() = listOf(
             this.debugEnabled,
@@ -95,6 +102,7 @@ object DebugSettingsStore : MapSettingsStore() {
             this.useAccessibilityInsteadOfContextToExpandActionPanel,
             this.enableLogging,
             this.privateSpaceDebugInfo,
-            this.disableExtensionSignatureCheck
+            this.disableExtensionSignatureCheck,
+            this.backupStores
         )
     }

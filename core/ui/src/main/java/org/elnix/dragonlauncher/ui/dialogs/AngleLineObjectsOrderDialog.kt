@@ -153,7 +153,6 @@ fun AngleLineObjectsOrderDialog(
 
 @Composable
 fun rememberLineObjectsOrder(): MutableState<List<AngleLineObjects>> {
-    val ctx = LocalContext.current
     val orderString by AngleLineSettingsStore.angleLineObjectsOrder.asState()
 
     return remember(orderString) {
@@ -164,9 +163,7 @@ fun rememberLineObjectsOrder(): MutableState<List<AngleLineObjects>> {
                     ?.split(",")
                     ?.map { AngleLineObjects.valueOf(it) }
             } catch (e: Exception) {
-                ctx.logE(
-                    ANGLE_LINE_TAG
-                ) { "Failed to decode angle line objects order, using default value" }
+                logE(ANGLE_LINE_TAG, e) { "Failed to decode angle line objects order, using default value" }
                 null
             } ?: AngleLineObjects.entries.toList()
 

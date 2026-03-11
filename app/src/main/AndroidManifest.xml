@@ -18,8 +18,6 @@
     <uses-permission android:name="android.permission.BIND_APPWIDGET"
         tools:ignore="ProtectedPermissions" />
 
-    <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN"
-        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.GET_TASKS" tools:ignore="GetTasks" />
 
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
@@ -43,9 +41,9 @@
     <!-- Extension Security: Launcher defines the permission -->
     <!-- We use 'normal' protection so developers can build extensions without matching signatures -->
     <!-- The launcher's internal code will handle the actual security check based on settings -->
-    <permission android:name="org.dragon.launcher.APP_EXTENSION"
+    <permission android:name="org.elnix.dragonlauncher.APP_EXTENSION"
         android:protectionLevel="normal" />
-    <uses-permission android:name="org.dragon.launcher.APP_EXTENSION" />
+    <uses-permission android:name="org.elnix.dragonlauncher.APP_EXTENSION" />
 
     <application
         android:name=".MyApplication"
@@ -163,24 +161,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-
-        <receiver
-            android:name=".services.DeviceAdminReceiver"
-            android:label="@string/device_admin_label"
-            android:description="@string/device_admin_description"
-            android:permission="android.permission.BIND_DEVICE_ADMIN"
-            android:exported="true">
-
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/device_admin_policies" />
-
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-                <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
-                <action android:name="android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED" />
-            </intent-filter>
-        </receiver>
 
         <receiver
             android:name=".PackageReceiver"

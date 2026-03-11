@@ -3,14 +3,17 @@ package org.elnix.dragonlauncher.ui.actions
 import android.content.Context
 import android.content.Intent
 import android.content.pm.LauncherApps
+import android.os.Build
 import android.os.Process
 import android.os.UserManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.APP_LAUNCH_TAG
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.common.utils.expandQuickActionsDrawer
 import org.elnix.dragonlauncher.common.utils.hasUriReadPermission
 import org.elnix.dragonlauncher.common.utils.launchShortcut
@@ -55,7 +58,7 @@ fun launchSwipeAction(
 
             try {
 
-                ctx.logD(APP_LAUNCH_TAG) { "Launching action: $action" }
+                logD(APP_LAUNCH_TAG) { "Launching action: $action" }
 
                 /*  ─────────────  1. Private Space Check ─────────────  */
                 if (action.isPrivateSpace) {
@@ -89,9 +92,9 @@ fun launchSwipeAction(
                 // If app has no wellbeing checks to do; it launches directly
                 launchAppDirectly(appsViewModel, ctx, action.packageName, action.userId ?: 0)
             } catch (e: AppLaunchException) {
-                ctx.logE(APP_LAUNCH_TAG) { e.toString() }
+                logE(APP_LAUNCH_TAG) { e.toString() }
             } catch (e: Exception) {
-                ctx.logE(APP_LAUNCH_TAG) { e.toString() }
+                logE(APP_LAUNCH_TAG) { e.toString() }
                 e.printStackTrace()
             }
         }
@@ -111,11 +114,11 @@ fun launchSwipeAction(
 
         SwipeActionSerializable.NotificationShade -> {
             if (!SystemControl.isServiceEnabled(ctx)) {
-                ctx.showToast("Please enable accessibility settings to use that feature")
+                ctx.showToast(ctx.getString(R.string.please_enable_accessibility_services_to_use_that_feature))
                 SystemControl.openServiceSettings(ctx)
                 return
             }
-            SystemControl.expandNotifications(ctx)
+            SystemControl.expandNotifications()
         }
 
         SwipeActionSerializable.ControlPanel -> {
@@ -140,7 +143,11 @@ fun launchSwipeAction(
                 SystemControl.openServiceSettings(ctx)
                 return
             }
-            SystemControl.lockScreen(ctx)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                SystemControl.lockScreen(ctx)
+            } else {
+                ctx.showToast(ctx.getString(R.string.not_supported_in_this_android_version))
+            }
         }
 
         is SwipeActionSerializable.OpenFile -> {
@@ -167,7 +174,7 @@ fun launchSwipeAction(
 
             } catch (e: Exception) {
                 ctx.showToast("Unable to open file: ${e.message}")
-                ctx.logE("OpenFile") { e.toString() }
+                logE(TAG) { e.toString() }
             }
         }
 
@@ -216,7 +223,7 @@ fun launchAppDirectly(
 //            .any { it.applicationInfo.packageName == packageName }
     } ?: Process.myUserHandle()
 
-    ctx.logD(APP_LAUNCH_TAG) { "pkg: $packageName; userId: $userId: handle: $targetUserHandle" }
+    logD(APP_LAUNCH_TAG) { "pkg: $packageName; userId: $userId: handle: $targetUserHandle" }
 
     // 2. Find the launcher activity in that profile
     val activity = launcherApps
@@ -236,13 +243,13 @@ fun launchAppDirectly(
         // Track recently used app
         appsViewModel.addRecentlyUsedApp(packageName)
     } catch (e: SecurityException) {
-        ctx.logE(APP_LAUNCH_TAG) { "Security error launching $packageName" }
+        logE(APP_LAUNCH_TAG) { "Security error launching $packageName" }
         throw AppLaunchException("Security error launching $packageName", e)
     } catch (e: NullPointerException) {
-        ctx.logE(APP_LAUNCH_TAG) { "App component not found for $packageName" }
+        logE(APP_LAUNCH_TAG) { "App component not found for $packageName" }
         throw AppLaunchException("App component not found for $packageName", e)
     } catch (e: Exception) {
-        ctx.logE(APP_LAUNCH_TAG) { "Failed to launch $packageName" }
+        logE(APP_LAUNCH_TAG) { "Failed to launch $packageName" }
         throw AppLaunchException("Failed to launch $packageName", e)
     }
 }

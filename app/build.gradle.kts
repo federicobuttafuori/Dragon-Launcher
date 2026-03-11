@@ -1,9 +1,9 @@
 
 import com.android.build.api.dsl.ApplicationExtension
-import java.util.Properties
-import java.net.URI
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.URI
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -80,6 +80,7 @@ extensions.configure<ApplicationExtension> {
                 storePassword = storePass
                 keyAlias = alias
                 keyPassword = keyPass
+
             } else {
                 println("WARNING: Release signingConfig not fully configured.")
             }
@@ -102,8 +103,12 @@ extensions.configure<ApplicationExtension> {
                             env("KEY_PASSWORD") != null
 
                  if (hasSigning) {
-                    signingConfigs.getByName("release")
-                } else null
+                     println("Signing release using release signing")
+                     signingConfigs.getByName("release")
+                } else {
+                     println("No signing config found, apk will be unsigned!")
+                    null
+                 }
 
             } else {
                 println("FDroid build - not using release signing config")

@@ -66,6 +66,7 @@ import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.allStatusBarSerializable
 import org.elnix.dragonlauncher.common.utils.Constants
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.isValidDateFormat
 import org.elnix.dragonlauncher.common.utils.isValidTimeFormat
@@ -180,7 +181,6 @@ fun EditStatusBar() {
     val haptic = LocalHapticFeedback.current
 
     val scope = rememberCoroutineScope()
-    val logger = remember { object {} } // used as target for log helpers
 
     val statusBarBackground by StatusBarSettingsStore.barBackgroundColor.asState()
     val statusBarText by StatusBarSettingsStore.barTextColor.asState()
@@ -288,7 +288,7 @@ fun EditStatusBar() {
                     elements.add(toIdx, item)
                 }
             } catch (e: Exception) {
-                logger.logE("StatusBarDebug") { "Crash avoided during reorder: ${e.message}" }
+                logE(STATUS_BAR_TAG) { "Crash avoided during reorder: ${e.message}" }
             }
         },
         onDragEnd = { _, _ ->

@@ -1,6 +1,5 @@
 package org.elnix.dragonlauncher.common.logging
 
-import android.util.Log
 import timber.log.Timber
 
 object DragonLogManager {
@@ -8,10 +7,7 @@ object DragonLogManager {
     private var fileTree: FileLoggingTree? = null
 
     fun init(ctx: android.content.Context) {
-        // Arbre pour Logcat (uniquement en debug)
-        if (Log.isLoggable("DragonLauncher", Log.DEBUG)) {
-            Timber.plant(Timber.DebugTree())
-        }
+        Timber.plant(Timber.DebugTree())
 
         // Initialisation de l'arbre pour les fichiers
         fileTree = FileLoggingTree(ctx)

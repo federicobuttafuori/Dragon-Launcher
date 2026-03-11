@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.enumsui
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -14,7 +15,7 @@ val settingsRoutes = listOf(
     SETTINGS.ICON_PACK,
     SETTINGS.STATUS_BAR,
     SETTINGS.THEME,
-    SETTINGS.FLOATING_APPS,
+    SETTINGS.WIDGETS_FLOATING_APPS,
     SETTINGS.COLORS,
     SETTINGS.BEHAVIOR,
     SETTINGS.DRAWER,
@@ -31,6 +32,7 @@ val settingsRoutes = listOf(
 )
 
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun routeName(route: String): String {
     val ctx = LocalContext.current
@@ -52,7 +54,7 @@ fun routeName(route: String): String {
             ctx.getString(R.string.status_bar)
         SETTINGS.THEME ->
             ctx.getString(R.string.theme_selector)
-        SETTINGS.FLOATING_APPS ->
+        SETTINGS.WIDGETS_FLOATING_APPS ->
             ctx.getString(R.string.widgets_floating_apps)
         SETTINGS.COLORS ->
             ctx.getString(R.string.color_selector)

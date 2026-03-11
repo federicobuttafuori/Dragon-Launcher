@@ -1,8 +1,8 @@
 package org.elnix.dragonlauncher.common.serializables
 
 import androidx.compose.runtime.Immutable
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerialName
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable.OpenDragonLauncherSettings
 
 /**
@@ -18,91 +18,91 @@ import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable.Ope
 data class SwipePointSerializable(
 
     /** Index of the circle (ring) this swipe point belongs to. */
-    @SerialName("a")
+    @SerializedName("a")
     var circleNumber: Int,
 
     /** Angular position in degrees (0–360), clockwise, relative to the circle center. */
-    @SerialName("b")
+    @SerializedName("b")
     var angleDeg: Double,
 
     /** Optional action executed when the swipe point is triggered. */
-    @SerialName("c")
+    @SerializedName("c")
     val action: SwipeActionSerializable,
 
     /** Stable unique identifier for persistence, diffing, and migrations. */
-    @SerialName("d")
+    @SerializedName("d")
     val id: String,
 
     /** Optional nesting/group identifier for hierarchical or contextual swipe layouts. */
-    @SerialName("e")
+    @SerializedName("e")
     var nestId: Int? = 0,
 
     /** Fully customizable icon definition overriding default visuals. */
-    @SerialName("f")
+    @SerializedName("f")
     val customIcon: CustomIconSerializable? = null,
 
     /** Border thickness (dp) when the swipe point is not selected. */
-    @SerialName("g")
+    @SerializedName("g")
     val borderStroke: Float? = null,
 
     /** Border thickness (dp) when the swipe point is selected or active. */
-    @SerialName("h")
+    @SerializedName("h")
     val borderStrokeSelected: Float? = null,
 
     /** Border color in ARGB format when not selected. */
-    @SerialName("i")
+    @SerializedName("i")
     val borderColor: Int? = null,
 
     /** Background fill color (ARGB) in normal state. */
-    @SerialName("k")
+    @SerializedName("k")
     val backgroundColor: Int? = null,
 
     /** Border color in ARGB format when selected. */
-    @SerialName("j")
+    @SerializedName("j")
     val borderColorSelected: Int? = null,
 
     /** Background fill color (ARGB) in selected state. */
-    @SerialName("l")
+    @SerializedName("l")
     val backgroundColorSelected: Int? = null,
 
     /** Global opacity multiplier (0.0 – 1.0) applied to the whole swipe point. */
-    @SerialName("m")
+    @SerializedName("m")
     val opacity: Float? = null,
 
     /** Enables haptic feedback when the swipe point is activated. */
-    @SerialName("n")
+    @SerializedName("n")
     val haptic: Int? = null,
 
     /** Optional user-defined display name (labels, accessibility, debug UI). */
-    @SerialName("o")
+    @SerializedName("o")
     val customName: String? = null,
 
     /** Per-corner radius definition for the swipe point container. */
-    @SerialName("p")
+    @SerializedName("p")
     val cornerRadius: CornerRadiusSerializable? = null,
 
     /** Inner padding (dp) between border and content. */
-    @SerialName("q")
+    @SerializedName("q")
     val innerPadding: Int? = null,
 
     /** Optional override for action color, default (null) will use the action color */
-    @SerialName("r")
+    @SerializedName("r")
     val customActionColor: Int? = null,
 
     /** Optional size override */
-    @SerialName("s")
+    @SerializedName("s")
     val size: Int? = null,
 
     /**
      * Shape of the border icon, default is a circle
      */
-    @SerialName("borderShape")
+    @SerializedName("borderShape")
     val borderShape: IconShape? = IconShape.Circle,
 
     /**
      * Shape of the selected border icon, default is a circle
      */
-    @SerialName("borderShapeSelected")
+    @SerializedName("borderShapeSelected")
     val borderShapeSelected: IconShape? = IconShape.Circle
 ) {
     override fun toString(): String {

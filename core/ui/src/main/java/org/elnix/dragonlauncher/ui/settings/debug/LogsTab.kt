@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -50,17 +51,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import java.io.InputStreamReader
-import org.elnix.dragonlauncher.common.serializables.ExtensionModel
-import kotlinx.coroutines.delay
-import kotlinx.serialization.json.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.elnix.dragonlauncher.common.logging.DragonLogManager
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.LOGS_TAG
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.detectSystemLauncher
 import org.elnix.dragonlauncher.common.utils.formatDateTime
+import org.elnix.dragonlauncher.common.utils.getVersionCode
+import org.elnix.dragonlauncher.common.utils.getVersionName
 import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.services.ExtensionManager
@@ -72,13 +77,6 @@ import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import java.io.File
 
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.graphics.vector.ImageVector
-
 @Composable
 fun LogsTab(
     onBack: () -> Unit
@@ -89,7 +87,7 @@ fun LogsTab(
     var logs by remember { mutableStateOf("") }
     var selectedFile by remember { mutableStateOf<File?>(null) }
 
-    var refreshTrigger by remember { mutableStateOf(0) }
+    var refreshTrigger by remember { mutableIntStateOf(0) }
     val logFiles by produceState(initialValue = emptyList(), ctx, refreshTrigger) {
         value = DragonLogManager.getAllLogFiles()
     }
@@ -102,9 +100,8 @@ fun LogsTab(
     am.getMemoryInfo(memInfo)
     val currentLauncher = detectSystemLauncher(ctx)
     val isDefault = ctx.isDefaultLauncher
-    val packageInfo = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
-    val versionName = packageInfo.versionName ?: "unknown"
-    val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) packageInfo.longVersionCode else packageInfo.versionCode.toLong()
+    val versionName = ctx.getVersionName()
+    val versionCode = ctx.getVersionCode()
 
     // Build extension list by parsing the registry JSON directly (robust to field names)
     var finalExtensionText = "No extensions installed"
@@ -124,7 +121,7 @@ fun LogsTab(
                         if (ExtensionManager.isExtensionInstalled(ctx, pkgValue)) {
                             val pkgInfo = try {
                                 ctx.packageManager.getPackageInfo(pkgValue, 0)
-                            } catch (e: Exception) { null }
+                            } catch (_: Exception) { null }
                             
                             val versionStr = pkgInfo?.versionName ?: "unknown"
                             lines.add("$nameValue ($versionStr)")
@@ -430,10 +427,10 @@ private fun exportLogFile(ctx: Context, file: File) {
 
 
         ctx.startActivity(Intent.createChooser(shareIntent, "Share ${file.name}"))
-        ctx.logD {" Share opened: ${file.name} (${shareFile.absolutePath})" }
+        logD(LOGS_TAG) {" Share opened: ${file.name} (${shareFile.absolutePath})" }
 
     } catch (e: SecurityException) {
-        ctx.logE("LogsTab") { "FileProvider not configured: ${e.message}" }
+        logE(LOGS_TAG, e) { "FileProvider not configured: ${e.message}" }
         val content = DragonLogManager.readLogFile(file)
         val textIntent = Intent().apply {
             action = Intent.ACTION_SEND
@@ -443,6 +440,6 @@ private fun exportLogFile(ctx: Context, file: File) {
         }
         ctx.startActivity(Intent.createChooser(textIntent, "Share logs (text)"))
     } catch (e: Exception) {
-        ctx.logE("LogsTab") { "Share failed: ${e.message}" }
+        logE(LOGS_TAG, e) { "Share failed: ${e.message}" }
     }
 }

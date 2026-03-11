@@ -3,33 +3,46 @@ package org.elnix.dragonlauncher.ui.dialogs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChangeCircle
+import androidx.compose.material.icons.filled.Deselect
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.settings.DataStoreName
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 
 @Composable
 fun ExportSettingsDialog(
     onDismiss: () -> Unit,
-    availableStores: Map<DataStoreName, BaseSettingsStore<*,*>> = backupableStores,
-    defaultStores:  Map<DataStoreName, BaseSettingsStore<*,*>> = backupableStores,
-    onConfirm: (selectedStores: Map<DataStoreName, BaseSettingsStore<*,*>>) -> Unit
+    availableStores: Map<DataStoreName, BaseSettingsStore<*, *>> = backupableStores,
+    defaultStores: Map<DataStoreName, BaseSettingsStore<*, *>> = backupableStores,
+    onConfirm: (selectedStores: Map<DataStoreName, BaseSettingsStore<*, *>>) -> Unit
 ) {
 
     val selected = remember(availableStores) {
@@ -48,7 +61,7 @@ fun ExportSettingsDialog(
                 colors = AppObjectsColors.buttonColors()
             ) {
                 Text("Export")
-              }
+            }
         },
         dismissButton = {
             TextButton(
@@ -58,26 +71,13 @@ fun ExportSettingsDialog(
         },
         title = { Text("Select settings to export") },
         text = {
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 600.dp)
+            ) {
+                selectedActionRow(selected)
+
                 items(availableStores.entries.toList()) { entry ->
-                    val dataStoreName = entry.key
-                    val settingsStore = entry.value
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .toggleable(
-                                value = selected[dataStoreName] ?: true,
-                                onValueChange = { selected[dataStoreName] = it }
-                            ),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(settingsStore.name)
-                        Checkbox(
-                            checked = selected[dataStoreName] ?: true,
-                            onCheckedChange = null
-                        )
-                    }
+                    StoreItem(selected, entry.key, entry.value)
                 }
             }
         },
@@ -85,4 +85,82 @@ fun ExportSettingsDialog(
         tonalElevation = 6.dp,
         shape = DragonShape
     )
+}
+
+fun LazyListScope.selectedActionRow(selected: SnapshotStateMap<DataStoreName, Boolean>) {
+    item {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DragonButton(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    selected.forEach { (store, _) ->
+                        selected[store] = false
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Deselect,
+                    contentDescription = stringResource(R.string.deselect_all)
+                )
+            }
+
+            DragonButton(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    selected.forEach { (store, _) ->
+                        selected[store] = true
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SelectAll,
+                    contentDescription = stringResource(R.string.select_all)
+                )
+            }
+
+            DragonButton(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    selected.forEach { (store, isSelected) ->
+                        selected[store] = !isSelected
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChangeCircle,
+                    contentDescription = stringResource(R.string.invert)
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun StoreItem(
+    selected: SnapshotStateMap<DataStoreName, Boolean>,
+    dataStoreName: DataStoreName,
+    settingsStore: BaseSettingsStore<*, *>
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(DragonShape)
+            .padding(vertical = 4.dp)
+            .toggleable(
+                value = selected[dataStoreName] ?: true,
+            ) { selected[dataStoreName] = it },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(settingsStore.name)
+        Checkbox(
+            checked = selected[dataStoreName] ?: true,
+            onCheckedChange = null
+        )
+    }
 }

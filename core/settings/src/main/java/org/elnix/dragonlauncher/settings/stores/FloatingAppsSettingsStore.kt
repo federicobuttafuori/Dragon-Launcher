@@ -34,7 +34,7 @@ object FloatingAppsSettingsStore : JsonObjectSettingsStore() {
     suspend fun loadFloatingApps(ctx: Context): List<FloatingAppObject> {
         return try {
             val allJson = getAll(ctx)
-            FloatingAppsSettingsStore.logD(FLOATING_APPS_TAG) { "Raw: $allJson" }
+            logD(FLOATING_APPS_TAG) { "Raw: $allJson" }
             val floatingAppArray = allJson?.optJSONArray("floating_apps") ?: return emptyList()
 
             val floatingApps = mutableListOf<FloatingAppObject>()
@@ -58,16 +58,16 @@ object FloatingAppsSettingsStore : JsonObjectSettingsStore() {
                     )
                 )
             }
-            FloatingAppsSettingsStore.logD(FLOATING_APPS_TAG) { "Loaded ${floatingApps.size} floatingApps" }
+            logD(FLOATING_APPS_TAG) { "Loaded ${floatingApps.size} floatingApps" }
             floatingApps
         } catch (e: Exception) {
-            FloatingAppsSettingsStore.logE(FLOATING_APPS_TAG) { "Load failed" }
+            logE(FLOATING_APPS_TAG, e) { "Load failed" }
             emptyList()
         }
     }
 
     suspend fun saveFloatingApp(ctx: Context, floatingApp: FloatingAppObject) {
-        FloatingAppsSettingsStore.logD(FLOATING_APPS_TAG) { "Saving floatingApps ${floatingApp.id}" }
+        logD(FLOATING_APPS_TAG) { "Saving floatingApps ${floatingApp.id}" }
 
         val floatingApps = loadFloatingApps(ctx).toMutableList().apply {
             removeAll { it.id == floatingApp.id }
@@ -96,7 +96,7 @@ object FloatingAppsSettingsStore : JsonObjectSettingsStore() {
             put("floating_apps", floatingAppsArray)
         }
 
-        FloatingAppsSettingsStore.logD(FLOATING_APPS_TAG) { "Saved: $json" }
+        logD(FLOATING_APPS_TAG) { "Saved: $json" }
         setAll(ctx, json)
     }
 
