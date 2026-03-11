@@ -133,6 +133,7 @@ import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
+import org.elnix.dragonlauncher.ui.settings.PermissionsTab
 import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
 import org.elnix.dragonlauncher.ui.settings.customization.AngleLineTab
 import org.elnix.dragonlauncher.ui.settings.customization.AppearanceTab
@@ -148,6 +149,7 @@ import org.elnix.dragonlauncher.ui.settings.customization.WallpaperTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.debug.LogsTab
 import org.elnix.dragonlauncher.ui.settings.debug.SettingsDebugTab
+import org.elnix.dragonlauncher.ui.settings.extensions.ExtensionsTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
 import org.elnix.dragonlauncher.ui.settings.wellbeing.WellbeingTab
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceDetailScreen
@@ -179,7 +181,7 @@ fun MainAppUi(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (!isGranted) {
-            ctx.logW(TAG) { "Notification permission denied" }
+            logW(TAG) { "Notification permission denied" }
         }
     }
 
@@ -197,7 +199,7 @@ fun MainAppUi(
     val lastSeenVersionCodeWhatsNew by PrivateSettingsStore.lastSeenVersionCodeWhatsNew.asState()
     val lastSeenVersionCodeGoogleLockdownWarning by PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.asState()
 
-    val currentVersionCode = getVersionCode(ctx)
+    val currentVersionCode = ctx.getVersionCode()
     var showWhatsNewBottomSheet by remember { mutableStateOf(false) }
 
     var showWidgetPicker by remember { mutableStateOf<Int?>(null) }
@@ -286,7 +288,7 @@ fun MainAppUi(
         if (pendingPackageToLaunch != null) {
             val packageName = pendingPackageToLaunch!!
 
-            ctx.logD(APP_LAUNCH_TAG) { "result: $result" }
+            logD(APP_LAUNCH_TAG) { "result: $result" }
 
             if (result.resultCode == DigitalPauseActivity.RESULT_PROCEED) {
                 try {
@@ -309,7 +311,7 @@ fun MainAppUi(
                         pendingUserIdToLaunch!!
                     )
                 } catch (e: Exception) {
-                    ctx.logE(TAG) { "Failed to launch after pause: ${e.message}" }
+                    logE(TAG) { "Failed to launch after pause: ${e.message}" }
                 }
             } else if (result.resultCode == DigitalPauseActivity.RESULT_PROCEED_WITH_TIMER) {
                 try {
@@ -342,7 +344,7 @@ fun MainAppUi(
                         pendingUserIdToLaunch!!
                     )
                 } catch (e: Exception) {
-                    ctx.logE(
+                    logE(
                         APP_LAUNCH_TAG
                     ) {
                         "Failed to launch after pause with timer: ${e.message}"
@@ -521,9 +523,9 @@ fun MainAppUi(
                 }
             )
         } catch (e: AppLaunchException) {
-            ctx.logE(TAG) { e.message ?: "" }
+            logE(TAG) { e.message ?: "" }
         } catch (e: Exception) {
-            ctx.logE(TAG) { e.message ?: "" }
+            logE(TAG) { e.message ?: "" }
         }
     }
 
@@ -634,7 +636,7 @@ fun MainAppUi(
 
     val elements by remember(elementsJson) {
         val decoded = StatusBarJson.decodeStatusBarElements(elementsJson)
-        ctx.logW(STATUS_BAR_TAG) { "Element: $elementsJson, decoded: $decoded" }
+        logW(STATUS_BAR_TAG) { "Element: $elementsJson, decoded: $decoded" }
 
         derivedStateOf { decoded }
     }
@@ -654,7 +656,7 @@ fun MainAppUi(
         default = UiConstants.defaultLineCustomObject,
         json = json
     ) {
-        ctx.logE(ANGLE_LINE_TAG) { "Error decoding lineObject" }
+        logE(ANGLE_LINE_TAG) { "Error decoding lineObject" }
     }
 
     val angleLineJson by AngleLineSettingsStore.angleLineJson.asState()
@@ -663,7 +665,7 @@ fun MainAppUi(
         default = UiConstants.defaultAngleCustomObject,
         json = json
     ) {
-        ctx.logE(ANGLE_LINE_TAG) { "Error decoding angleLineObject" }
+        logE(ANGLE_LINE_TAG) { "Error decoding angleLineObject" }
     }
 
     val startLineJson by AngleLineSettingsStore.startLineJson.asState()
@@ -672,7 +674,7 @@ fun MainAppUi(
         default = UiConstants.defaultStartCustomObject,
         json = json
     ) {
-        ctx.logE(ANGLE_LINE_TAG) { "Error decoding startLineObject" }
+        logE(ANGLE_LINE_TAG) { "Error decoding startLineObject" }
     }
 
     val endLineJson by AngleLineSettingsStore.endLineJson.asState()
@@ -681,7 +683,7 @@ fun MainAppUi(
         default = UiConstants.defaultEndCustomObject,
         json = json
     ) {
-        ctx.logE(ANGLE_LINE_TAG) { "Error decoding endLineObject" }
+        logE(ANGLE_LINE_TAG) { "Error decoding endLineObject" }
     }
 
     /**
@@ -803,8 +805,9 @@ fun MainAppUi(
                     noAnimComposable(SETTINGS.ICON_PACK) { IconPackTab(appsViewModel, ::goAppearance) }
                     noAnimComposable(SETTINGS.STATUS_BAR) { StatusBarTab(::goAppearance) }
                     noAnimComposable(SETTINGS.THEME) { ThemesTab(::goAppearance) }
+                    noAnimComposable(SETTINGS.PERMISSIONS) { PermissionsTab { goAdvSettingsRoot() } }
 
-                    noAnimComposable(SETTINGS.BEHAVIOR) { BehaviorTab(::goAdvSettingsRoot) }
+                    noAnimComposable(SETTINGS.BEHAVIOR) { BehaviorTab(navController ,::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.DRAWER) { DrawerTab(appsViewModel, ::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.COLORS) { ColorSelectorTab(::goAppearance) }
                     noAnimComposable(SETTINGS.DEBUG) {
@@ -820,6 +823,7 @@ fun MainAppUi(
                     noAnimComposable(SETTINGS.ANGLE_LINE_EDIT) { AngleLineTab(::goAppearance) }
                     noAnimComposable(SETTINGS.BACKUP) { BackupTab(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
+                    noAnimComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
 
                     noAnimComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
 
@@ -830,7 +834,7 @@ fun MainAppUi(
                         )
                     }
 
-                    noAnimComposable(SETTINGS.FLOATING_APPS) {
+                    noAnimComposable(SETTINGS.WIDGETS_FLOATING_APPS) {
                         FloatingAppsTab(
                             widgetHostProvider = widgetHostProvider,
                             onBack = ::goAppearance,

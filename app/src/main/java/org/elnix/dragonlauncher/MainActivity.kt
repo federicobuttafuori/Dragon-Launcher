@@ -5,13 +5,16 @@ import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
+import android.content.BroadcastReceiver
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,6 +49,9 @@ import org.elnix.dragonlauncher.common.logging.logI
 import org.elnix.dragonlauncher.common.logging.logW
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.PRIVATE_SPACE_TAG
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.STARTUP_TAG
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.WIDGET_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Navigation.ignoredReturnRoutes
 import org.elnix.dragonlauncher.common.utils.Constants.Settings.HOME_REENTER_WINDOW_MS
@@ -71,6 +77,9 @@ import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.UUID
 
 class MainActivity : FragmentActivity(), WidgetHostProvider {
@@ -211,7 +220,11 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                 showToast("Failed to launch configuration")
                 // Add it anyway if config fails to launch
                 floatingAppsViewModel.addFloatingApp(
-                    SwipeActionSerializable.OpenWidget(widgetId, info.provider),
+                    SwipeActionSerializable.OpenWidget(
+                        widgetId,
+                        info.provider.packageName,
+                        info.provider.className
+                    ),
                     info,
                     pendingAddNestId ?: 0
                 )
@@ -219,7 +232,11 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
         } else {
             logD(WIDGET_TAG) { "DRAGON_FLOW: No configuration needed, adding widget" }
             floatingAppsViewModel.addFloatingApp(
-                SwipeActionSerializable.OpenWidget(widgetId, info.provider),
+                SwipeActionSerializable.OpenWidget(
+                    widgetId,
+                    info.provider.packageName,
+                    info.provider.className
+                ),
                 info,
                 pendingAddNestId ?: 0
             )
@@ -232,14 +249,19 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_WIDGET_CONFIG) {
             val widgetId =
-                data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingConfigWidgetId) ?: pendingConfigWidgetId
+                data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingConfigWidgetId)
+                    ?: pendingConfigWidgetId
             logD(WIDGET_TAG) { "DRAGON_FLOW: Proxy config finished for ID $widgetId, result=$resultCode" }
 
             if (resultCode == RESULT_OK && widgetId != -1) {
                 val info = widgetHolder.getAppWidgetInfo(widgetId)
                 if (info != null) {
                     floatingAppsViewModel.addFloatingApp(
-                        SwipeActionSerializable.OpenWidget(widgetId, info.provider),
+                        SwipeActionSerializable.OpenWidget(
+                            widgetId,
+                            info.provider.packageName,
+                            info.provider.className
+                        ),
                         info,
                         0
                     )
@@ -260,6 +282,44 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
     }
 
     private val packageReceiver = PackageReceiver()
+    private val fontsReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            try {
+                val action = intent?.action ?: "<null>"
+                Log.d("FontsReceiver", "Received intent action=$action")
+                if (action == "org.elnix.dragonlauncher.FONTS_UPDATED") {
+                    val fontPath = intent?.getStringExtra("FONT_PATH")
+                    val fontName = intent?.getStringExtra("FONT_NAME") ?: "unknown"
+                    Log.d("FontsReceiver", "FONTS_UPDATED for $fontName -> path=$fontPath")
+
+                    if (fontPath != null && context != null) {
+                        try {
+                            val src = File(fontPath)
+                            val destDir = File(context.getExternalFilesDir(null), "fonts")
+                            if (!destDir.exists()) destDir.mkdirs()
+                            val dest = File(destDir, src.name)
+
+                            FileInputStream(src).use { input ->
+                                FileOutputStream(dest).use { output ->
+                                    input.copyTo(output)
+                                }
+                            }
+
+                            Log.d("FontsReceiver", "Copied font to ${dest.absolutePath}")
+                        } catch (e: Exception) {
+                            Log.e("FontsReceiver", "Failed to copy font: ${e.message}")
+                            Log.e(
+                                "FontsReceiver",
+                                "If this path is inside another app's cache, the extension must provide a content URI or write the file into a shared location. "
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("FontsReceiver", "Receiver error: ${e.message}")
+            }
+        }
+    }
     private val filter = IntentFilter().apply {
         addAction(Intent.ACTION_PACKAGE_ADDED)
         addAction(Intent.ACTION_PACKAGE_REMOVED)
@@ -280,13 +340,23 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
         )
 
         super.onCreate(savedInstanceState)
-        logI("StartupPerf") { "MainActivity.onCreate started" }
+        logI(STARTUP_TAG) { "MainActivity.onCreate started" }
 
         // Initialize logging & other background tasks asynchronously
         org.elnix.dragonlauncher.common.utils.AsyncInitializer.init(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(packageReceiver, filter, RECEIVER_EXPORTED)
+            // Register fonts update receiver (extensions send org.elnix.dragonlauncher.FONTS_UPDATED)
+            try {
+                registerReceiver(
+                    fontsReceiver,
+                    IntentFilter("org.elnix.dragonlauncher.FONTS_UPDATED"),
+                    RECEIVER_EXPORTED
+                )
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed to register fontsReceiver: ${e.message}")
+            }
         }
 
         appWidgetHost.startListening()
@@ -299,11 +369,11 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
         // This avoids layout & loading overlap
         lifecycleScope.launch(Dispatchers.Main) {
             yield() // Wait for first frame
-            logI("StartupPerf") {
+            logI(STARTUP_TAG) {
                 "First frame rendered in ${System.currentTimeMillis() - startTime}ms. Starting AppsViewModel.loadAll()."
             }
             (applicationContext as MyApplication).appsViewModel.loadAll()
-            logI("StartupPerf") {
+            logI(STARTUP_TAG) {
                 "AppsViewModel.loadAll() finished at ${System.currentTimeMillis() - startTime}ms total."
             }
         }
@@ -372,27 +442,18 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                 appLifecycleViewModel.privateSpaceUnlockRequestEvents.collect {
 
                     val openPrivateSpace = {
-                        ctx.logI("SamsungIntegration") { "Using standard Android Private Space" }
+                        logI(PRIVATE_SPACE_TAG) { "Using standard Android Private Space" }
                         ctx.startActivity(
                             Intent(ctx, PrivateSpaceUnlockActivity::class.java)
                         )
                     }
 
-                    ctx.logI(
-                        "SamsungIntegration"
-                    ) {
-                        "Loading Samsung preference: $samsungPreferSecureFolder"
-                    }
+                    logI(PRIVATE_SPACE_TAG) { "Loading Samsung preference: $samsungPreferSecureFolder" }
                     val useSecureFolder = SamsungWorkspaceIntegration.resolveUseSecureFolder(
                         context = ctx,
                         preferenceEnabled = samsungPreferSecureFolder
                     )
-
-                    ctx.logI(
-                        "SamsungIntegration"
-                    ) {
-                        "Using system: ${if (useSecureFolder) "Secure Folder" else "Private Space"}"
-                    }
+                    logI(PRIVATE_SPACE_TAG) { "Using system: ${if (useSecureFolder) "Secure Folder" else "Private Space"}" }
 
                     if (useSecureFolder) {
                         SamsungWorkspaceIntegration.openSecureFolder(
@@ -565,7 +626,7 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
             intent.hasCategory(Intent.CATEGORY_HOME)
         ) {
             isNewHomeIntent = true
-            logD("HomeAction") { "HOME intent received (pending)" }
+            logD(TAG) { "HOME intent received (pending)" }
         }
     }
 
@@ -582,7 +643,14 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(packageReceiver)
+        try {
+            unregisterReceiver(packageReceiver)
+        } catch (_: Exception) {
+        }
+        try {
+            unregisterReceiver(fontsReceiver)
+        } catch (_: Exception) {
+        }
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         lifecycleScope.launch {
             SettingsBackupManager.triggerBackup(this@MainActivity)

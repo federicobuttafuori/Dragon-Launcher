@@ -178,19 +178,18 @@ class SystemControlService : AccessibilityService() {
 
     private fun listenToSettingsChanges() {
         serviceScope.launch {
-            DebugSettingsStore.systemLauncherPackageName.get(this@SystemControlService)
-                ?.let { pkg ->
-                    systemLauncher = pkg.ifBlank { null }
-                    logD(ACCESSIBILITY_TAG) { "Launcher setting updated: $pkg" }
-                }
+            val pkg = DebugSettingsStore.systemLauncherPackageName.get(this@SystemControlService)
+            systemLauncher = pkg.ifBlank { null }
+            logD(ACCESSIBILITY_TAG) { "Launcher setting updated: $pkg" }
+
         }
 
         serviceScope.launch {
-            DebugSettingsStore.autoRaiseDragonOnSystemLauncher.get(this@SystemControlService)
-                ?.let { enabled ->
-                    autoRaiseEnabled = enabled
-                    logD(ACCESSIBILITY_TAG) { "Auto-raise toggled: $enabled" }
-                }
+            val enabled =
+                DebugSettingsStore.autoRaiseDragonOnSystemLauncher.get(this@SystemControlService)
+            autoRaiseEnabled = enabled
+            logD(ACCESSIBILITY_TAG) { "Auto-raise toggled: $enabled" }
+
         }
     }
 
@@ -219,7 +218,7 @@ class SystemControlService : AccessibilityService() {
  * doesn't work on my redmagic thus.
  */
 private fun isLikelyRecents(ctx: Context, root: AccessibilityNodeInfo): Boolean {
-    ctx.logI(ACCESSIBILITY_TAG) { "Root: $root" }
+    logI(ACCESSIBILITY_TAG) { "Root: $root" }
 
     var nodeCount = 0
     var clickableCount = 0
@@ -239,8 +238,8 @@ private fun isLikelyRecents(ctx: Context, root: AccessibilityNodeInfo): Boolean 
 
     traverse(root)
 
-    ctx.logI(ACCESSIBILITY_TAG) { "NodeCount: $nodeCount" }
-    ctx.logI(ACCESSIBILITY_TAG) { "clickableCount: $clickableCount, focusableCount: $focusableCount" }
+    logI(ACCESSIBILITY_TAG) { "NodeCount: $nodeCount" }
+    logI(ACCESSIBILITY_TAG) { "clickableCount: $clickableCount, focusableCount: $focusableCount" }
     if (nodeCount < 5) return true
     if (clickableCount == 0 && focusableCount == 0) return true
 

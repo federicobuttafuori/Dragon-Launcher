@@ -6,12 +6,12 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.logging.logI
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.BROADCAST_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
@@ -26,7 +26,7 @@ class PackageReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
 
-        Log.i(BROADCAST_TAG, "Got intent: $intent")
+        logI(BROADCAST_TAG) { "Got intent: $intent" }
 
         if (
             action == Intent.ACTION_PACKAGE_ADDED ||
@@ -39,7 +39,7 @@ class PackageReceiver : BroadcastReceiver() {
             val packageName = intent.data?.schemeSpecificPart
             val scope = CoroutineScope(Dispatchers.Default)
 
-            Log.i(BROADCAST_TAG, "Got intent: $intent, action! $action, pkg: $packageName")
+            logI(BROADCAST_TAG) { "Got intent: $intent, action! $action, pkg: $packageName" }
             if (packageName != context.packageName) {
                 try {
                     val app = context.applicationContext as MyApplication

@@ -19,7 +19,7 @@ fun ChangelogsScreen(
 ) {
     val ctx = LocalContext.current
 
-    val versionCode = getVersionCode(ctx)
+    val versionCode = ctx.getVersionCode()
 
     val updates by produceState(initialValue = emptyList()) {
         value = loadChangelogs(ctx, versionCode)

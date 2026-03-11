@@ -11,13 +11,12 @@ import androidx.annotation.RequiresApi
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.logging.logI
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.PRIVATE_SPACE_UTILS
 
 /**
  * Utility functions for managing Android 15+ Private Space.
  */
 object PrivateSpaceUtils {
-
-    private const val TAG = "PrivateSpaceUtils"
     private const val PRIVATE_PROFILE_TYPE = "android.os.usertype.profile.PRIVATE"
 
     /**
@@ -48,18 +47,18 @@ object PrivateSpaceUtils {
                 try {
                     val userInfo = launcherApps.getLauncherUserInfo(userHandle)
                     if (userInfo?.userType == PRIVATE_PROFILE_TYPE) {
-                        PrivateSpaceUtils.logD(TAG) { "Found Private Space profile: $userHandle" }
+                        logD(PRIVATE_SPACE_UTILS) { "Found Private Space profile: $userHandle" }
                         return userHandle
                     }
                 } catch (e: Exception) {
-                    PrivateSpaceUtils.logE(TAG) { "Error checking user profile: ${e.message}" }
+                    logE(PRIVATE_SPACE_UTILS) { "Error checking user profile: ${e.message}" }
                 }
             }
 
-            PrivateSpaceUtils.logI(TAG) { "No Private Space profile found" }
+            logI(PRIVATE_SPACE_UTILS) { "No Private Space profile found" }
             return null
         } catch (e: Exception) {
-            PrivateSpaceUtils.logE(TAG) { "Error getting Private Space user handle: ${e.message}" }
+            logE(PRIVATE_SPACE_UTILS) { "Error getting Private Space user handle: ${e.message}" }
             return null
         }
     }
@@ -75,10 +74,10 @@ object PrivateSpaceUtils {
         try {
             val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
             val isLocked = userManager.isQuietModeEnabled(privateUserHandle)
-            PrivateSpaceUtils.logD(TAG) { "Private Space locked status: $isLocked" }
+            logD(PRIVATE_SPACE_UTILS) { "Private Space locked status: $isLocked" }
             return isLocked
         } catch (e: Exception) {
-            PrivateSpaceUtils.logE(TAG) { "Error checking Private Space lock status: ${e.message}" }
+            logE(PRIVATE_SPACE_UTILS) { "Error checking Private Space lock status: ${e.message}" }
             return null
         }
     }
@@ -109,7 +108,7 @@ object PrivateSpaceUtils {
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun requestUnlockPrivateSpace(ctx: Context): Boolean {
         val privateUserHandle = getPrivateSpaceUserHandle(ctx) ?: run {
-            logE(TAG) { "Cannot unlock: Private Space not found" }
+            logE(PRIVATE_SPACE_UTILS) { "Cannot unlock: Private Space not found" }
             return false
         }
 
@@ -118,20 +117,20 @@ object PrivateSpaceUtils {
 
             // Check if already unlocked
             if (!userManager.isQuietModeEnabled(privateUserHandle)) {
-                PrivateSpaceUtils.logI(TAG) { "Private Space is already unlocked" }
+                logI(PRIVATE_SPACE_UTILS) { "Private Space is already unlocked" }
                 return true
             }
 
-            PrivateSpaceUtils.logI(TAG) { "Requesting Private Space unlock" }
+            logI(PRIVATE_SPACE_UTILS) { "Requesting Private Space unlock" }
 
             // Request to disable quiet mode (unlock)
             // On some devices this may trigger biometric auth, on others it may do nothing
             val success = userManager.requestQuietModeEnabled(false, privateUserHandle)
 
-            PrivateSpaceUtils.logI(TAG) { "requestQuietModeEnabled returned: $success" }
+            logI(PRIVATE_SPACE_UTILS) { "requestQuietModeEnabled returned: $success" }
             return success
         } catch (e: Exception) {
-            PrivateSpaceUtils.logE(TAG) { "Error requesting Private Space unlock: ${e.message}" }
+            logE(PRIVATE_SPACE_UTILS) { "Error requesting Private Space unlock: ${e.message}" }
             return false
         }
     }
@@ -153,7 +152,7 @@ object PrivateSpaceUtils {
 //    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 //    fun requestLockPrivateSpace(context: Context): Boolean {
 //        val privateUserHandle = getPrivateSpaceUserHandle(context) ?: run {
-//            logE(TAG, "Cannot lock: Private Space not found")
+//            logE(PRIVATE_SPACE_UTILS, "Cannot lock: Private Space not found")
 //            return false
 //        }
 //
@@ -162,29 +161,29 @@ object PrivateSpaceUtils {
 //
 //            // Check if already locked
 //            if (userManager.isQuietModeEnabled(privateUserHandle)) {
-//                logI(TAG, "Private Space is already locked")
+//                logI(PRIVATE_SPACE_UTILS, "Private Space is already locked")
 //                return true
 //            }
 //
-//            logI(TAG, "Requesting Private Space lock")
+//            logI(PRIVATE_SPACE_UTILS, "Requesting Private Space lock")
 //
 //            // Request to enable quiet mode (lock)
 //            val success = userManager.requestQuietModeEnabled(true, privateUserHandle)
 //
 //            if (success) {
-//                logI(TAG, "Private Space locked successfully")
+//                logI(PRIVATE_SPACE_UTILS, "Private Space locked successfully")
 //            } else {
-//                logE(TAG, "Private Space lock request failed")
+//                logE(PRIVATE_SPACE_UTILS, "Private Space lock request failed")
 //            }
 //
 //            return success
 //        } catch (e: Exception) {
-//            logE(TAG, "Error requesting Private Space lock: ${e.message}", e)
+//            logE(PRIVATE_SPACE_UTILS, "Error requesting Private Space lock: ${e.message}", e)
 //            return false
 //        }
 //    }
 //
-//    /**
+//    /**"
 //     * Check if Private Space exists and has apps.
 //     */
 //    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -196,7 +195,7 @@ object PrivateSpaceUtils {
 //            val activities = launcherApps.getActivityList(null, privateUserHandle)
 //            return activities.isNotEmpty()
 //        } catch (e: Exception) {
-//            logE(TAG, "Error checking Private Space apps: ${e.message}")
+//            logE(PRIVATE_SPACE_UTILS, "Error checking Private Space apps: ${e.message}")
 //            return false
 //        }
 //    }

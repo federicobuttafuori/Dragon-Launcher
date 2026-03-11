@@ -42,7 +42,7 @@ import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WorkspaceSettingsStore
 
-enum class DataStoreName(
+enum class  DataStoreName(
     val value: String,
     val backupKey: String,
     val userBackup: Boolean = true

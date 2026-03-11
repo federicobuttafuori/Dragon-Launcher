@@ -2,7 +2,6 @@ package org.elnix.dragonlauncher.ui
 
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,36 +10,26 @@ import android.provider.Settings
 import android.system.Os.kill
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Launch
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.GridOn
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
@@ -52,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,10 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -74,33 +59,24 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
-import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.common.serializables.allShapesWithoutRandom
-import org.elnix.dragonlauncher.common.utils.Constants.Links.discordInviteLink
+import org.elnix.dragonlauncher.common.utils.Constants.Links.DISCORD_INVITE_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.Links.DRAGON_WEBSITE
+import org.elnix.dragonlauncher.common.utils.Constants.Links.MAILTO_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.Links.REDDIT_LINK
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
-import org.elnix.dragonlauncher.common.utils.detectSystemLauncher
 import org.elnix.dragonlauncher.common.utils.getVersionCode
-import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.common.utils.obtainiumPackageName
 import org.elnix.dragonlauncher.common.utils.openUrl
 import org.elnix.dragonlauncher.common.utils.showToast
-import org.elnix.dragonlauncher.enumsui.LockMethod
 import org.elnix.dragonlauncher.settings.SettingsStoreRegistry
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.components.TextDivider
-import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.asState
-import org.elnix.dragonlauncher.ui.dialogs.CustomAlertDialog
-import org.elnix.dragonlauncher.ui.dialogs.PinSetupDialog
-import org.elnix.dragonlauncher.ui.dialogs.PinUnlockDialog
-import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
-import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
@@ -109,7 +85,6 @@ import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
-@Suppress("AssignedValueIsNeverRead", "VariableNeverRead")
 @Composable
 fun AdvancedSettingsScreen(
     navController: NavController,
@@ -121,10 +96,9 @@ fun AdvancedSettingsScreen(
 
     val scope = rememberCoroutineScope()
 
-    val versionCode = getVersionCode(ctx)
+    val versionCode = ctx.getVersionCode()
 
     val isDebugModeEnabled by DebugSettingsStore.debugEnabled.asState()
-    val forceAppLanguageSelector by DebugSettingsStore.forceAppLanguageSelector.asState()
 
 
     val allApps by appsViewModel.allApps.collectAsState()
@@ -133,15 +107,6 @@ fun AdvancedSettingsScreen(
     var toast by remember { mutableStateOf<Toast?>(null) }
     val versionName = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "unknown"
     var timesClickedOnVersion by remember { mutableIntStateOf(0) }
-
-    // Lock settings state
-    val currentLockMethod by PrivateSettingsStore.lockMethod.asState()
-    val pinHash by PrivateSettingsStore.lockPinHash.asState()
-
-    var showLockMethodPicker by remember { mutableStateOf(false) }
-    var showPinSetupDialog by remember { mutableStateOf(false) }
-    var showRemovePinConfirm by remember { mutableStateOf(false) }
-    var pendingLockMethod by remember { mutableStateOf<LockMethod?>(null) }
 
     val backgroundColor = MaterialTheme.colorScheme.background
 
@@ -189,20 +154,6 @@ fun AdvancedSettingsScreen(
 
         item {
             SettingsItem(
-                title = stringResource(R.string.settings_language_title),
-                icon = Icons.Default.Language,
-                onClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !forceAppLanguageSelector) {
-                        openSystemLanguageSettings(ctx)
-                    } else {
-                        navController.navigate(SETTINGS.LANGUAGE)
-                    }
-                }
-            )
-        }
-
-        item {
-            SettingsItem(
                 title = stringResource(R.string.backup_restore),
                 icon = Icons.Default.Restore
             ) {
@@ -237,6 +188,26 @@ fun AdvancedSettingsScreen(
             }
         }
 
+        item { TextDivider(stringResource(R.string.advanced)) }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.permissions),
+                icon = Icons.Default.Security
+            ) {
+                navController.navigate(SETTINGS.PERMISSIONS)
+            }
+        }
+
+        item {
+            SettingItemWithExternalOpen(
+                title = stringResource(R.string.extensions),
+                icon = Icons.Default.Extension,
+                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher-Extensions") }
+            ) { navController.navigate(SETTINGS.EXTENSIONS) }
+        }
+
+
         item {
             SettingsItem(
                 title = stringResource(R.string.android_settings),
@@ -251,48 +222,6 @@ fun AdvancedSettingsScreen(
             }
         }
 
-        item {
-            val lockDescription = when (currentLockMethod) {
-                LockMethod.NONE -> stringResource(R.string.lock_none)
-                LockMethod.PIN -> stringResource(R.string.lock_pin)
-                LockMethod.DEVICE_UNLOCK -> stringResource(R.string.lock_device_unlock)
-            }
-            SettingsItem(
-                title = stringResource(R.string.lock_method),
-                description = lockDescription,
-                icon = Icons.Default.Lock
-            ) {
-                showLockMethodPicker = true
-            }
-        }
-
-        if (currentLockMethod == LockMethod.PIN) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .height(IntrinsicSize.Max)
-                        .animateItem(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)
-                ) {
-                    SettingsItem(
-                        title = stringResource(R.string.change_pin),
-                        icon = Icons.Default.Fingerprint,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        showPinSetupDialog = true
-                    }
-
-                    SettingsItem(
-                        title = stringResource(R.string.remove_pin),
-                        icon = Icons.Default.Close,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        showRemovePinConfirm = true
-                    }
-                }
-            }
-        }
 
         if (isDebugModeEnabled) {
             item {
@@ -308,9 +237,8 @@ fun AdvancedSettingsScreen(
 
         item {
             SettingsItem(
-                title = "Logs",
-                icon = Icons.AutoMirrored.Filled.Notes,
-                modifier = Modifier.animateItem()
+                title = stringResource(R.string.logs),
+                icon = Icons.AutoMirrored.Filled.Notes
             ) {
                 navController.navigate(SETTINGS.LOGS)
             }
@@ -319,6 +247,8 @@ fun AdvancedSettingsScreen(
 
         item { TextDivider(stringResource(R.string.about)) }
 
+
+        // Social links
         item {
             Row(
                 modifier = Modifier
@@ -327,52 +257,62 @@ fun AdvancedSettingsScreen(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Row(
+
+                val githubIcon = if (backgroundColor.luminance() < 0.5) {
+                    R.drawable.github_invertocat_white
+                } else {
+                    R.drawable.github_invertocat_black
+                }
+                Icon(
+                    painter = painterResource(githubIcon),
+                    contentDescription = "Github Icon",
+                    tint = Color.Unspecified,
                     modifier = Modifier
                         .weight(1f)
                         .clip(DragonShape)
-                        .clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") },
-                    horizontalArrangement = Arrangement.Center
-                ) {
+                        .clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") }
+                )
 
-                    val githubIcon = if (backgroundColor.luminance() < 0.5) {
-                        R.drawable.github_invertocat_white
-                    } else {
-                        R.drawable.github_invertocat_black
-                    }
 
-                    val githubLogo = if (backgroundColor.luminance() < 0.5) {
-                        R.drawable.github_logo_white
-                    } else {
-                        R.drawable.github_logo
-                    }
-
-                    Icon(
-                        painter = painterResource(githubIcon),
-                        contentDescription = "Github Icon",
-                        tint = Color.Unspecified
-                    )
-
-                    Image(
-                        painter = painterResource(githubLogo),
-                        contentDescription = "Github Logo"
-                    )
-                }
-
-                Spacer(Modifier.width(12.dp))
-
-                Row(
+                Icon(
+                    painterResource(R.drawable.discord_symbol_blurple),
+                    contentDescription = "Discord icon",
+                    tint = Color.Unspecified,
                     modifier = Modifier
                         .weight(1f)
                         .clip(DragonShape)
-                        .clickable { ctx.openUrl(discordInviteLink) },
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.discord_logo_blurple),
-                        contentDescription = "Discord Logo"
-                    )
-                }
+                        .clickable { ctx.openUrl(DISCORD_INVITE_LINK) }
+                )
+
+                Icon(
+                    painterResource(R.drawable.reddit_icon_fullcolor),
+                    contentDescription = "Reddit icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(REDDIT_LINK) }
+                )
+
+                Icon(
+                    painterResource(R.drawable.dragon_launcher_foreground),
+                    contentDescription = "Website icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(DRAGON_WEBSITE) }
+                )
+
+                Icon(
+                    painterResource(R.drawable.protonmail_icon),
+                    contentDescription = "Proton Mail icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(MAILTO_LINK) }
+                )
             }
         }
 
@@ -405,7 +345,13 @@ fun AdvancedSettingsScreen(
                     onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest") },
                     onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
                 ) {
-                    onLaunchAction(SwipeActionSerializable.LaunchApp(obtainiumPackageName, false, 0))
+                    onLaunchAction(
+                        SwipeActionSerializable.LaunchApp(
+                            obtainiumPackageName,
+                            false,
+                            0
+                        )
+                    )
                 }
             } else {
                 SettingsItem(
@@ -438,6 +384,8 @@ fun AdvancedSettingsScreen(
             )
         }
 
+
+        // Contributors
         item {
             ContributorItem(
                 name = "Elnix90",
@@ -448,54 +396,26 @@ fun AdvancedSettingsScreen(
         }
 
         item {
-            Row(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.yoanndev90),
-                    contentDescription = "YoannDev90 profile picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            ctx.openUrl("https://github.com/YoannDev90")
-                        }
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Fit
-                )
-                Image(
-                    painter = painterResource(R.drawable.lucky_the_cookie),
-                    contentDescription = "LuckyTheCookie profile picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            ctx.openUrl("https://lthb.fr")
-                        }
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Fit
-                )
-                Image(
-                    painter = painterResource(R.drawable.acress1),
-                    contentDescription = "Acress1 profile picture",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            ctx.openUrl("https://github.com/acress1")
-                        }
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Fit
-                )
-            }
+            ContributorItem(
+                name = "YoannDev90",
+                imageRes = R.drawable.yoanndev90,
+                description = stringResource(R.string.yoann_desc),
+                githubUrl = "https://lthb.fr"
+            )
         }
 
+        item {
+            ContributorItem(
+                name = "Lucky",
+                imageRes = R.drawable.lucky_the_cookie,
+                description = stringResource(R.string.lucky_desc),
+                githubUrl = "https://github.com/YoannDev90"
+            )
+        }
+
+
+
+        // Version name (clickable to access debug / copy)
         item {
             Column(
                 modifier = Modifier
@@ -506,69 +426,13 @@ fun AdvancedSettingsScreen(
                 val infoStyle = MaterialTheme.typography.labelSmall
                 val infoColor = MaterialTheme.colorScheme.onBackground.alphaMultiplier(0.7f)
 
-                val density = LocalDensity.current
-                val windowInfo = LocalWindowInfo.current
-                val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                val memInfo = ActivityManager.MemoryInfo()
-                am.getMemoryInfo(memInfo)
-
-                val currentLauncher = detectSystemLauncher(ctx)
-                val isDefault = ctx.isDefaultLauncher
-
-                val deviceDetails = buildString {
-                    appendLine("System: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.PRODUCT})")
-                    appendLine("OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
-                    if (Build.VERSION.SECURITY_PATCH.isNotEmpty()) {
-                        appendLine("Security Patch: ${Build.VERSION.SECURITY_PATCH}")
-                    }
-                    appendLine("Arch: ${Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"}")
-                    appendLine("Display: ${windowInfo.containerSize.width.dp}x${windowInfo.containerSize.height.dp}dp (${density.density} dpi)")
-                    appendLine(
-                        "RAM: %.1fGB used / %.1fGB total (%d%% available)".format(
-                            (memInfo.totalMem - memInfo.availMem) / 1024.0 / 1024 / 1024,
-                            memInfo.totalMem / 1024.0 / 1024 / 1024,
-                            memInfo.availMem * 100 / memInfo.totalMem
-                        )
-                    )
-                    appendLine("Default Launcher: ${if (isDefault) "Yes" else "No ($currentLauncher)"}")
-                    appendLine("App version: $versionName ($versionCode)")
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Device Information",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-
-                    Spacer(Modifier.width(8.dp))
-
-                    DragonIconButton(
-                        onClick = {
-                            ctx.copyToClipboard(deviceDetails)
-                            ctx.showToast("Device details copied to clipboard")
-                        },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy device info",
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                val debugModeAlreadyEnabledText = stringResource(R.string.debug_mode_already_enabled)
-                val deviceInfoCopiedToClipboard = stringResource(R.string.device_info_copied_to_clipboard)
+                val debugModeAlreadyEnabledText =
+                    stringResource(R.string.debug_mode_already_enabled)
+                val versionNameCopiedToClipboard =
+                    stringResource(R.string.version_copied_to_clipboard)
 
                 Text(
-                    text = deviceDetails,
+                    text = "Dragon Launcher $versionName ($versionCode)",
                     style = infoStyle,
                     textAlign = TextAlign.Center,
                     color = infoColor,
@@ -584,7 +448,7 @@ fun AdvancedSettingsScreen(
 
                                 timesClickedOnVersion == 0 -> {
                                     ctx.copyToClipboard(versionName)
-                                    ctx.showToast(deviceInfoCopiedToClipboard)
+                                    ctx.showToast(versionNameCopiedToClipboard)
                                     timesClickedOnVersion += 1
                                 }
 
@@ -619,196 +483,4 @@ fun AdvancedSettingsScreen(
             }
         }
     }
-
-    // ── PIN setup dialog ──
-    if (showPinSetupDialog) {
-        PinSetupDialog(
-            onDismiss = {
-                showPinSetupDialog = false
-                pendingLockMethod = null
-            },
-            onPinSet = { pin ->
-                scope.launch {
-                    val hash = SecurityHelper.hashPin(pin)
-                    PrivateSettingsStore.lockPinHash.set(ctx, hash)
-                    PrivateSettingsStore.lockMethod.set(ctx, LockMethod.PIN)
-                    ctx.showToast(ctx.getString(R.string.pin_set_success))
-                }
-                showPinSetupDialog = false
-                pendingLockMethod = null
-            }
-        )
-    }
-
-    if (showRemovePinConfirm) {
-        var pin by remember { mutableStateOf("") }
-        val pinShapes = remember { mutableStateListOf<IconShape>() }
-        var failedTries by remember { mutableStateOf(0) }
-
-        PinUnlockDialog(
-            onDismiss = { showRemovePinConfirm = false },
-            onValidate = {
-                if (SecurityHelper.verifyPin(pin, pinHash)) {
-                    scope.launch {
-                        PrivateSettingsStore.lockMethod.reset(ctx)
-                        showRemovePinConfirm = false
-                    }
-                } else {
-                    ctx.showToast(ctx.getString(R.string.wrong_pin))
-                    pin = ""
-                    pinShapes.clear()
-                    failedTries++
-                }
-            },
-            pin = { pin },
-            pinShapes = { pinShapes },
-            failedTries = { failedTries },
-            onPinChanged = { newValue ->
-                pin = newValue
-                if (pinShapes.size < newValue.length) {
-                    repeat(newValue.length - pinShapes.size) {
-                        pinShapes.add(allShapesWithoutRandom.random())
-                    }
-                } else {
-                    repeat(pinShapes.size - newValue.length) {
-                        pinShapes.removeAt(pinShapes.lastIndex)
-                    }
-                }
-            }
-        )
-    }
-
-
-    // ── Lock method picker dialog ──
-    if (showLockMethodPicker) {
-        val methods = LockMethod.entries
-        val methodLabels = methods.map { method ->
-            when (method) {
-                LockMethod.NONE -> stringResource(R.string.lock_none)
-                LockMethod.PIN -> stringResource(R.string.lock_pin)
-                LockMethod.DEVICE_UNLOCK -> stringResource(R.string.lock_device_unlock)
-            }
-        }
-
-        CustomAlertDialog(
-            onDismissRequest = { showLockMethodPicker = false },
-            title = {
-                Text(
-                    stringResource(R.string.lock_method),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = stringResource(R.string.lock_settings_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(0.7f)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    methods.forEachIndexed { index, method ->
-                        val isAvailable = when (method) {
-                            LockMethod.DEVICE_UNLOCK -> SecurityHelper.isDeviceUnlockAvailable(ctx)
-                            else -> true
-                        }
-                        val unavailableText = when (method) {
-                            LockMethod.DEVICE_UNLOCK -> if (!isAvailable) stringResource(R.string.device_credentials_not_available) else null
-                            else -> null
-                        }
-                        SettingsItem(
-                            title = methodLabels[index],
-                            description = unavailableText,
-                            enabled = isAvailable,
-                            backgroundColor = if (method == currentLockMethod)
-                                MaterialTheme.colorScheme.primaryContainer
-                            else
-                                MaterialTheme.colorScheme.surface
-                        ) {
-                            when (method) {
-                                LockMethod.PIN -> {
-                                    pendingLockMethod = LockMethod.PIN
-                                    showLockMethodPicker = false
-                                    showPinSetupDialog = true
-                                }
-
-                                LockMethod.NONE -> {
-                                    if (currentLockMethod == LockMethod.PIN) {
-                                        // Remove PIN
-                                        scope.launch {
-                                            PrivateSettingsStore.lockPinHash.set(ctx, "")
-                                            PrivateSettingsStore.lockMethod.set(
-                                                ctx,
-                                                LockMethod.NONE
-                                            )
-                                            ctx.showToast(ctx.getString(R.string.pin_removed))
-                                        }
-                                    } else {
-                                        scope.launch {
-                                            PrivateSettingsStore.lockMethod.set(
-                                                ctx,
-                                                LockMethod.NONE
-                                            )
-                                        }
-                                    }
-                                    showLockMethodPicker = false
-                                }
-
-                                LockMethod.DEVICE_UNLOCK -> {
-                                    // Test biometric authentication immediately
-                                    val activity = ctx.findFragmentActivity()
-                                    ctx.logD(
-                                        "AdvSettings"
-                                    ) {
-                                        "DEVICE_UNLOCK selected: activity=$activity, isAvailable=${
-                                            SecurityHelper.isDeviceUnlockAvailable(ctx)
-                                        }"
-                                    }
-                                    if (activity != null && SecurityHelper.isDeviceUnlockAvailable(
-                                            ctx
-                                        )
-                                    ) {
-                                        SecurityHelper.showDeviceUnlockPrompt(
-                                            activity = activity,
-                                            onSuccess = {
-                                                scope.launch {
-                                                    PrivateSettingsStore.lockMethod.set(
-                                                        ctx,
-                                                        method
-                                                    )
-                                                }
-                                                showLockMethodPicker = false
-                                            },
-                                            onError = { msg ->
-                                                ctx.showToast(
-                                                    ctx.getString(
-                                                        R.string.authentication_error,
-                                                        msg
-                                                    )
-                                                )
-                                            },
-                                            onFailed = {
-                                                ctx.showToast(ctx.getString(R.string.authentication_failed))
-                                            }
-                                        )
-                                    } else {
-                                        ctx.showToast(ctx.getString(R.string.device_credentials_not_available))
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {}
-        )
-    }
-}
-
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private fun openSystemLanguageSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
-        data = Uri.fromParts("package", context.packageName, null)
-    }
-    context.startActivity(intent)
 }

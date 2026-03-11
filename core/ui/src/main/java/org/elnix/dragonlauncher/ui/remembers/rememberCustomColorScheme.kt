@@ -3,7 +3,6 @@ package org.elnix.dragonlauncher.ui.remembers
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.COLORS_TAG
 import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
@@ -13,9 +12,6 @@ import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 
 @Composable
 internal fun rememberCustomColorScheme(defaultColorScheme: ColorScheme): ColorScheme {
-
-    val ctx = LocalContext.current
-
 
     /* ───────────── PRIMARY ───────────── */
     val primary by ColorSettingsStore.primaryColor.asStateNull()
@@ -87,12 +83,12 @@ internal fun rememberCustomColorScheme(defaultColorScheme: ColorScheme): ColorSc
 
 
 
-    ctx.logD(COLORS_TAG) {
+    logD(COLORS_TAG) {
         "Primary: ${primary.toHexWithAlpha()}, definedOrNull: ${
             primary.definedOrNull().toHexWithAlpha()
         }, default fallback: ${defaultColorScheme.primary.toHexWithAlpha()}"
     }
-    ctx.logD(COLORS_TAG) { "Used: ${(primary.definedOrNull() ?: defaultColorScheme.primary).toHexWithAlpha()}" }
+    logD(COLORS_TAG) { "Used: ${(primary.definedOrNull() ?: defaultColorScheme.primary).toHexWithAlpha()}" }
 
     return ColorScheme(
         primary = primary.definedOrNull() ?: defaultColorScheme.primary,

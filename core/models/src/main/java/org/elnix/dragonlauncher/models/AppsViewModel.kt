@@ -1571,11 +1571,11 @@ private fun parseAppFilterXml(ctx: Context, packPkg: String): List<IconMapping>?
             mappings = parseXml(parser)
         }
         if (mappings?.isNotEmpty() == true) {
-            ctx.logD(ICONS_TAG) { "Loaded ${mappings.size} mappings from assets/appfilter.xml" }
+            logD(ICONS_TAG) { "Loaded ${mappings.size} mappings from assets/appfilter.xml" }
             return mappings
         }
     } catch (e: Exception) {
-        ctx.logD(ICONS_TAG) { "Assets appfilter.xml failed: ${e.message}" }
+        logD(ICONS_TAG) { "Assets appfilter.xml failed: ${e.message}" }
     }
 
     // 2. Fallback to res/xml/appfilter.xml
@@ -1585,9 +1585,9 @@ private fun parseAppFilterXml(ctx: Context, packPkg: String): List<IconMapping>?
     try {
         val parser: XmlResourceParser = packResources.getXml(resId)
         mappings = parseXml(parser)
-        ctx.logD(ICONS_TAG) { "Loaded ${mappings.size} mappings from res/xml/appfilter.xml" }
+        logD(ICONS_TAG) { "Loaded ${mappings.size} mappings from res/xml/appfilter.xml" }
     } catch (e: Exception) {
-        ctx.logE(ICONS_TAG) { "res/xml/appfilter.xml parse failed: ${e.message}" }
+        logE(ICONS_TAG) { "res/xml/appfilter.xml parse failed: ${e.message}" }
     }
 
     return mappings

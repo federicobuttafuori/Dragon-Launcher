@@ -3,14 +3,13 @@ package org.elnix.dragonlauncher.ui.wellbeing
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -18,9 +17,6 @@ import android.provider.Settings
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
-import org.elnix.dragonlauncher.common.logging.logD
-import org.elnix.dragonlauncher.common.logging.logE
-import org.elnix.dragonlauncher.common.logging.logW
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
@@ -28,6 +24,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +35,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.logging.logW
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.OVERLAY_REMINDER_TAG
 import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
 
 /**
@@ -57,7 +55,6 @@ class OverlayReminderService : Service() {
         const val EXTRA_REMAINING_TIME = "extra_remaining_time"
         const val EXTRA_HAS_LIMIT = "extra_has_limit"
 
-        private const val TAG = "OverlayReminder"
         private const val DISMISS_DELAY = 7000L
 
         fun show(
@@ -70,7 +67,7 @@ class OverlayReminderService : Service() {
             mode: String = "reminder"
         ) {
             if (!Settings.canDrawOverlays(ctx)) {
-                Companion.logW(TAG) { "Cannot show overlay: permission not granted" }
+                logW(OVERLAY_REMINDER_TAG) { "Cannot show overlay: permission not granted" }
                 return
             }
             try {
@@ -84,7 +81,7 @@ class OverlayReminderService : Service() {
                 }
                 ctx.startService(intent)
             } catch (e: Exception) {
-                Companion.logE(TAG) { "Failed to start overlay service" }
+                logE(OVERLAY_REMINDER_TAG, e) { "Failed to start overlay service" }
             }
         }
     }
@@ -92,18 +89,18 @@ class OverlayReminderService : Service() {
     // ── Colors ──
 
     // Reminder mode (dark glass + purple/teal accent)
-    private val colorCardBg = Color.parseColor("#E6192133")        // dark with slight transparency
-    private val colorCardBorder = Color.parseColor("#806C5CE7")    // purple border
-    private val colorTextPrimary = Color.parseColor("#FFFFFFFF")
-    private val colorTextSecondary = Color.parseColor("#B3FFFFFF")  // white 70%
-    private val colorAccentTeal = Color.parseColor("#FF00CEC9")
-    private val colorDivider = Color.parseColor("#33FFFFFF")        // white 20%
+    private val colorCardBg = "#E6192133".toColorInt()        // dark with slight transparency
+    private val colorCardBorder = "#806C5CE7".toColorInt()    // purple border
+    private val colorTextPrimary = "#FFFFFFFF".toColorInt()
+    private val colorTextSecondary = "#B3FFFFFF".toColorInt()  // white 70%
+    private val colorAccentTeal = "#FF00CEC9".toColorInt()
+    private val colorDivider = "#33FFFFFF".toColorInt()        // white 20%
 
     // Time warning mode (dark + orange/red accent)
-    private val colorWarningBg = Color.parseColor("#E62D1B3D")
-    private val colorWarningBorder = Color.parseColor("#80FFA502")
-    private val colorWarningAccent = Color.parseColor("#FFFFA502")
-    private val colorWarningText = Color.parseColor("#CCFFA502")   // orange 80%
+    private val colorWarningBg = "#E62D1B3D".toColorInt()
+    private val colorWarningBorder = "#80FFA502".toColorInt()
+    private val colorWarningAccent = "#FFFFA502".toColorInt()
+    private val colorWarningText = "#CCFFA502".toColorInt()   // orange 80%
 
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
@@ -117,7 +114,7 @@ class OverlayReminderService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
             if (!Settings.canDrawOverlays(this)) {
-                logW(TAG) { "Overlay permission not granted" }
+                logW(OVERLAY_REMINDER_TAG) { "Overlay permission not granted" }
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -131,11 +128,11 @@ class OverlayReminderService : Service() {
             val remainingTime = intent?.getStringExtra(EXTRA_REMAINING_TIME) ?: ""
             val hasLimit = intent?.getBooleanExtra(EXTRA_HAS_LIMIT, false) ?: false
 
-            logD(TAG) { "onStartCommand: mode=$mode, app=$appName" }
+            logD(OVERLAY_REMINDER_TAG) { "onStartCommand: mode=$mode, app=$appName" }
 
             showOverlay(appName, sessionTime, todayTime, remainingTime, hasLimit, mode)
         } catch (e: Exception) {
-            logE(TAG) { "Error in onStartCommand" }
+            logE(OVERLAY_REMINDER_TAG, e) { "Error in onStartCommand" }
             stopSelf()
         }
         return START_NOT_STICKY
@@ -155,7 +152,7 @@ class OverlayReminderService : Service() {
         serviceScope.launch {
             try {
                 // Read user preferences (which stats to show)
-                val showSession = WellbeingSettingsStore.popupShowSessionTime.get(this@OverlayReminderService) ?: true
+                val showSession = WellbeingSettingsStore.popupShowSessionTime.get(this@OverlayReminderService)
                 val showToday = WellbeingSettingsStore.popupShowTodayTime.flow(this@OverlayReminderService).first()
                 val showRemaining =
                     WellbeingSettingsStore.popupShowRemainingTime.flow(this@OverlayReminderService).first()
@@ -174,11 +171,7 @@ class OverlayReminderService : Service() {
                 val layoutParams = WindowManager.LayoutParams(
                     WindowManager.LayoutParams.MATCH_PARENT,
                     WindowManager.LayoutParams.WRAP_CONTENT,
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                    else
-                        @Suppress("DEPRECATION")
-                        WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                     // FLAG_NOT_FOCUSABLE: overlay never gets input focus
                     // FLAG_NOT_TOUCH_MODAL: touches outside overlay go to app below
                     // FLAG_LAYOUT_IN_SCREEN: allow overlay in status bar area
@@ -192,7 +185,7 @@ class OverlayReminderService : Service() {
 
                 overlayView = container
                 windowManager?.addView(container, layoutParams)
-                logD(TAG) { "Overlay view added successfully" }
+                logD(OVERLAY_REMINDER_TAG) { "Overlay view added successfully" }
 
                 // Entry animation
                 animateIn(container)
@@ -210,13 +203,13 @@ class OverlayReminderService : Service() {
                             stopSelf()
                         }
                     } catch (e: Exception) {
-                        logE(TAG) { "Error in auto-dismiss" }
+                        logE(OVERLAY_REMINDER_TAG, e) { "Error in auto-dismiss" }
                     }
                 }
                 handler.postDelayed(autoDismissRunnable!!, DISMISS_DELAY)
 
             } catch (e: Exception) {
-                logE(TAG) { "Error in showOverlay" }
+                logE(OVERLAY_REMINDER_TAG, e) { "Error in showOverlay" }
                 stopSelf()
             }
         }
@@ -305,7 +298,7 @@ class OverlayReminderService : Service() {
         // Close button
         val closeBtn = ImageView(ctx).apply {
             setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-            setColorFilter(Color.parseColor("#99FFFFFF"))
+            setColorFilter("#99FFFFFF".toColorInt())
             val size = dp(32)
             layoutParams = LinearLayout.LayoutParams(size, size).apply {
                 gravity = Gravity.CENTER_VERTICAL
@@ -416,7 +409,7 @@ class OverlayReminderService : Service() {
             val trackBg = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = dp(2).toFloat()
-                setColor(Color.parseColor("#1AFFFFFF"))
+                setColor("#1AFFFFFF".toColorInt())
             }
             background = trackBg
             layoutParams = LinearLayout.LayoutParams(
@@ -476,25 +469,25 @@ class OverlayReminderService : Service() {
         }
     }
 
-    private fun animateOut(view: View, onEnd: () -> Unit) {
-        AnimatorSet().apply {
-            playTogether(
-                ObjectAnimator.ofFloat(view, "translationY", 0f, -200f).apply {
-                    duration = 400
-                    interpolator = AccelerateDecelerateInterpolator()
-                },
-                ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
-                    duration = 300
-                }
-            )
-            addListener(object : android.animation.AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: android.animation.Animator) {
-                    onEnd()
-                }
-            })
-            start()
-        }
-    }
+//    private fun animateOut(view: View, onEnd: () -> Unit) {
+//        AnimatorSet().apply {
+//            playTogether(
+//                ObjectAnimator.ofFloat(view, "translationY", 0f, -200f).apply {
+//                    duration = 400
+//                    interpolator = AccelerateDecelerateInterpolator()
+//                },
+//                ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
+//                    duration = 300
+//                }
+//            )
+//            addListener(object : android.animation.AnimatorListenerAdapter() {
+//                override fun onAnimationEnd(animation: android.animation.Animator) {
+//                    onEnd()
+//                }
+//            })
+//            start()
+//        }
+//    }
 
     private fun startPulseAnimation(view: View) {
         pulseAnimator = ValueAnimator.ofFloat(1f, 1.02f).apply {
@@ -522,11 +515,11 @@ class OverlayReminderService : Service() {
             overlayView?.let { view ->
                 if (view.isAttachedToWindow) {
                     windowManager?.removeViewImmediate(view)
-                    logD(TAG) { "Overlay removed" }
+                    logD(OVERLAY_REMINDER_TAG) { "Overlay removed" }
                 }
             }
         } catch (e: Exception) {
-            logE(TAG) { "Error removing overlay" }
+            logE(OVERLAY_REMINDER_TAG, e) { "Error removing overlay" }
         } finally {
             overlayView = null
             windowManager = null
@@ -542,6 +535,7 @@ class OverlayReminderService : Service() {
 
     // ───────────────────── Helpers ─────────────────────
 
+    @SuppressLint("InternalInsetResource", "DiscouragedApi")
     private fun getStatusBarHeight(): Int {
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         return if (resourceId > 0) resources.getDimensionPixelSize(resourceId) else 0

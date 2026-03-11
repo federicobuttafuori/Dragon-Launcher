@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
@@ -36,10 +35,7 @@ fun ShapeRow(
     onReset:() -> Unit,
     onClick: () -> Unit
 ) {
-
-    val ctx = LocalContext.current
-
-    ctx.logD(SHAPES_TAG) { "Selected: $selected" }
+    logD(SHAPES_TAG) { "Selected: $selected" }
 
     Row(
         modifier = Modifier

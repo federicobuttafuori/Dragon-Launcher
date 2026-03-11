@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.json.JSONObject
 
 @Composable
@@ -27,7 +28,7 @@ fun rememberSettingsImportLauncher(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
 
-        ctx.logD("BackupManager") { "File picked: $uri" }
+        logD(BACKUP_TAG) { "File picked: $uri" }
 
         if (uri == null) {
             onCancel()

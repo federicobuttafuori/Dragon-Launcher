@@ -2,6 +2,7 @@ package org.elnix.dragonlauncher.common.serializables
 
 import androidx.compose.runtime.Immutable
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable.OpenDragonLauncherSettings
 
 /**
@@ -13,6 +14,7 @@ import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable.Ope
  * All visual values are interpreted by the rendering layer (Compose / Canvas / View).
  */
 @Immutable
+@Serializable
 data class SwipePointSerializable(
 
     /** Index of the circle (ring) this swipe point belongs to. */

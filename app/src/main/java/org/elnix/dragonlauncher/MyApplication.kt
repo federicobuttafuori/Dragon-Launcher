@@ -28,8 +28,9 @@ class MyApplication : Application() {
         )
 
         CoroutineScope(Dispatchers.Default).launch {
+
             val tag = LanguageSettingsStore.keyLang.get(this@MyApplication)
-            if (!tag.isNullOrEmpty()) {
+            if (tag.isNotEmpty()) {
                 AppCompatDelegate.setApplicationLocales(
                     LocaleListCompat.forLanguageTags(tag)
                 )

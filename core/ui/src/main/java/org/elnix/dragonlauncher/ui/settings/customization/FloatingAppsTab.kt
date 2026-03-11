@@ -3,7 +3,6 @@
 package org.elnix.dragonlauncher.ui.settings.customization
 
 import android.annotation.SuppressLint
-import android.content.ComponentName
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -121,15 +120,12 @@ fun FloatingAppsTab(
         if (selected == floatingApp) selected = null
     }
 
-    val widgetNumber = floatingApps.filter { it.action is SwipeActionSerializable.OpenWidget }.size
-    val floatingAppsNumber = floatingApps.filter { it.action is SwipeActionSerializable.LaunchApp }.size
-
     var showAddDialog by remember { mutableStateOf(false) }
     var showNestPickerDialog by remember { mutableStateOf(false) }
     var nestId by remember { mutableIntStateOf(0) }
 
     /**
-     * Status bar things, copy paste from the getters, do no change that, it's just for displaying
+     * Status bar things, copy paste from the getters, do not change that, it's just for displaying
      * the status bar if enabled to preview more easily
      */
     val systemInsets = WindowInsets.systemBars.asPaddingValues()
@@ -148,7 +144,7 @@ fun FloatingAppsTab(
         }
 
         SettingsLazyHeader(
-            title = "${stringResource(R.string.widgets_floating_apps)} (${widgetNumber}) (${floatingAppsNumber})",
+            title = stringResource(R.string.widgets),
             onBack = onBack,
             helpText = stringResource(R.string.floating_apps_tab_help),
             onReset = {
@@ -380,7 +376,7 @@ fun FloatingAppsTab(
         AddPointDialog(
             onDismiss = { showAddDialog = false },
             actions = listOf(
-                SwipeActionSerializable.OpenWidget(0, ComponentName("", "")),
+                SwipeActionSerializable.OpenWidget(0, "", ""),
                 SwipeActionSerializable.OpenCircleNest(0),
                 SwipeActionSerializable.GoParentNest,
                 SwipeActionSerializable.LaunchShortcut("", ""),
@@ -414,10 +410,10 @@ fun FloatingAppsTab(
             onNewNest = null,
             onNameChange = null
         ) {
-            ctx.logD(WIDGET_TAG) { it.toString() }
+            logD(WIDGET_TAG) { it.toString() }
             nestId = it.id
             selected = null
-            ctx.logD(WIDGET_TAG) { nestId.toString() }
+            logD(WIDGET_TAG) { nestId.toString() }
 
             showNestPickerDialog = false
         }

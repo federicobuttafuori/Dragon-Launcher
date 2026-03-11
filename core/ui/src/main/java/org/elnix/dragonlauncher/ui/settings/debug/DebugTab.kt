@@ -3,7 +3,6 @@
 package org.elnix.dragonlauncher.ui.settings.debug
 
 import android.content.Intent
-import android.os.Build
 import android.provider.Settings
 import android.system.Os.kill
 import androidx.compose.foundation.BorderStroke
@@ -11,13 +10,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,32 +29,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.detectSystemLauncher
+import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.services.SystemControl
-import org.elnix.dragonlauncher.services.SystemControl.activateDeviceAdmin
-import org.elnix.dragonlauncher.services.SystemControl.isDeviceAdminActive
 import org.elnix.dragonlauncher.settings.allStores
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
-import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
-import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
@@ -80,7 +73,15 @@ fun DebugTab(
     var showEditAppOverrides by remember { mutableStateOf(false) }
 
     val debugInfosSectionState = rememberExpandableSection(stringResource(R.string.debug_infos))
+    val packageSearchSectionState = rememberExpandableSection("Package Search")
     val storeResetSectionState = rememberExpandableSection(stringResource(R.string.store_reset))
+    val dangerousActionsSectionState = rememberExpandableSection("Dangerous Actions")
+    val testOverlaysSectionState = rememberExpandableSection("Test Overlays")
+    val accessibilitySectionState = rememberExpandableSection("Accessibility & System")
+    val uiDebugSectionState = rememberExpandableSection("UI & Flow Debug")
+
+    var packageQuery by remember { mutableStateOf("") }
+    var packageResult by remember { mutableStateOf<String?>(null) }
 
 
     LaunchedEffect(Unit) {
@@ -90,11 +91,10 @@ fun DebugTab(
     SettingsLazyHeader(
         title = stringResource(R.string.debug),
         onBack = onBack,
-        helpText = "Debug, too busy to make a translated explanation",
+        helpText = "Advanced developer tools and system overrides.",
         onReset = null,
         resetText = null
     ) {
-
         item {
             SettingsSwitchRow(
                 setting = DebugSettingsStore.debugEnabled,
@@ -102,43 +102,60 @@ fun DebugTab(
                 description = stringResource(R.string.activate_debug_mode_desc)
             ) {
                 scope.launch { DebugSettingsStore.debugEnabled.set(ctx, it) }
-                navController.popBackStack()
-            }
-        }
-
-        item { TextDivider("Debug things") }
-
-        item {
-            SettingsItem(
-                title = "Settings debug json",
-                icon = Icons.Default.Settings
-            ) {
-                navController.navigate(SETTINGS.SETTINGS_JSON)
             }
         }
 
         item {
-            DragonColumnGroup {
-                DragonButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        kill(9, 9)
-                    }
+            ExpandableSection(uiDebugSectionState) {
+                SettingsItem(
+                    title = "Settings debug json",
+                    icon = Icons.Default.Settings
                 ) {
-                    Text("☠\uFE0F Kill app")
+                    navController.navigate(SETTINGS.SETTINGS_JSON)
                 }
 
                 DragonButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        ctx.startActivity(
-                            Intent(Intent.ACTION_DELETE).apply {
-                                data = "package:${ctx.packageName}".toUri()
-                            }
-                        )
-                    }
+                    onClick = { onShowWelcome() },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("☠\uFE0F Uninstall app")
+                    Text(text = "Show welcome screen")
+                }
+
+                DragonButton(
+                    onClick = {
+                        scope.launch {
+                            PrivateSettingsStore.lastSeenVersionCodeWhatsNew.set(
+                                ctx,
+                                0
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Reset What's New sheet")
+                }
+
+                DragonButton(
+                    onClick = {
+                        scope.launch {
+                            PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(
+                                ctx,
+                                0
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Reset Google lockdown warning")
+                }
+
+                DragonButton(
+                    onClick = {
+                        showEditAppOverrides = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Edit ALL app overrides \uD83D\uDE08")
                 }
             }
         }
@@ -178,43 +195,128 @@ fun DebugTab(
         }
 
         item {
-            DragonColumnGroup {
-                DragonButton(
-                    onClick = { onShowWelcome() },
-                    modifier = Modifier.fillMaxWidth()
+            ExpandableSection(packageSearchSectionState) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Show welcome screen",
+                    OutlinedTextField(
+                        value = packageQuery,
+                        onValueChange = { packageQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Search package") },
+                        placeholder = { Text("e.g. org.elnix.dragonlauncher.fonts") },
+                        singleLine = true,
+                        colors = AppObjectsColors.outlinedTextFieldColors()
                     )
-                }
+                    DragonButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            packageResult = try {
+                                val info = ctx.packageManager.getPackageInfo(packageQuery.trim(), 0)
+                                buildString {
+                                    appendLine("Package: ${info.packageName}")
+                                    appendLine("Version: ${info.versionName} (${ctx.getVersionCode()}")
+                                    appendLine("Enabled: ${info.applicationInfo?.enabled ?: "unknown"}")
+                                    appendLine("Data Dir: ${info.applicationInfo?.dataDir ?: "unknown"}")
+                                }
+                            } catch (e: Exception) {
+                                "Not found or error: ${e.message}"
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                        Text("Search")
+                    }
 
-                DragonButton(
-                    onClick = {
-                        scope.launch { PrivateSettingsStore.lastSeenVersionCodeWhatsNew.set(ctx, 0) }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Show what's new sheet",
-                    )
-                }
-
-                DragonButton(
-                    onClick = {
-                        scope.launch { PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.set(ctx, 0) }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Show google lockdown warning",
-                    )
+                    packageResult?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
 
+        item {
+            ExpandableSection(accessibilitySectionState) {
+                SettingsSwitchRow(
+                    setting = DebugSettingsStore.useAccessibilityInsteadOfContextToExpandActionPanel,
+                    title = stringResource(R.string.use_accessibility_instead_of_context),
+                    description = stringResource(R.string.use_accessibility_instead_of_context_desc)
+                )
+
+                SettingsSwitchRow(
+                    setting = DebugSettingsStore.autoRaiseDragonOnSystemLauncher,
+                    title = stringResource(R.string.auto_raise_dragon_on_system_launcher),
+                    description = stringResource(R.string.auto_raise_dragon_on_system_launcher_desc)
+                )
+
+                DragonButton(
+                    onClick = { SystemControl.openServiceSettings((ctx)) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Open Accessibility Services")
+                }
+
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        DragonButton(
+                            onClick = {
+                                pendingSystemLauncher = detectSystemLauncher(ctx)
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Detect Launcher")
+                        }
+                        DragonButton(
+                            onClick = {
+                                scope.launch {
+                                    DebugSettingsStore.systemLauncherPackageName.set(
+                                        ctx,
+                                        pendingSystemLauncher ?: ""
+                                    )
+                                }
+                            },
+                            enabled = pendingSystemLauncher != null
+                        ) {
+                            Text("Set Default")
+                        }
+                    }
+
+                    pendingSystemLauncher?.let {
+                        Text(
+                            text = "Detected: $it",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+
+                OutlinedTextField(
+                    label = { Text("System launcher package") },
+                    value = systemLauncherPackageName,
+                    onValueChange = { newValue ->
+                        scope.launch {
+                            DebugSettingsStore.systemLauncherPackageName.set(ctx, newValue)
+                        }
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    colors = AppObjectsColors.outlinedTextFieldColors()
+                )
+            }
+        }
 
         item {
-            DragonColumnGroup {
+            ExpandableSection(testOverlaysSectionState) {
                 DragonButton(
                     onClick = {
                         if (!Settings.canDrawOverlays(ctx)) {
@@ -231,10 +333,9 @@ fun DebugTab(
                             "reminder"
                         )
                     },
-                    colors = AppObjectsColors.buttonColors(),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Test: Reminder overlay popup")
+                    Text(text = "Test: Reminder overlay")
                 }
 
                 DragonButton(
@@ -253,180 +354,75 @@ fun DebugTab(
                             "time_warning"
                         )
                     },
-                    colors = AppObjectsColors.buttonColors(),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Test: Time almost up overlay")
+                    Text(text = "Test: Limit overlay")
                 }
             }
-        }
-
-        item {
-            SettingsSwitchRow(
-                setting = PrivateSettingsStore.hasInitialized,
-                title = stringResource(R.string.has_initialized),
-                description = stringResource(R.string.has_initialized_desc),
-                needValidationToDisable = true
-            )
-        }
-
-        item {
-            SettingsSwitchRow(
-                setting = PrivateSettingsStore.showSetDefaultLauncherBanner,
-                title = stringResource(R.string.show_default_launcher_banner),
-                description = stringResource(R.string.show_default_launcher_banner_desc)
-            )
-        }
-
-        item {
-            // >= Android 13
-            val enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            if (!enabled) {
-                Text(
-                    text = "Since you're under android 13, or code name TIRAMISU you can't use the android language selector and you're blocked with the app custom one.",
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            SettingsSwitchRow(
-                setting = DebugSettingsStore.forceAppLanguageSelector,
-                title = stringResource(R.string.force_app_language_selector),
-                description = stringResource(R.string.force_app_language_selector_desc),
-                enabled = enabled
-            )
-        }
-
-        item {
-            SettingsSwitchRow(
-                setting = DebugSettingsStore.useAccessibilityInsteadOfContextToExpandActionPanel,
-                title = stringResource(R.string.use_accessibility_instead_of_context),
-                description = stringResource(R.string.use_accessibility_instead_of_context_desc)
-            )
         }
 
         item {
             ExpandableSection(storeResetSectionState) {
                 allStores.entries.forEach { entry ->
                     val settingsStore = entry.value
-
                     OutlinedButton(
                         onClick = { scope.launch { settingsStore.resetAll(ctx) } },
                         colors = AppObjectsColors.cancelButtonColors(),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
                     ) {
                         Text(
-                            text = buildAnnotatedString {
-                                append("Reset ")
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        textDecoration = TextDecoration.Underline
-                                    ),
-                                ) {
-                                    append(settingsStore.name)
-                                }
-                            }
+                            text = "Reset ${settingsStore.name}",
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
-            }
-        }
-
-        item {
-            TextDivider("Hacky launching accessibility things")
-        }
-
-        item {
-            DragonColumnGroup {
-                TextButton(
-                    onClick = { SystemControl.openServiceSettings((ctx)) }
-                ) {
-                    Text("Open Service settings")
-                }
-                ActivateDeviceAdminButton()
-
 
                 SettingsSwitchRow(
-                    setting = DebugSettingsStore.autoRaiseDragonOnSystemLauncher,
-                    title = stringResource(R.string.auto_raise_dragon_on_system_launcher),
-                    description = stringResource(R.string.auto_raise_dragon_on_system_launcher_desc)
+                    setting = PrivateSettingsStore.hasInitialized,
+                    title = stringResource(R.string.has_initialized),
+                    description = "De-initializing will re-run the welcome flow.",
+                    needValidationToDisable = true
                 )
 
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        DragonButton(
-                            onClick = {
-                                pendingSystemLauncher = detectSystemLauncher(ctx)
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Detect System launcher")
-                        }
-                        DragonButton(
-                            onClick = {
-                                scope.launch {
-                                    DebugSettingsStore.systemLauncherPackageName.set(
-                                        ctx,
-                                        pendingSystemLauncher
-                                    )
-                                }
-                            },
-                            enabled = pendingSystemLauncher != null
-                        ) {
-                            Text("Set")
-                        }
-                    }
-
-                    if (pendingSystemLauncher != null) {
-                        Text(
-                            buildAnnotatedString {
-                                append("Your system launcher: ")
-                                withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
-                                    append(pendingSystemLauncher)
-                                }
-                            }
-                        )
-                    } else {
-                        Text("No system launcher detected")
-                    }
-                }
-
-                OutlinedTextField(
-                    label = {
-                        Text(
-                            text = "Your system launcher package name",
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    },
-                    value = systemLauncherPackageName,
-                    onValueChange = { newValue ->
-                        scope.launch {
-                            DebugSettingsStore.systemLauncherPackageName.set(ctx, newValue)
-                        }
-                    },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = AppObjectsColors.outlinedTextFieldColors()
+                SettingsSwitchRow(
+                    setting = PrivateSettingsStore.showSetDefaultLauncherBanner,
+                    title = "Show default banner",
+                    description = "Forces the 'Set as default' banner to appear."
                 )
             }
         }
 
         item {
-            TextDivider("Random debug settings")
-        }
-
-        item {
-            TextButton(
-                onClick = {
-                    showEditAppOverrides = true
+            ExpandableSection(dangerousActionsSectionState) {
+                DragonButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = AppObjectsColors.cancelButtonColors(),
+                    onClick = { kill(9, 9) }
+                ) {
+                    Text("☠\uFE0F Kill Process")
                 }
-            ) {
-                Text(
-                    text = "Edit ALL app overrides \uD83D\uDE08",
-                    color = MaterialTheme.colorScheme.onBackground
+
+                DragonButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = AppObjectsColors.cancelButtonColors(),
+                    onClick = {
+                        ctx.startActivity(
+                            Intent(Intent.ACTION_DELETE).apply {
+                                data = "package:${ctx.packageName}".toUri()
+                            }
+                        )
+                    }
+                ) {
+                    Text("☠\uFE0F Uninstall Launcher")
+                }
+
+                SettingsSwitchRow(
+                    setting = DebugSettingsStore.disableExtensionSignatureCheck,
+                    title = "Disable extension signature check",
+                    description = "Allow extensions not signed with the official key (DANGEROUS)"
                 )
             }
         }
@@ -441,24 +437,5 @@ fun DebugTab(
             )
             showEditAppOverrides = false
         }
-    }
-}
-
-
-@Composable
-fun ActivateDeviceAdminButton() {
-    val ctx = LocalContext.current
-    val isActive = remember(Unit) { isDeviceAdminActive(ctx) }
-    TextButton(
-        enabled = !isActive,
-        onClick = {
-            ctx.logD("Compose") { "Button clicked - context: ${ctx.packageName}" }
-            activateDeviceAdmin(ctx)
-        }
-    ) {
-        Text(
-            if (isActive) "Device Admin ✓ Active"
-            else "Activate Device Admin"
-        )
     }
 }

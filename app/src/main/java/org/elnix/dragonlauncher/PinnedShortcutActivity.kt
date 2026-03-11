@@ -9,6 +9,7 @@ import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.PINNED_SHORTCUTS
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import java.util.UUID
@@ -26,30 +27,26 @@ import java.util.UUID
  */
 class PinnedShortcutActivity : ComponentActivity() {
 
-    companion object {
-        private const val TAG = "PinnedShortcut"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val launcherApps = getSystemService(LauncherApps::class.java)
         if (launcherApps == null) {
-            logE(TAG) { "LauncherApps service not available" }
+            logE(PINNED_SHORTCUTS) { "LauncherApps service not available" }
             finish()
             return
         }
 
         val request = launcherApps.getPinItemRequest(intent)
         if (request == null) {
-            logE(TAG) { "No pin item request found in intent" }
+            logE(PINNED_SHORTCUTS) { "No pin item request found in intent" }
             finish()
             return
         }
 
         val shortcutInfo = request.shortcutInfo
         if (shortcutInfo == null) {
-            logE(TAG) { "Pin request does not contain a shortcut (maybe a widget?)" }
+            logE(PINNED_SHORTCUTS) { "Pin request does not contain a shortcut (maybe a widget?)" }
             // For now, we don't handle widget pin requests
             finish()
             return
@@ -59,18 +56,18 @@ class PinnedShortcutActivity : ComponentActivity() {
         val shortcutId = shortcutInfo.id
         val shortLabel = shortcutInfo.shortLabel?.toString() ?: shortcutId
 
-        logD(TAG) { "Received pin request: $packageName / $shortcutId ($shortLabel)" }
+        logD(PINNED_SHORTCUTS) { "Received pin request: $packageName / $shortcutId ($shortLabel)" }
 
         // Accept the pin request — this tells the system the shortcut is pinned
         val accepted = request.accept()
         if (!accepted) {
-            logE(TAG) { "Failed to accept pin request for $packageName / $shortcutId" }
+            logE(PINNED_SHORTCUTS) { "Failed to accept pin request for $packageName / $shortcutId" }
             showToast(getString(org.elnix.dragonlauncher.common.R.string.pinned_shortcut_failed))
             finish()
             return
         }
 
-        logD(TAG) { "Pin request accepted for $packageName / $shortcutId" }
+        logD(PINNED_SHORTCUTS) { "Pin request accepted for $packageName / $shortcutId" }
 
         // Add the shortcut as a new swipe point on circle 0, nest 0
         lifecycleScope.launch {
@@ -111,7 +108,7 @@ class PinnedShortcutActivity : ComponentActivity() {
                 val updatedPoints = existingPoints + newPoint
                 SwipeSettingsStore.savePoints(this@PinnedShortcutActivity, updatedPoints)
 
-                logD(TAG) { "Shortcut added as point: $shortLabel at $angle°" }
+                logD(PINNED_SHORTCUTS) { "Shortcut added as point: $shortLabel at $angle°" }
                 showToast(
                     getString(
                         org.elnix.dragonlauncher.common.R.string.pinned_shortcut_added,
@@ -119,7 +116,7 @@ class PinnedShortcutActivity : ComponentActivity() {
                     )
                 )
             } catch (e: Exception) {
-                logE(TAG) { "Failed to save pinned shortcut: ${e.message}" }
+                logE(PINNED_SHORTCUTS) { "Failed to save pinned shortcut: ${e.message}" }
                 showToast(getString(org.elnix.dragonlauncher.common.R.string.pinned_shortcut_failed))
             }
 

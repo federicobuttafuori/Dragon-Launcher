@@ -117,7 +117,6 @@ fun MainScreen(
     val defaultColor = Color.Red
 
 
-
     var start by remember { mutableStateOf<Offset?>(null) }
     var current by remember { mutableStateOf<Offset?>(null) }
     var size by remember { mutableStateOf(IntSize.Zero) }
@@ -142,9 +141,6 @@ fun MainScreen(
     val showStatusBar by StatusBarSettingsStore.showStatusBar.asState()
     val systemInsets = WindowInsets.systemBars.asPaddingValues()
     val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
-
-    /* ────────────────────────────────────────────── */
-
 
     /* Dim wallpaper system */
     val mainBlurRadius by UiSettingsStore.wallpaperDimMainScreen.asState()
@@ -400,14 +396,15 @@ fun MainScreen(
                         BurgerAction(
                             onClick = {
                                 showDropDownMenuSettings = false
-                                onSettings(SETTINGS.FLOATING_APPS)
+                                onSettings(SETTINGS.WIDGETS_FLOATING_APPS)
                             }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Widgets,
                                 contentDescription = null
                             )
-                            Text(stringResource(R.string.widgets),
+                            Text(
+                                stringResource(R.string.widgets_floating_apps),
                             )
                         },
                         BurgerAction(
@@ -420,7 +417,8 @@ fun MainScreen(
                                 imageVector = Icons.Default.Wallpaper,
                                 contentDescription = null
                             )
-                            Text(stringResource(R.string.wallpaper),
+                            Text(
+                                stringResource(R.string.wallpaper),
                             )
                         }
                     )

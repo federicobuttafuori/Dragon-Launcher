@@ -75,6 +75,19 @@ object DebugSettingsStore : MapSettingsStore() {
         default = false
     )
 
+    val disableExtensionSignatureCheck = Settings.boolean(
+        key = "disableExtensionSignatureCheck",
+        dataStoreName = dataStoreName,
+        default = false
+    )
+
+
+
+    val backupStores = Settings.stringSet(
+        key = "backupStores",
+        dataStoreName = dataStoreName,
+        default = DataStoreName.entries.map { it.value }.toSet()
+    )
 
     override val ALL: List<BaseSettingObject<*,*>>
         get() = listOf(
@@ -88,6 +101,8 @@ object DebugSettingsStore : MapSettingsStore() {
             this.systemLauncherPackageName,
             this.useAccessibilityInsteadOfContextToExpandActionPanel,
             this.enableLogging,
-            this.privateSpaceDebugInfo
+            this.privateSpaceDebugInfo,
+            this.disableExtensionSignatureCheck,
+            this.backupStores
         )
     }

@@ -253,8 +253,6 @@
     <string name="move_point_to_right">Mova o ponto para a direita</string>
     <string name="move_point_to_left">Mova o ponto para a esquerda</string>
     <string name="toggle_drag_distances_editing">Alternar arrastar e editar círculo</string>
-    <string name="device_admin_description">Usado para impedir que a Xiaomi encerrasse o app</string>
-    <string name="device_admin_label">Dragon Launcher</string>
     <string name="ghosted">Ignorado</string>
     <string name="foreground">Primeiro plano</string>
     <string name="app_label_icon_overlay_top_padding">Etiqueta/ícone do app sobrepõe o preenchimento superior</string>

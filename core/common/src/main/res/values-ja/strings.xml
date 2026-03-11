@@ -253,8 +253,6 @@
     <string name="move_point_to_right">右にポイントを移動します</string>
     <string name="move_point_to_left">ポイントを左に移動</string>
     <string name="toggle_drag_distances_editing">ドラッグサークル編集のトグル</string>
-    <string name="device_admin_description">Xiaomiがアプリを停止させるのを防ぐために使われました</string>
-    <string name="device_admin_label">ドラゴンランチャー</string>
     <string name="ghosted">ゴースト</string>
     <string name="foreground">前景</string>
     <string name="app_label_icon_overlay_top_padding">アプリラベル/アイコンオーバーレイ トップパディング</string>

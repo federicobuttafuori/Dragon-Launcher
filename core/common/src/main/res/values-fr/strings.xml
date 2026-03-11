@@ -16,6 +16,14 @@
     <string name="app_display">Affichage de l’application</string>
     <string name="color_selector">Sélecteur de couleurs</string>
     <string name="debug">Débogage</string>
+    <string name="extensions">Extensions</string>
+    <string name="extensions_description">Téléchargez et gérez des fonctionnalités supplémentaires pour Dragon Launcher.</string>
+    <string name="install">Installer</string>
+    <string name="permissions">Permissions</string>
+    <string name="no_extensions_found">Aucune extension trouvée dans le registre.</string>
+    <string name="extension_manual_install_title">Installation Manuelle</string>
+    <string name="extension_manual_install_desc">Si vous n\'avez pas d\'extension d\'installation, téléchargez l\'APK et sélectionnez-le ci-dessous pour l\'installer.</string>
+    <string name="select_apk">Sélectionner l\'APK</string>
     <string name="language_english">Anglais</string>
     <string name="language_french">Français</string>
     <string name="language_german">Allemand</string>
@@ -234,6 +242,9 @@
     <string name="auto_separate">Séparation automatique</string>
     <string name="add_widget">Ajouter un widget</string>
     <string name="widgets">Widgets</string>
+    <string name="edit">Édit</string>
+    <string name="active_widgets">Widgets actifs</string>
+    <string name="options">Options</string>
     <string name="widgets_floating_apps">Widgets / Applications flottantes</string>
     <string name="floating_apps_tab_help"><![CDATA[Gérez les widgets de votre espace de travail et les applications flottantes : ajoutez-les, réorganisez-les, redimensionnez et positionnez-les.\n Ghosted signifie que le widget n\'est pas cliquable.\nLe premier plan signifie que les gestes de glissement ne sont pas enregistrés sur le widget.\nVous pouvez essayer une combinaison de ces deux pour obtenir la configuration que vous souhaitez.]]></string>
     <string name="delete_widget">Supprimer widget</string>
@@ -243,8 +254,6 @@
     <string name="move_point_to_right">Déplacez le point vers la droite</string>
     <string name="move_point_to_left">Déplacez le point vers la gauche</string>
     <string name="toggle_drag_distances_editing">Modification du cercle par glisser à bascule</string>
-    <string name="device_admin_description">Utilisé pour empêcher Xiaomi de couper l’application</string>
-    <string name="device_admin_label">Lance-dragons</string>
     <string name="ghosted">Ghosté</string>
     <string name="foreground">Premier plan</string>
     <string name="app_label_icon_overlay_top_padding">Rembourrage supérieur superposé à l’étiquette/icône de l’application</string>
@@ -811,6 +820,33 @@
     <string name="glow_radius">Rayon de lueur</string>
     <string name="glow_color">Couleur lumineuse</string>
     <string name="enable_glow">Activer la lueur</string>
+    <string name="line_object">Objet ligne</string>
+    <string name="angle_object">Objet en angle</string>
+    <string name="start_object">Objet de départ</string>
+    <string name="end_object">Fin de l’objet</string>
+    <string name="show_all_actions_on_current_nest">Afficher toutes les actions sur le nid actuel</string>
+    <string name="show_all_actions_on_current_nest_desc">Diasplay sur tous les cercles et points du nid actuel tout en traînant</string>
+    <string name="disable_auto_launch_on_space_first_char">Désactiver le lancement automatique sur le premier personnage spatial</string>
+    <string name="disable_auto_launch_on_space_first_char_desc">Quand vous appuyez sur espace avant de chercher, le lancement automatique ne s’active pas</string>
+    <string name="configure_draw_order">Configurer l’ordre de dessin</string>
+    <string name="debug_mode_already_enabled">Le mode Débogage est déjà activé</string>
+    <string name="not_supported_in_this_android_version">Non pris en charge dans cette version Android</string>
+    <string name="please_enable_accessibility_services_to_use_that_feature">Veuillez activer le service d’accessibilité pour utiliser cette fonctionnalité</string>
+    <string name="permission_tab_help">Gérez ici les permissions et accès système pour Dragon Launcher.</string>
+    <string name="special_system_access">Accès système spéciaux</string>
+    <string name="notification_access">Accès aux notifications</string>
+    <string name="notification_access_desc">Permet d\'afficher les badges de notification sur les icônes.</string>
+    <string name="install_from_unknown_source_permission">Installation d\'applications (APK)</string>
+    <string name="install_from_unknown_source_permission_desc">Nécessaire pour installer les extensions téléchargées.</string>
 
+    <string name="accessibility_service">Service d\'accessibilité</string>
+    <string name="accessibility_service_desc">Utilisé pour étendre le panneau de notifications via des gestes.</string>
+
+    <string name="usage_access">Accès aux statistiques d\'utilisation</string>
+    <string name="usage_access_desc">Requis pour les fonctionnalités de Bien-être numérique.</string>
+
+    <string name="android_permissions">Permissions Android</string>
+
+    <string name="manage_in_system_settings">Gérer dans les paramètres système.</string>
 
 </resources>

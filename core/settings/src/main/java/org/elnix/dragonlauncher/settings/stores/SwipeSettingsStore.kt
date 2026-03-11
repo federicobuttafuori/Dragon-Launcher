@@ -6,10 +6,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.elnix.dragonlauncher.common.logging.logI
 import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.settings.DataStoreName
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.bases.JsonObjectSettingsStore
@@ -48,6 +50,7 @@ object SwipeSettingsStore : JsonObjectSettingsStore() {
 
     suspend fun savePoints(ctx: Context, points: List<SwipePointSerializable>) {
         ctx.resolveDataStore(dataStoreName).edit { prefs ->
+            logI(BACKUP_TAG) { "Encoding points: $points"}
             prefs[POINTS] = SwipeJson.encodePoints(points)
         }
     }
@@ -75,12 +78,12 @@ object SwipeSettingsStore : JsonObjectSettingsStore() {
 
     fun getDefaultPointFlow(ctx: Context): Flow<SwipePointSerializable> =
         ctx.resolveDataStore(dataStoreName).data.map { prefs ->
-            prefs[DEFAULT_CIRCLE]?.let { SwipeJson.decodePoints(it).first() } ?: defaultSwipePointsValues
+            prefs[DEFAULT_CIRCLE]?.let { SwipeJson.decodePoints(it).firstOrNull() } ?: defaultSwipePointsValues
         }
 
     suspend fun getDefaultPoint(ctx: Context): SwipePointSerializable =
         ctx.resolveDataStore(dataStoreName).data.map { prefs ->
-            prefs[DEFAULT_CIRCLE]?.let { SwipeJson.decodePoints(it).first() } ?: defaultSwipePointsValues
+            prefs[DEFAULT_CIRCLE]?.let { SwipeJson.decodePoints(it).firstOrNull() } ?: defaultSwipePointsValues
         }.first()
 
     suspend fun setDefaultPoint(ctx: Context, point: SwipePointSerializable) {
