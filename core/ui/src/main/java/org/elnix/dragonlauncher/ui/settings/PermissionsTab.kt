@@ -6,21 +6,34 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 
@@ -58,6 +71,26 @@ fun PermissionsTab(onBack: () -> Unit) {
         checkPermissions()
     }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Recheck permissions on user return
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            // The activity resumes when the user returns from the Home settings screen
+            if (event == Lifecycle.Event.ON_RESUME) {
+                checkPermissions()
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the noAnimComposable leaves the screen, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Column {
         SettingsLazyHeader(
             title = stringResource(R.string.permissions),
@@ -66,12 +99,26 @@ fun PermissionsTab(onBack: () -> Unit) {
             onReset = null
         ) {
             item {
-                Text(
-                    text = stringResource(R.string.special_system_access),
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(15.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.special_system_access),
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.reload),
+                        modifier = Modifier
+                            .clip(DragonShape)
+                            .clickable { checkPermissions() }
+                            .padding(5.dp)
+                    )
+                }
             }
 
             item {
@@ -82,7 +129,7 @@ fun PermissionsTab(onBack: () -> Unit) {
                         ctx.startActivity(intent)
                     },
                     text = stringResource(R.string.notification_access),
-                    subText = ""
+                    subText = stringResource(R.string.notification_access_desc)
                 )
             }
 
