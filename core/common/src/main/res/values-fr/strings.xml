@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dragon Launcher</string>
     <string name="accessibility_service_description">Permet à DragonLauncher d\'ouvrir le volet de notifications et le panneau des réglages rapides.</string>
@@ -383,7 +384,6 @@
     <string name="open_kb">Clavier ouvert</string>
     <string name="open_settings">Ouvrir les paramètres</string>
     <string name="clear_all">Tout effacer</string>
-
     <!--  ─────────────  Wellbeing Section  ─────────────  -->
     <string name="wellbeing">Bien-être numérique</string>
     <string name="wellbeing_help">Prenez le contrôle de vos habitudes numériques. Faites une pause avant d\'ouvrir des applications distrayantes et réfléchissez à votre utilisation.</string>
@@ -399,7 +399,6 @@
     <string name="no_paused_apps">Aucune application en pause. Ajoutez des apps qui vous distraient.</string>
     <string name="usage_permission_required">Permission d\'accès aux données d\'utilisation</string>
     <string name="usage_permission_description">Pour afficher vos vraies statistiques d\'utilisation, Dragon Launcher a besoin d\'accéder aux données d\'utilisation des applications. Cela vous aide à être plus conscient du temps que vous passez sur les apps.</string>
-
     <!--  ─────────────  Digital Pause Screen  ─────────────  -->
     <string name="digital_pause_title">Pause Numérique</string>
     <string name="pause_breathe_1">Prenez un moment pour respirer…</string>
@@ -419,7 +418,6 @@
     <string name="not_used_yet">Vous n\'avez pas encore utilisé cette application aujourd\'hui, peut-être devriez-vous y renoncer?</string>
     <string name="usage_permission_needed">Permission d\'accès aux données d\'utilisation nécessaire</string>
     <string name="grant_usage_permission">Accorder la permission</string>
-
     <!--  ─────────────  Wellbeing: Reminder Mode  ─────────────  -->
     <string name="reminder_mode_title">Rappel d\'utilisation</string>
     <string name="reminder_mode_description">Recevez des rappels périodiques lorsque vous restez trop longtemps sur une app en pause</string>
@@ -430,7 +428,6 @@
     <string name="reminder_mode_overlay">Popup à l\'écran</string>
     <string name="overlay_permission_required">Permission de superposition</string>
     <string name="overlay_permission_description">Pour afficher des rappels par-dessus d\'autres applications, Dragon Launcher a besoin de la permission « Afficher par-dessus d\'autres apps ».</string>
-
     <!--  Popup Display Options  -->
     <string name="popup_display_title">Contenu de la popup</string>
     <string name="popup_display_description">Choisissez les informations à afficher dans la popup de rappel</string>
@@ -440,18 +437,15 @@
     <string name="popup_show_today_time_desc">Temps total passé sur cette app aujourd\'hui</string>
     <string name="popup_show_remaining_time">Afficher le temps restant</string>
     <string name="popup_show_remaining_time_desc">Temps avant retour auto (si activé)</string>
-
     <!--  Popup Display Labels  -->
     <string name="popup_session_label">Session</string>
     <string name="popup_today_label">Aujourd\'hui</string>
     <string name="popup_remaining_label">Restant</string>
     <string name="popup_no_limit">Pas de limite</string>
-
     <string name="reminder_notification_title">Toujours sur %s</string>
     <string name="reminder_notification_text">Vous utilisez %1$s depuis %2$s. Et si vous faisiez une pause ?</string>
     <string name="reminder_overlay_text">Vous êtes sur %1$s depuis %2$s</string>
     <string name="reminder_overlay_subtext">Faites une pause, vos yeux vous remercieront 🌿</string>
-
     <!--  ─────────────  Wellbeing: Return to Launcher  ─────────────  -->
     <string name="return_to_launcher_title">Retour automatique au Launcher</string>
     <string name="return_to_launcher_description">Définissez un temps max avant d\'ouvrir une app en pause. Dragon vous ramène quand le temps est écoulé.</string>
@@ -478,7 +472,6 @@
     <string name="encouragement_stretch">Étirez-vous un peu 🧘</string>
     <string name="encouragement_window">Regardez par la fenêtre 🪟</string>
     <string name="encouragement_text_someone">Envoyez un message à quelqu\'un que vous aimez 💬</string>
-
     <!--  ─────────────  Appearance ?  ─────────────  -->
     <string name="edit_icons_shape">Modifier la forme des icônes</string>
     <string name="edit_icons_shape_desc">Personnalisez la forme sur les icônes du tiroir et le reste de l’application</string>
@@ -494,8 +487,6 @@
     <string name="dynamic_colors">Couleurs dynamiques</string>
     <string name="dynamic_colors_desc">Utilisez des couleurs dynamiques Android pour vous offrir un schéma de couleurs dynamique</string>
     <string name="use_pure_black_background">Utilisez un fond noir pur</string>
-
-
     <!--  ───────────── Colors  ─────────────  -->
     <string name="primary_colors_section">Couleurs primaires</string>
     <string name="primary_color">Couleur primaire</string>
@@ -503,19 +494,16 @@
     <string name="primary_container_color">Conteneur principal</string>
     <string name="on_primary_container_color">Sur le récipient primaire</string>
     <string name="inverse_primary_color">Primaire inverse</string>
-
     <string name="secondary_colors_section">Couleurs secondaires</string>
     <string name="secondary_color">Couleur secondaire</string>
     <string name="on_secondary_color">Sur la couleur secondaire</string>
     <string name="secondary_container_color">Conteneur secondaire</string>
     <string name="on_secondary_container_color">Sur le conteneur secondaire</string>
-
     <string name="tertiary_colors_section">Couleurs tertiaires</string>
     <string name="tertiary_color">Couleur tertiaire</string>
     <string name="on_tertiary_color">Sur la couleur tertiaire</string>
     <string name="tertiary_container_color">Conteneur tertiaire</string>
     <string name="on_tertiary_container_color">Sur le conteneur tertiaire</string>
-
     <string name="background_surface_colors_section">Arrière-plan / Couleurs de surface</string>
     <string name="background_color">Couleur de fond</string>
     <string name="on_background_color">Sur la couleur de fond</string>
@@ -526,18 +514,15 @@
     <string name="surface_tint_color">Teinte de surface</string>
     <string name="inverse_surface_color">Inverse Surface</string>
     <string name="inverse_on_surface_color">Inverse sur la surface</string>
-
     <string name="error_colors_section">Couleurs d’erreur</string>
     <string name="error_color">Couleur d’erreur</string>
     <string name="on_error_color">Sur la couleur d’erreur</string>
     <string name="error_container_color">Conteneur d’erreur</string>
     <string name="on_error_container_color">Sur le conteneur d’erreur</string>
-
     <string name="outline_colors_section">Contour / Couleurs diverses</string>
     <string name="outline_color">Couleur de contour</string>
     <string name="outline_variant_color">Variante de contour</string>
     <string name="scrim_color">Scrim</string>
-
     <string name="surface_container_colors_section">Couleurs des contenants de surface</string>
     <string name="surface_bright_color">Surface Bright</string>
     <string name="surface_container_color">Conteneur de surface</string>
@@ -546,7 +531,6 @@
     <string name="surface_container_low_color">Basse Surface Container</string>
     <string name="surface_container_lowest_color">Conteneur de surface le plus bas</string>
     <string name="surface_dim_color">Obscurité de surface</string>
-
     <string name="fixed_colors_section">Couleurs fixes</string>
     <string name="primary_fixed_color">Primaire fixe</string>
     <string name="primary_fixed_dim_color">Dim fixe primaire</string>
@@ -582,7 +566,6 @@
     <string name="grid_settings">Réglages de la grille</string>
     <string name="category_cells">Cellules de catégorie</string>
     <string name="category_cells_desc">Le nombre de lignes et de colonnes dans la boîte de catégorie</string>
-
     <!--  ─────────────  Multi Select  ─────────────  -->
     <string name="multi_select_hint">Appui long sur une app pour démarrer la multi-sélection</string>
     <string name="multi_select_count">%d sélectionnée(s)</string>
@@ -594,12 +577,10 @@
     <string name="apps_added_successfully">%d apps ajoutées avec succès</string>
     <string name="multi_select_drawer_hint">💡 Appui long sur une app pour en sélectionner plusieurs d\'un coup</string>
     <string name="deselect_all">Tout désélectionner</string>
-
     <!--  ─────────────  Shortcuts Settings  ─────────────  -->
     <string name="shortcuts_settings">Raccourcis</string>
     <string name="prompt_shortcuts_when_adding_app">Invite pour les raccourcis lors de l’ajout d’une application</string>
     <string name="prompt_shortcuts_when_adding_app_desc">Une fois activé, on vous demandera de choisir entre l’application ou ses raccourcis. Une fois désactivée, l’application est ajoutée directement.</string>
-
     <!--  ─────────────  Lock Settings  ─────────────  -->
     <string name="lock_settings">Verrouiller les paramètres</string>
     <string name="lock_settings_description">Protégez les paramètres du lanceur avec une méthode de sécurité</string>
@@ -626,12 +607,10 @@
     <string name="device_credentials_not_available">Aucun écran de verrouillage configuré</string>
     <string name="authentication_failed">Échec de l\'authentification</string>
     <string name="authentication_error">Erreur d\'authentification : %s</string>
-
     <!--  ─────────────  Drawer Workspace Selection  ─────────────  -->
     <string name="select_default_workspace">Sélectionner le profil par défaut</string>
     <string name="select_workspace_hint">Choisissez quel profil s\'ouvre par défaut. Vous pouvez toujours changer en glissant à gauche ou à droite dans le tiroir.</string>
     <string name="workspace_default">Par défaut</string>
-
     <!--  ─────────────  Pinned Shortcuts  ─────────────  -->
     <string name="pinned_shortcut_added">Raccourci "%s" ajouté à vos cercles</string>
     <string name="pinned_shortcut_failed">Échec de l\'ajout du raccourci</string>
@@ -640,7 +619,6 @@
     <string name="pinned_shortcuts_desc">Parcourir et ajouter les raccourcis de vos apps</string>
     <string name="no_pinned_shortcuts">Aucun raccourci disponible</string>
     <string name="pinned_shortcuts_from">Raccourcis de %s</string>
-
     <!--  ─────────────  Recently Used Apps  ─────────────  -->
     <string name="recently_used_apps">Apps récemment utilisées</string>
     <string name="show_recently_used_apps">Afficher les apps récentes</string>
@@ -701,51 +679,37 @@
     <string name="app_info_cacheKey">cacheKey = %1$s</string>
     <string name="no_apps">Pas d’applications</string>
     <string name="unlock">Déverrouiller</string>
-
     <string name="activate_debug_mode">Activez le mode débogage</string>
     <string name="activate_debug_mode_desc">Activez les fonctionnalités de débogage sur toute l’application</string>
-
     <string name="show_debug_infos">Infos de débogage de l’affichage</string>
     <string name="show_debug_infos_desc">Afficher les informations de débogage à l’échelle mondiale</string>
-
     <string name="show_debug_infos_settings">Afficher les infos de débogage dans la page des paramètres</string>
     <string name="show_debug_infos_settings_desc">Afficher les informations de débogage dans les paramètres</string>
-
     <string name="show_debug_infos_widgets">Afficher les infos de débogage dans la page widgets</string>
     <string name="show_debug_infos_widgets_desc">Afficher les informations de débogage à l’intérieur des widgets</string>
-
     <string name="show_debug_infos_workspace">Afficher les infos de débogage sur la page de l’espace de travail</string>
     <string name="show_debug_infos_workspace_desc">Afficher les informations de débogage dans l’espace de travail</string>
-
     <string name="has_initialized">A été initialisé</string>
     <string name="has_initialized_desc">Si l’application a terminé son initialisation</string>
-
     <string name="show_default_launcher_banner">Afficher bannière de lancement par défaut</string>
     <string name="show_default_launcher_banner_desc">Affichez la bannière invitant à définir le lanceur par défaut</string>
-
     <string name="force_app_language_selector">Force sélection de langue de l’application</string>
     <string name="force_app_language_selector_desc">Utilisez le sélecteur de langue de l’application au lieu du sélecteur système d’Android</string>
-
     <string name="force_app_widgets_selector">Forcer le sélecteur de widgets de l’application</string>
-
     <string name="use_accessibility_instead_of_context">Utilisez l’accessibilité plutôt que le contexte</string>
     <string name="use_accessibility_instead_of_context_desc">Élargir le panneau d’actions en utilisant l’accessibilité plutôt que le contexte</string>
-
     <string name="ask_notifications_behavior">Comportement des notifications de demande</string>
     <string name="ask_notifications_behavior_desc">Invite à chaque fois les notifications / le comportement des paramètres rapides</string>
-
     <string name="auto_raise_dragon_on_system_launcher">Dragon de lancement automatique sur le lanceur système</string>
     <string name="auto_raise_dragon_on_system_launcher_desc">Lancer automatiquement Dragon lorsqu’il est sur le lanceur système (nécessite une accessibilité)</string>
     <string name="are_you_sure">Tu es sûr \?</string>
     <string name="store_reset">Réinitialisation des magasins</string>
     <string name="debug_infos">Infos de débogage</string>
-
     <string name="private_space_debug_info">Informations sur le débogage en espace privé</string>
     <string name="private_space_debug_info_desc">Afficher les informations de débogage de l’état de l’espace privé par-dessus tout</string>
     <string name="backspace">Retour en arrière</string>
     <string name="super_warning_mode">Mode Super Avertissement</string>
     <string name="super_warning_mode_desc">Faites quelque chose de drôle quand vous entrez une épingle incorrecte</string>
-
     <string name="super_warning_mode_sound">Mode Super Avertissement + son</string>
     <string name="super_warning_mode_sound_desc">Ajoute le son</string>
     <string name="alarm_sound">Son d’alarme</string>
@@ -754,19 +718,13 @@
     <string name="metal_pipes_sound_desc">Jouez le bruit des tuyaux métalliques quand la mauvaise goupille est entrée</string>
     <string name="vibrate_on_error">Vibrer en cas d’erreur</string>
     <string name="vibrate_on_error_desc">Déclenche une vibration infinie à la suite d’une erreur de broche</string>
-
-
     <string name="drawer_pull_down_settings">Paramètres de tirage déroulant</string>
-
     <string name="pull_down_animations">Animations de tirage déplacé</string>
     <string name="pull_down_animations_desc">Activez ou désactivez les animations en tirant vers le bas</string>
-
     <string name="pull_down_wallpaper_dim">Fond de papier peint rabattable Faible</string>
     <string name="pull_down_wallpaper_dim_desc">Atténuez le papier peint lorsque le tiroir est baissé</string>
-
     <string name="pull_down_icon_fade">Fondu d’icône déroulante</string>
     <string name="pull_down_icon_fade_desc">Icônes fondues dedans/sorties lors de l’animation du tiroir déroulant</string>
-
     <string name="pull_down_scale_in">Scale In à tirage vers le bas</string>
     <string name="pull_down_scale_in_desc">Écartez les icônes lorsque le tiroir est tiré vers le bas</string>
     <string name="drawer_enter_exit_animations">Animations d’entrée/sortie dans le tiroir</string>
@@ -776,7 +734,6 @@
     <string name="more">Plus</string>
     <string name="reload">Rechargement</string>
     <string name="select_icon">Icône de sélection</string>
-
     <string name="show_notifications_desc">Afficher des icônes d’applications avec notifications actives (nécessite l’autorisation d’accès aux notifications)</string>
     <string name="max_notification_icons">Icônes de notification maximale</string>
     <string name="max_notification_icons_desc">Nombre maximal d’icônes de notification d’application à afficher dans la barre d’état</string>
@@ -838,15 +795,10 @@
     <string name="notification_access_desc">Permet d\'afficher les badges de notification sur les icônes.</string>
     <string name="install_from_unknown_source_permission">Installation d\'applications (APK)</string>
     <string name="install_from_unknown_source_permission_desc">Nécessaire pour installer les extensions téléchargées.</string>
-
     <string name="accessibility_service">Service d\'accessibilité</string>
     <string name="accessibility_service_desc">Utilisé pour étendre le panneau de notifications via des gestes.</string>
-
     <string name="usage_access">Accès aux statistiques d\'utilisation</string>
     <string name="usage_access_desc">Requis pour les fonctionnalités de Bien-être numérique.</string>
-
     <string name="android_permissions">Permissions Android</string>
-
     <string name="manage_in_system_settings">Gérer dans les paramètres système.</string>
-
 </resources>
