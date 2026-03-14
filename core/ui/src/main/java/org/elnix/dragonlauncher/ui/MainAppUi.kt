@@ -58,12 +58,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import org.elnix.dragonlauncher.common.FloatingAppObject
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.logging.logW
 import org.elnix.dragonlauncher.common.serializables.ColorSerializer
+import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.StatusBarJson
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
@@ -843,52 +843,50 @@ fun MainAppUi(
                     noAnimComposable(SETTINGS.BACKUP) { BackupTab(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.FONTS) {
-                        FontPickerScreen(::goAppearance)
+                    noAnimComposable(SETTINGS.FONTS) { FontPickerScreen(::goAppearance) }
 
-                        noAnimComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
+                    noAnimComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
 
-                        noAnimComposable(SETTINGS.NESTS_EDIT) {
-                            NestEditingScreen(
-                                nestId = pendingNestToEdit,
-                                onBack = ::goSettingsRoot
-                            )
-                        }
+                    noAnimComposable(SETTINGS.NESTS_EDIT) {
+                        NestEditingScreen(
+                            nestId = pendingNestToEdit,
+                            onBack = ::goSettingsRoot
+                        )
+                    }
 
-                        noAnimComposable(SETTINGS.WIDGETS_FLOATING_APPS) {
-                            FloatingAppsTab(
-                                widgetHostProvider = widgetHostProvider,
-                                onBack = ::goAppearance,
-                                onLaunchSystemWidgetPicker = ::launchWidgetsPicker,
-                                onResetWidgetSize = onResetWidgetSize,
-                                onRemoveWidget = onRemoveFloatingApp
-                            )
-                        }
+                    noAnimComposable(SETTINGS.WIDGETS_FLOATING_APPS) {
+                        FloatingAppsTab(
+                            widgetHostProvider = widgetHostProvider,
+                            onBack = ::goAppearance,
+                            onLaunchSystemWidgetPicker = ::launchWidgetsPicker,
+                            onResetWidgetSize = onResetWidgetSize,
+                            onRemoveWidget = onRemoveFloatingApp
+                        )
+                    }
 
-                        noAnimComposable(SETTINGS.WORKSPACE) {
-                            WorkspaceListScreen(
-                                onOpenWorkspace = { id ->
-                                    navController.navigate(
-                                        SETTINGS.WORKSPACE_DETAIL.replace("{id}", id)
-                                    )
-                                },
-                                onBack = ::goAdvSettingsRoot
-                            )
-                        }
+                    noAnimComposable(SETTINGS.WORKSPACE) {
+                        WorkspaceListScreen(
+                            onOpenWorkspace = { id ->
+                                navController.navigate(
+                                    SETTINGS.WORKSPACE_DETAIL.replace("{id}", id)
+                                )
+                            },
+                            onBack = ::goAdvSettingsRoot
+                        )
+                    }
 
-                        noAnimComposable(
-                            route = SETTINGS.WORKSPACE_DETAIL,
-                            arguments = listOf(navArgument("id") { type = NavType.StringType }),
-                        ) { backStack ->
-                            WorkspaceDetailScreen(
-                                showLabels = showAppLabelsInDrawer,
-                                showIcons = showAppIconsInDrawer,
-                                gridSize = gridSize,
-                                workspaceId = backStack.arguments!!.getString("id")!!,
-                                onBack = { navController.popBackStack() },
-                                onLaunchAction = ::launchApp
-                            )
-                        }
+                    noAnimComposable(
+                        route = SETTINGS.WORKSPACE_DETAIL,
+                        arguments = listOf(navArgument("id") { type = NavType.StringType }),
+                    ) { backStack ->
+                        WorkspaceDetailScreen(
+                            showLabels = showAppLabelsInDrawer,
+                            showIcons = showAppIconsInDrawer,
+                            gridSize = gridSize,
+                            workspaceId = backStack.arguments!!.getString("id")!!,
+                            onBack = { navController.popBackStack() },
+                            onLaunchAction = ::launchApp
+                        )
                     }
                 }
             }

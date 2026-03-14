@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.ktx.toDp
-import org.elnix.dragonlauncher.common.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable

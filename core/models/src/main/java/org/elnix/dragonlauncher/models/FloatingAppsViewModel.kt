@@ -9,7 +9,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.common.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.FloatingAppsJson
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.settings.stores.FloatingAppsSettingsStore
 import kotlin.math.roundToInt
@@ -52,10 +53,10 @@ class FloatingAppsViewModel(
 
             _floatingApps.value += app
 
-            centerFloatingApp(app.id)
-            resetFloatingAppSize(app.id, info)
+            centerFloatingApp(appId = app.id, persist = false)
+            resetFloatingAppSize(appId = app.id, info = info, persist = false)
 
-            FloatingAppsSettingsStore.saveFloatingApp(ctx, app)
+            persist()
         }
     }
 
@@ -63,7 +64,7 @@ class FloatingAppsViewModel(
     fun removeFloatingApp(id: Int, onDeleteId: (Int) -> Unit) {
         viewModelScope.launch {
             _floatingApps.value = _floatingApps.value.filterNot { it.id == id }
-            FloatingAppsSettingsStore.deleteFloatingApp(ctx, id)
+            persist()
             onDeleteId(id)
         }
     }
@@ -117,10 +118,7 @@ class FloatingAppsViewModel(
             add(index - 1, floatingApp)
         }
         _floatingApps.value = moved
-
-        viewModelScope.launch {
-            moved.forEach { FloatingAppsSettingsStore.saveFloatingApp(ctx, it) }
-        }
+        persist()
     }
 
     fun moveFloatingAppDown(appId: Int) {
@@ -133,16 +131,13 @@ class FloatingAppsViewModel(
             add(index + 1, floatingApp)
         }
         _floatingApps.value = moved
-
-        viewModelScope.launch {
-            moved.forEach { FloatingAppsSettingsStore.saveFloatingApp(ctx, it) }
-        }
+        persist()
     }
 
 
-    fun centerFloatingApp(appId: Int) {
+    fun centerFloatingApp(appId: Int, persist: Boolean = true) {
 
-        updateApp(appId) { app ->
+        updateApp(appId, persist) { app ->
             val floatingAppWidthPx = app.spanX * cellSizePx
             val floatingAppHeightPx = app.spanY * cellSizePx
 
@@ -157,8 +152,8 @@ class FloatingAppsViewModel(
     }
 
 
-    fun resetFloatingAppSize(appId: Int, info: AppWidgetProviderInfo? = null) {
-        updateApp(appId) { app ->
+    fun resetFloatingAppSize(appId: Int, info: AppWidgetProviderInfo? = null, persist: Boolean = true) {
+        updateApp(appId, persist) { app ->
             app.copy(
                 spanX = calculateSpanX(info?.minWidth?.toFloat() ?: 1.5f),
                 spanY = calculateSpanY(info?.minHeight?.toFloat() ?: 1.5f),
@@ -245,12 +240,7 @@ class FloatingAppsViewModel(
         }
 
         _floatingApps.value = updated
-
-        viewModelScope.launch {
-            updated.find { it.id == app.id }?.let {
-                FloatingAppsSettingsStore.saveFloatingApp(ctx, it)
-            }
-        }
+        persist()
     }
 
 
@@ -268,8 +258,16 @@ class FloatingAppsViewModel(
 
 
     /* ----------------------------- Internal ----------------------------- */
+
+    private fun persist() {
+        viewModelScope.launch {
+            FloatingAppsSettingsStore.jsonSetting.set(ctx, FloatingAppsJson.encodeFloatingApps(_floatingApps.value))
+        }
+    }
+
     private fun updateApp(
         appId: Int,
+        persist: Boolean = true,
         block: (FloatingAppObject) -> FloatingAppObject
     ) {
         val current = _floatingApps.value
@@ -284,16 +282,13 @@ class FloatingAppsViewModel(
 
         _floatingApps.value = updatedList
 
-        viewModelScope.launch {
-            updatedList.find { it.id == appId }?.let { updatedApp ->
-                FloatingAppsSettingsStore.saveFloatingApp(ctx, updatedApp)
-            }
-        }
+         if (persist) persist()
     }
 
     private fun loadFloatingApps() {
         viewModelScope.launch {
-            _floatingApps.value = FloatingAppsSettingsStore.loadFloatingApps(ctx)
+            val floatingAppsJsonString = FloatingAppsSettingsStore.jsonSetting.get(ctx)
+            _floatingApps.value = FloatingAppsJson.decodeFloatingApps(floatingAppsJsonString)
         }
     }
 

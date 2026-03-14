@@ -93,13 +93,11 @@ object None : SwipeActionSerializable()
 
 object SwipeJson {
     private val jsonConfig = Json {
-        encodeDefaults = true
         explicitNulls = false
         ignoreUnknownKeys = true
     }
 
     private val jsonPretty = Json {
-        encodeDefaults = true
         explicitNulls = false
         ignoreUnknownKeys = true
         prettyPrint = true

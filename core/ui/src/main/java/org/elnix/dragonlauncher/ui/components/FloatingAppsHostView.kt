@@ -18,7 +18,7 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
-import org.elnix.dragonlauncher.common.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.common.utils.resolveShape
