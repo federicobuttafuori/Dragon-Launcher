@@ -78,6 +78,12 @@ object UiSettingsStore : MapSettingsStore() {
         dataStoreName = dataStoreName,
         default = true
     )
+    val freeMoveDraggedPoint = Settings.boolean(
+        key = "freeMoveDraggedPoint",
+        dataStoreName = dataStoreName,
+        default = true
+    )
+
 
 
     /*  ───────────── Advanced line preview customization  ─────────────  */
@@ -169,6 +175,7 @@ object UiSettingsStore : MapSettingsStore() {
         this.showCirclePreview,
         this.snapPoints,
         this.autoSeparatePoints,
+        this.freeMoveDraggedPoint,
         this.showAppPreviewIconCenterStartPosition,
         this.linePreviewSnapToAction,
         this.showAllActionsOnCurrentCircle,

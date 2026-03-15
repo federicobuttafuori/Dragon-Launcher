@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Grid3x3
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
@@ -164,6 +165,7 @@ fun SettingsScreen(
 
     val snapPoints by UiSettingsStore.snapPoints.asState()
     val autoSeparatePoints by UiSettingsStore.autoSeparatePoints.asState()
+    val freeMoveDraggedPoint by UiSettingsStore.freeMoveDraggedPoint.asState()
     val appLabelOverlaySize by UiSettingsStore.appLabelOverlaySize.asState()
     val appIconOverlaySize by UiSettingsStore.appIconOverlaySize.asState()
 
@@ -452,14 +454,12 @@ fun SettingsScreen(
         }
     }
 
-    fun updatePointPosition(
+
+    fun computePointMoved(
         point: SwipePointSerializable,
         circles: List<UiCircle>,
-        center: Offset,
-        pos: Offset,
-        snap: Boolean
-    ) {
-        var haveToApplyToStack = false
+        pos: Offset
+    ): Pair<Double, Int>? {
 
         // 1. Compute raw angle from center -> pos
         val dx = pos.x - center.x
@@ -468,7 +468,7 @@ fun SettingsScreen(
         if (angle < 0) angle += 360.0
 
         // 2. Apply snapping if enabled
-        val finalAngle = if (snap) {
+        val finalAngle = if (snapPoints) {
             round(angle / SNAP_STEP_DEG) * SNAP_STEP_DEG
         } else {
             angle
@@ -478,7 +478,7 @@ fun SettingsScreen(
         // 3. Find nearest circle based on radius
         val distFromCenter = hypot(dx, dy)
         val closestCircle = circles.minByOrNull { c -> abs(c.radius - distFromCenter) }
-            ?: return
+            ?: error("Failed to find circle: BIG ISSUE") // Shouldn't happen
 
 
         // Only apply to the undo stack if the point coordinates have changed
@@ -486,12 +486,30 @@ fun SettingsScreen(
             (point.angleDeg != finalAngle) ||
             (point.circleNumber != closestCircle.id)
         ) {
-            haveToApplyToStack = true
+            return (finalAngle to closestCircle.id)
         }
 
-        if (haveToApplyToStack) applyChange {
-            point.angleDeg = finalAngle
-            point.circleNumber = closestCircle.id
+        // Position is the same as before, return null to tell the updater to not move the point
+        return null
+    }
+
+    fun updatePointPosition(
+        point: SwipePointSerializable,
+        circles: List<UiCircle>,
+        pos: Offset
+    ) {
+        val newPointValues = computePointMoved(
+            point = point,
+            circles = circles,
+            pos = pos
+        )
+
+        // Only apply the changed if the point has been changed
+        newPointValues?.let { newPoint ->
+            applyChange {
+                point.angleDeg = newPoint.first
+                point.circleNumber = newPoint.second
+            }
         }
     }
 
@@ -848,7 +866,10 @@ fun SettingsScreen(
                                             circles = circles,
                                             center = center
                                         )
-                                        val dist = hypot(offset.x - pointOffset.x, offset.y - pointOffset.y)
+                                        val dist = hypot(
+                                            offset.x - pointOffset.x,
+                                            offset.y - pointOffset.y
+                                        )
 
                                         if (dist < best) {
                                             best = dist
@@ -873,9 +894,29 @@ fun SettingsScreen(
                                     val position = change.position
 
                                     // Update the selected point offset in real time (the dragging thing)
-                                    selectedPoint?.let {
+                                    selectedPoint?.let { p ->
+
+                                        val newPosition: Offset = if (freeMoveDraggedPoint) {
+                                            position
+                                        } else {
+                                            val newPointValues = computePointMoved(
+                                                point = p,
+                                                circles = circles,
+                                                pos = position
+                                            )
+
+                                            computePointPosition(
+                                                point = p.copy(
+                                                    angleDeg = newPointValues?.first ?: p.angleDeg,
+                                                    circleNumber = newPointValues?.second ?: p.circleNumber
+                                                ),
+                                                circles = circles,
+                                                center = center
+                                            )
+                                        }
+
                                         scope.launch {
-                                            selectedPointTempOffset.snapTo(position)
+                                            selectedPointTempOffset.snapTo(newPosition)
                                         }
                                     }
 
@@ -884,20 +925,24 @@ fun SettingsScreen(
                                     var best = Float.MAX_VALUE
 
                                     // Can only see points on the same nest
-                                    currentFilteredPoints.filter { it.id != selectedPoint?.id }.forEach { p ->
+                                    currentFilteredPoints.filter { it.id != selectedPoint?.id }
+                                        .forEach { p ->
 
-                                        val pointOffset = computePointPosition(
-                                            point = p,
-                                            circles = circles,
-                                            center = center
-                                        )
-                                        val dist = hypot(position.x - pointOffset.x, position.y - pointOffset.y)
+                                            val pointOffset = computePointPosition(
+                                                point = p,
+                                                circles = circles,
+                                                center = center
+                                            )
+                                            val dist = hypot(
+                                                position.x - pointOffset.x,
+                                                position.y - pointOffset.y
+                                            )
 
-                                        if (dist < best) {
-                                            best = dist
-                                            closest = p
+                                            if (dist < best) {
+                                                best = dist
+                                                closest = p
+                                            }
                                         }
-                                    }
 
                                     closestHoveredPoint =
                                         if (best <= TOUCH_THRESHOLD_PX) closest else null
@@ -907,6 +952,9 @@ fun SettingsScreen(
                                     selectedPoint?.let { p ->
                                         val position = selectedPointTempOffset.value
 
+
+                                        // 1) On finger release; if the user has hovered another point for long enough, (the glow overlay)
+                                        //    do the computation to merge the 2 points
                                         if (ableToLaunchHoverAction && closestHoveredPoint != null) {
 
                                             // The hovered point
@@ -919,23 +967,26 @@ fun SettingsScreen(
                                                     (closest.action as SwipeActionSerializable.OpenCircleNest).nestId
 
                                                 // Adjust the merged nest circle size if the point belongs to higher circles and the nest has less
-                                                nests.find { it.id == targetNestId }?.let { targetNest ->
+                                                nests.find { it.id == targetNestId }
+                                                    ?.let { targetNest ->
 
-                                                    // I remove 1 because the dragDistances counts the cancel zone
-                                                    val targetNestCircleNumbers = targetNest.dragDistances.size - 1
+                                                        // I remove 1 because the dragDistances counts the cancel zone
+                                                        val targetNestCircleNumbers =
+                                                            targetNest.dragDistances.size - 1
 
-                                                    // Add 1 because the circle number starts at 0
-                                                    val selectedPointCircleNumber = p.circleNumber + 1
+                                                        // Add 1 because the circle number starts at 0
+                                                        val selectedPointCircleNumber =
+                                                            p.circleNumber + 1
 
-                                                    if (selectedPointCircleNumber > targetNestCircleNumbers) {
-                                                        repeat(selectedPointCircleNumber - targetNestCircleNumbers) {
-                                                            logD(NESTS_TAG) {
-                                                                "Adding a circle to nest n°$targetNestId "
+                                                        if (selectedPointCircleNumber > targetNestCircleNumbers) {
+                                                            repeat(selectedPointCircleNumber - targetNestCircleNumbers) {
+                                                                logD(NESTS_TAG) {
+                                                                    "Adding a circle to nest n°$targetNestId "
+                                                                }
+                                                                addCircle(targetNestId)
                                                             }
-                                                            addCircle(targetNestId)
                                                         }
                                                     }
-                                                }
 
                                                 applyChange {
                                                     p.nestId = targetNestId
@@ -952,22 +1003,27 @@ fun SettingsScreen(
                                                         circleNumber = closest.circleNumber,
                                                         angleDeg = closest.angleDeg,
                                                         nestId = closest.nestId,
-                                                        action = SwipeActionSerializable.OpenCircleNest(newNestId),
+                                                        action = SwipeActionSerializable.OpenCircleNest(
+                                                            newNestId
+                                                        ),
                                                         id = UUID.randomUUID().toString()
                                                     )
 
                                                     // Creates a new go parent nest that'll be put on top of the nest, to easily exit this nest
-                                                    val newGoParentNestPoint = SwipePointSerializable(
-                                                        circleNumber = 0,
-                                                        angleDeg = 0.0,
-                                                        nestId = newNestId,
-                                                        action = SwipeActionSerializable.GoParentNest,
-                                                        id = UUID.randomUUID().toString()
-                                                    )
+                                                    val newGoParentNestPoint =
+                                                        SwipePointSerializable(
+                                                            circleNumber = 0,
+                                                            angleDeg = 0.0,
+                                                            nestId = newNestId,
+                                                            action = SwipeActionSerializable.GoParentNest,
+                                                            id = UUID.randomUUID().toString()
+                                                        )
 
                                                     points.add(newGoParentNestPoint)
 
-                                                    appsViewModel.reloadPointIcon(newGoParentNestPoint)
+                                                    appsViewModel.reloadPointIcon(
+                                                        newGoParentNestPoint
+                                                    )
 
                                                     points.add(newNestPoint)
 
@@ -992,14 +1048,12 @@ fun SettingsScreen(
                                             }
 
                                         } else {
-                                            // No merging, just normal dragging
+                                            // 2) No merging, just normal dragging and dropping
 
                                             updatePointPosition(
-                                                p,
-                                                circles,
-                                                center,
-                                                position,
-                                                snapPoints
+                                                point = p,
+                                                circles = circles,
+                                                pos = position
                                             )
 
                                             if (autoSeparatePoints) autoSeparate(
@@ -1009,6 +1063,7 @@ fun SettingsScreen(
                                                 p
                                             )
 
+
                                             // Compute final snapped position
                                             val finalOffset = computePointPosition(
                                                 p,
@@ -1017,10 +1072,15 @@ fun SettingsScreen(
                                             )
 
                                             scope.launch {
-                                                selectedPointTempOffset.animateTo(
-                                                    finalOffset,
-                                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
-                                                )
+                                                if (freeMoveDraggedPoint) {
+                                                    selectedPointTempOffset.animateTo(
+                                                        finalOffset,
+                                                        animationSpec = tween(
+                                                            300,
+                                                            easing = FastOutSlowInEasing
+                                                        )
+                                                    )
+                                                }
 
                                                 // Stop dragging
                                                 isDragging = false
@@ -1044,7 +1104,8 @@ fun SettingsScreen(
                                         // Compute angle from center
                                         val dx = offset.x - center.x
                                         val dy = center.y - offset.y
-                                        var angle = Math.toDegrees(atan2(dx.toDouble(), dy.toDouble()))
+                                        var angle =
+                                            Math.toDegrees(atan2(dx.toDouble(), dy.toDouble()))
                                         if (angle < 0) angle += 360.0
                                         val finalAngle = if (snapPoints) {
                                             round(angle / SNAP_STEP_DEG) * SNAP_STEP_DEG
@@ -1184,7 +1245,9 @@ fun SettingsScreen(
                 DragonIconButton(onClick = { undo() }, enabled = undoButtonEnabled) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Undo,
-                        tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(undoButtonEnabled),
+                        tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(
+                            undoButtonEnabled
+                        ),
                         contentDescription = "Undo"
                     )
                 }
@@ -1193,7 +1256,9 @@ fun SettingsScreen(
                 DragonIconButton(onClick = { redo() }, enabled = redoButtonEnabled) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Redo,
-                        tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(redoButtonEnabled),
+                        tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(
+                            redoButtonEnabled
+                        ),
                         contentDescription = "Redo"
                     )
                 }
@@ -1249,6 +1314,18 @@ fun SettingsScreen(
                 ) {
                     scope.launch {
                         UiSettingsStore.autoSeparatePoints.set(ctx, !autoSeparatePoints)
+                    }
+                }
+
+                CircleIconButton(
+                    icon = Icons.Default.Link,
+                    contentDescription = stringResource(R.string.free_move_dragged_point),
+                    tint = MaterialTheme.colorScheme.primary,
+                    enabled = freeMoveDraggedPoint,
+                    padding = 10.dp
+                ) {
+                    scope.launch {
+                        UiSettingsStore.freeMoveDraggedPoint.set(ctx, !freeMoveDraggedPoint)
                     }
                 }
 
