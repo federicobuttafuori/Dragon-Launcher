@@ -31,20 +31,14 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoMode
 import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.FullscreenExit
-import androidx.compose.material.icons.filled.Grid3x3
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
@@ -110,15 +104,27 @@ import org.elnix.dragonlauncher.common.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.enumsui.NestEditTools
+import org.elnix.dragonlauncher.enumsui.NestEditTools.EnterNest
+import org.elnix.dragonlauncher.enumsui.NestEditTools.GoParentNest
+import org.elnix.dragonlauncher.enumsui.NestEditTools.NestManagement
+import org.elnix.dragonlauncher.enumsui.PointsEditTools
+import org.elnix.dragonlauncher.enumsui.PointsEditTools.AutoSeparate
+import org.elnix.dragonlauncher.enumsui.PointsEditTools.FreeMove
+import org.elnix.dragonlauncher.enumsui.PointsEditTools.SnapPoints
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeMapSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore.autoSeparatePoints
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore.freeMoveDraggedPoint
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore.snapPoints
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonGroup
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
@@ -165,9 +171,9 @@ fun SettingsScreen(
     val backgroundColor = MaterialTheme.colorScheme.background
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    val snapPoints by UiSettingsStore.snapPoints.asState()
-    val autoSeparatePoints by UiSettingsStore.autoSeparatePoints.asState()
-    val freeMoveDraggedPoint by UiSettingsStore.freeMoveDraggedPoint.asState()
+    val snapPoints by snapPoints.asState()
+    val autoSeparatePoints by autoSeparatePoints.asState()
+    val freeMoveDraggedPoint by freeMoveDraggedPoint.asState()
     val appLabelOverlaySize by UiSettingsStore.appLabelOverlaySize.asState()
     val appIconOverlaySize by UiSettingsStore.appIconOverlaySize.asState()
 
@@ -1193,55 +1199,52 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val nestToGo =
+                    if (selectedPoint?.action is SwipeActionSerializable.OpenCircleNest) {
+                        (selectedPoint!!.action as SwipeActionSerializable.OpenCircleNest).nestId
+                    } else null
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(5.dp),
-                ) {
-                    val nestToGo =
-                        if (selectedPoint?.action is SwipeActionSerializable.OpenCircleNest) {
-                            (selectedPoint!!.action as SwipeActionSerializable.OpenCircleNest).nestId
-                        } else null
+                val canGoNest = nestToGo != null
 
-                    val canGoNest = nestToGo != null
+                val canGoback = currentNest.id != 0
 
-                    CircleIconButton(
-                        icon = Icons.Filled.AccountCircle,
-                        contentDescription = stringResource(R.string.edit_nests),
-                        tint = extraColors.goParentNest,
-                        padding = 7.dp
-                    ) {
-                        showNestManagementDialog = true
-                    }
+                MultiSelectConnectedButtonGroup(
+                    entries = NestEditTools.entries,
+                    showLabel = false,
 
-
-                    CircleIconButton(
-                        icon = Icons.Filled.Fullscreen,
-                        contentDescription = stringResource(R.string.open_nest_circle),
-                        tint = extraColors.goParentNest,
-                        enabled = canGoNest,
-                        padding = 7.dp
-                    ) {
-                        nestToGo?.let {
-                            nestNavigation.goToNest(it)
-                            selectedPoint = null
+                    isEnabled = {
+                        when (it) {
+                            NestManagement -> true
+                            GoParentNest -> canGoback
+                            EnterNest -> canGoNest
+                        }
+                    },
+                    isChecked = {
+                        when (it) {
+                            NestManagement -> true
+                            GoParentNest -> canGoback
+                            EnterNest -> canGoNest
                         }
                     }
-
-
-                    val canGoback = currentNest.id != 0
-
-                    CircleIconButton(
-                        icon = Icons.Filled.FullscreenExit,
-                        contentDescription = stringResource(R.string.go_parent_nest),
-                        tint = extraColors.goParentNest,
-                        enabled = canGoback,
-                        padding = 7.dp
-                    ) {
-                        nestNavigation.goBack()
-                        selectedPoint = null
+                ) { entry ->
+                    scope.launch {
+                        when (entry) {
+                            NestManagement -> {
+                                showNestManagementDialog = true
+                            }
+                            GoParentNest -> {
+                                nestNavigation.goBack()
+                                selectedPoint = null
+                            }
+                            EnterNest -> {
+                                nestToGo?.let {
+                                    nestNavigation.goToNest(it)
+                                    selectedPoint = null
+                                }
+                            }
+                        }
                     }
                 }
-
 
                 val undoButtonEnabled = undoStack.isNotEmpty()
                 DragonIconButton(onClick = { undo() }, enabled = undoButtonEnabled) {
@@ -1295,41 +1298,28 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                CircleIconButton(
-                    icon = Icons.Default.Grid3x3,
-                    contentDescription = stringResource(R.string.snap_points),
-                    tint = MaterialTheme.colorScheme.primary,
-                    enabled = snapPoints,
-                    padding = 10.dp
+
+
+                MultiSelectConnectedButtonGroup(
+                    entries = PointsEditTools.entries,
+                    showLabel = false,
+                    isChecked = {
+                        when (it) {
+                            SnapPoints -> snapPoints
+                            AutoSeparate -> autoSeparatePoints
+                            FreeMove -> freeMoveDraggedPoint
+                        }
+                    }
                 ) {
                     scope.launch {
-                        UiSettingsStore.snapPoints.set(ctx, !snapPoints)
+                        when (it) {
+                            SnapPoints -> UiSettingsStore.snapPoints.set(ctx, !snapPoints)
+                            AutoSeparate -> UiSettingsStore.autoSeparatePoints.set(ctx, !autoSeparatePoints)
+                            FreeMove -> UiSettingsStore.freeMoveDraggedPoint.set(ctx, !freeMoveDraggedPoint)
+                        }
                     }
                 }
 
-                CircleIconButton(
-                    icon = Icons.Default.AutoMode,
-                    contentDescription = stringResource(R.string.auto_separate),
-                    tint = MaterialTheme.colorScheme.primary,
-                    enabled = autoSeparatePoints,
-                    padding = 10.dp
-                ) {
-                    scope.launch {
-                        UiSettingsStore.autoSeparatePoints.set(ctx, !autoSeparatePoints)
-                    }
-                }
-
-                CircleIconButton(
-                    icon = Icons.Default.Link,
-                    contentDescription = stringResource(R.string.free_move_dragged_point),
-                    tint = MaterialTheme.colorScheme.primary,
-                    enabled = freeMoveDraggedPoint,
-                    padding = 10.dp
-                ) {
-                    scope.launch {
-                        UiSettingsStore.freeMoveDraggedPoint.set(ctx, !freeMoveDraggedPoint)
-                    }
-                }
 
 
                 RepeatingPressButton(

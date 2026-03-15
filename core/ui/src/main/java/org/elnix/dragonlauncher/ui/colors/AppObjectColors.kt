@@ -6,6 +6,7 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +18,11 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.ToggleButtonColors
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import org.elnix.dragonlauncher.common.utils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 
 object AppObjectsColors {
@@ -30,13 +34,13 @@ object AppObjectsColors {
             checkedThumbColor = colors.outline,
             checkedTrackColor = colors.primary,
             checkedBorderColor = Color.Transparent,
-            uncheckedThumbColor = colors.outline.copy(0.7f),
+            uncheckedThumbColor = colors.outline.alphaMultiplier(0.7f),
             uncheckedTrackColor = colors.background,
             uncheckedBorderColor = Color.Transparent,
-            disabledCheckedThumbColor = colors.outline.copy(0.5f),
-            disabledCheckedTrackColor = colors.primary.copy(0.5f),
+            disabledCheckedThumbColor = colors.outline.alphaMultiplier(0.5f),
+            disabledCheckedTrackColor = colors.primary.alphaMultiplier(0.5f),
             disabledCheckedBorderColor = Color.Transparent,
-            disabledUncheckedThumbColor = colors.onSurface.copy(0.5f),
+            disabledUncheckedThumbColor = colors.onSurface.alphaMultiplier(0.5f),
             disabledUncheckedTrackColor = colors.background,
             disabledUncheckedBorderColor = Color.Transparent,
         )
@@ -78,23 +82,6 @@ object AppObjectsColors {
         )
     }
 
-
-// --Commented out by Inspection START (11/8/25, 7:59 PM):
-//    @Composable
-//    fun dropDownMenuColors(): TextFieldColors {
-//        val colors = MaterialTheme.colorScheme
-//        return TextFieldDefaults.colors(
-//            focusedContainerColor = colors.secondary,
-//            unfocusedContainerColor = colors.secondary,
-//            disabledContainerColor = colors.surface,
-//            focusedIndicatorColor = colors.primary,
-//            unfocusedIndicatorColor = colors.outline,
-//            focusedTextColor = colors.onSurface,
-//            unfocusedTextColor = colors.onSurface
-//        )
-//    }
-// --Commented out by Inspection STOP (11/8/25, 7:59 PM)
-
     @Composable
     fun checkboxColors(): CheckboxColors {
         val colors = MaterialTheme.colorScheme
@@ -102,9 +89,9 @@ object AppObjectsColors {
             checkedColor = colors.primary,
             uncheckedColor = colors.outline,
             checkmarkColor = colors.onPrimary,
-            disabledCheckedColor = colors.primary.copy(alpha = 0.5f),
-            disabledUncheckedColor = colors.outline.copy(alpha = 0.5f),
-            disabledIndeterminateColor = colors.onSurface.copy(alpha = 0.5f),
+            disabledCheckedColor = colors.primary.alphaMultiplier(0.5f),
+            disabledUncheckedColor = colors.outline.alphaMultiplier(0.5f),
+            disabledIndeterminateColor = colors.onSurface.alphaMultiplier(0.5f),
         )
     }
 
@@ -131,7 +118,7 @@ object AppObjectsColors {
 
             focusedBorderColor = if (!removeBorder) colors.primary else Color.Transparent,
             unfocusedBorderColor = if (!removeBorder) colors.outline else Color.Transparent,
-            disabledBorderColor = if (!removeBorder) colors.outline.copy(0.5f) else Color.Transparent,
+            disabledBorderColor = if (!removeBorder) colors.outline.alphaMultiplier(0.5f) else Color.Transparent,
             errorBorderColor = if (!removeBorder) colors.error else Color.Transparent,
 
             focusedLeadingIconColor = colors.primary,
@@ -146,12 +133,12 @@ object AppObjectsColors {
 
             focusedLabelColor = colors.primary,
             unfocusedLabelColor = colors.outline,
-            disabledLabelColor = colors.outline.copy(0.5f),
+            disabledLabelColor = colors.outline.alphaMultiplier(0.5f),
             errorLabelColor = colors.error,
 
-            focusedPlaceholderColor = colors.outline.copy(0.8f),
-            unfocusedPlaceholderColor = colors.outline.copy(0.5f),
-            disabledPlaceholderColor = colors.outline.copy(0.3f),
+            focusedPlaceholderColor = colors.outline.alphaMultiplier(0.8f),
+            unfocusedPlaceholderColor = colors.outline.alphaMultiplier(0.5f),
+            disabledPlaceholderColor = colors.outline.alphaMultiplier(0.3f),
             errorPlaceholderColor = colors.error,
 
             focusedSupportingTextColor = colors.onSurfaceVariant,
@@ -177,8 +164,8 @@ object AppObjectsColors {
         return RadioButtonDefaults.colors(
             selectedColor = colors.primary,
             unselectedColor = colors.onSurface,
-            disabledSelectedColor = colors.primary.copy(0.5f),
-            disabledUnselectedColor = colors.onSurface.copy(0.5f)
+            disabledSelectedColor = colors.primary.alphaMultiplier(0.5f),
+            disabledUnselectedColor = colors.onSurface.alphaMultiplier(0.5f)
         )
     }
 
@@ -191,8 +178,8 @@ object AppObjectsColors {
         return IconButtonDefaults.iconButtonColors(
             containerColor = backgroundColor ?: colors.surface,
             contentColor = contentColor ?: colors.primary,
-            disabledContainerColor = backgroundColor ?: colors.surface.copy(0.5f),
-            disabledContentColor = contentColor ?: colors.onSurface.copy(0.5f)
+            disabledContainerColor = backgroundColor ?: colors.surface.alphaMultiplier(0.5f),
+            disabledContentColor = contentColor ?: colors.onSurface.alphaMultiplier(0.5f)
         )
     }
 
@@ -202,8 +189,23 @@ object AppObjectsColors {
         return CardDefaults.cardColors(
             colors.surface,
             colors.onSurface,
-            colors.surface.copy(0.5f),
-            colors.onSurface.copy(0.5f),
+            colors.surface.alphaMultiplier(0.5f),
+            colors.onSurface.alphaMultiplier(0.5f),
         )
+    }
+    
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @Composable
+    fun toggleButtonColors(): ToggleButtonColors {
+        return with(MaterialTheme.colorScheme) {
+            ToggleButtonDefaults.toggleButtonColors(
+                containerColor = primary,
+                contentColor = onPrimary,
+                disabledContainerColor = surfaceVariant,
+                disabledContentColor = onSurfaceVariant,
+                checkedContainerColor = surface,
+                checkedContentColor = onSurface
+            )
+        }
     }
 }
