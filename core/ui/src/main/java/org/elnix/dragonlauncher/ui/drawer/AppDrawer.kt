@@ -32,8 +32,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -118,7 +119,7 @@ import kotlin.math.pow
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Suppress("AssignedValueIsNeverRead")
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppDrawerScreen(
     showIcons: Boolean,
@@ -579,8 +580,8 @@ fun AppDrawerScreen(
                                 AnimatedContent(targetState = privateSpaceState) {
                                     when {
                                         // The loading shouldn't be displayed, but just in case I'll keep it for user visual feedback
-                                        it.isLoading -> CircularProgressIndicator()
-                                        it.isAuthenticating -> CircularProgressIndicator(color = Color.Yellow)
+                                        it.isLoading -> LoadingIndicator()
+                                        it.isAuthenticating -> LoadingIndicator(color = Color.Yellow)
                                         it.isLocked -> {
                                             DragonIconButton(
                                                 onClick = { appLifecycleViewModel.onUnlockPrivateSpace() }) {

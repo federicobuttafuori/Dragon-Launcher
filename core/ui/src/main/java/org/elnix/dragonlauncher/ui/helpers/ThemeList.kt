@@ -16,7 +16,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +45,7 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.dialogs.ThemeJsonPopup
 import org.json.JSONObject
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ThemesList(themes: List<ThemeObject>?) {
     val ctx = LocalContext.current
@@ -59,7 +61,7 @@ fun ThemesList(themes: List<ThemeObject>?) {
         ) {
             Text(stringResource(R.string.loading_themes))
             Spacer(Modifier.height(20.dp))
-            CircularProgressIndicator()
+            LoadingIndicator()
         }
     } else {
         LazyVerticalGrid(

@@ -31,8 +31,9 @@ import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -72,7 +73,7 @@ import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppPickerDialog(
     gridSize: Int,
@@ -340,8 +341,8 @@ fun AppPickerDialog(
                             AnimatedContent(targetState = privateSpaceState) {
                                 when {
                                     // The loading shouldn't be displayed, but just in case I'll keep it for user visual feedback
-                                    it.isLoading -> CircularProgressIndicator()
-                                    it.isAuthenticating -> CircularProgressIndicator(color = Color.Yellow)
+                                    it.isLoading -> LoadingIndicator()
+                                    it.isAuthenticating -> LoadingIndicator(color = Color.Yellow)
                                     it.isLocked -> {
                                         DragonIconButton(
                                             onClick = {

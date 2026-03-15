@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.ui.dialogs
 
 import android.annotation.SuppressLint
-import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
@@ -25,7 +24,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,10 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.res.ResourcesCompat
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
-
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 
 @Composable
@@ -149,6 +147,7 @@ private fun WidgetItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun WidgetPreviewImage(
     provider: AppWidgetProviderInfo,
@@ -179,7 +178,7 @@ private fun WidgetPreviewImage(
             modifier = modifier.clip(DragonShape),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+            LoadingIndicator(modifier = Modifier.size(20.dp))
         }
     }
 }

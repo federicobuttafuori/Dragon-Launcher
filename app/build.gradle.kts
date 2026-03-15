@@ -176,12 +176,10 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.glance.appwidget)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.reorderable)
     implementation(libs.android.image.cropper)
     implementation(libs.material)
-    implementation(libs.material3)
 
     implementation(project(":core:ui"))
     implementation(project(":core:base"))

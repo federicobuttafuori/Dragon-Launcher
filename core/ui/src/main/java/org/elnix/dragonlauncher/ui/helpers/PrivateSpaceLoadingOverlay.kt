@@ -17,8 +17,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PrivateSpaceLoadingOverlay(
     onCancel: () -> Unit,
@@ -78,7 +80,7 @@ fun PrivateSpaceLoadingOverlay(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            CircularProgressIndicator(
+            LoadingIndicator(
                 modifier = Modifier.size(48.dp),
                 color = MaterialTheme.colorScheme.primary
             )

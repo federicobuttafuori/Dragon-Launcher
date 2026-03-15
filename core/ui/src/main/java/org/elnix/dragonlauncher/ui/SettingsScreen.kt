@@ -51,6 +51,7 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -142,6 +143,7 @@ import kotlin.math.min
 import kotlin.math.round
 import kotlin.math.sin
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @SuppressLint("LocalContextGetResourceValueCall")
 @Suppress("AssignedValueIsNeverRead")
 @Composable

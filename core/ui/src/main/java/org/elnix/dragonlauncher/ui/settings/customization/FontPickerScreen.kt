@@ -36,13 +36,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -85,6 +86,7 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import java.io.File
 import java.io.FileOutputStream
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun FontPickerScreen(onBack: () -> Unit) {
@@ -537,9 +539,8 @@ fun FontPickerScreen(onBack: () -> Unit) {
                             },
                             trailingIcon = {
                                 if (isFetchingRemote) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp
+                                    LoadingIndicator(
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 } else if (isExtensionInstalled) {
                                     IconButton(onClick = {

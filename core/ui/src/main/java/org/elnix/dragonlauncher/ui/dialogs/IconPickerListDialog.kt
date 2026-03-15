@@ -15,7 +15,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +45,7 @@ import org.elnix.dragonlauncher.ui.helpers.AppDrawerSearch
 import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun IconPickerListDialog(
     pack: IconPackInfo,
@@ -132,7 +134,7 @@ fun IconPickerListDialog(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                 }
             }
         },
@@ -194,6 +196,7 @@ private fun IconCell(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
+            // Keep old circular progress indicator as it seems to lag less
             CircularProgressIndicator()
         }
     }
