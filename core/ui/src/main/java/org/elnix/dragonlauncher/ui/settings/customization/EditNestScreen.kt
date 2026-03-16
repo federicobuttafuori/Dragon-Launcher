@@ -167,18 +167,22 @@ fun NestEditingScreen(
                     .weight(1f)
             ) {
 
-                circlesSettingsOverlay(
-                    drawParams = drawParams,
-                    center = Offset(
-                        x = 5.dp.toPx(),
-                        y = 25.dp.toPx()
-                    ),
-                    depth = 1,
-                    circles = circlesPreview,
-                    selectedPoint = null,
-                    nestId = nestId,
-                    preventBgErasing = true
-                )
+                // Preview real size of the nest (shitty, TODO)
+                // Drawn into another layer to avoid it being erased by the other overlay
+                if (showSmallPreview) {
+                    circlesSettingsOverlay(
+                        drawParams = drawParams,
+                        center = Offset(
+                            x = 5.dp.toPx(),
+                            y = 25.dp.toPx()
+                        ),
+                        depth = 1,
+                        circles = circlesPreview,
+                        selectedPoint = null,
+                        nestId = nestId,
+                        preventBgErasing = true
+                    )
+                }
 
 
                 circlesSettingsOverlay(
@@ -349,6 +353,12 @@ fun NestEditingScreen(
                                 else it
                             }
                         }
+
+                        // Quick toggle to display the preview of the nest top left
+                        SwitchRow(
+                            state = showSmallPreview,
+                            text = stringResource(R.string.show_nest_preview)
+                        ) { showPreview -> showSmallPreview = showPreview }
                     }
                 }
             }
