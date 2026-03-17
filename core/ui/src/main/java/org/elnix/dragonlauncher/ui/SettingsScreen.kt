@@ -84,7 +84,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.theme.LocalExtraColors
-import org.elnix.dragonlauncher.base.theme.addRemoveCirclesColor
 import org.elnix.dragonlauncher.base.theme.copyColor
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
@@ -105,6 +104,7 @@ import org.elnix.dragonlauncher.common.utils.circles.normalizeAngle
 import org.elnix.dragonlauncher.common.utils.circles.randomFreeAngle
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.enumsui.AddRemoveCircleTools
 import org.elnix.dragonlauncher.enumsui.NestEditTools
 import org.elnix.dragonlauncher.enumsui.NestEditTools.EnterNest
 import org.elnix.dragonlauncher.enumsui.NestEditTools.GoParentNest
@@ -125,9 +125,11 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
 import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
+import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonGroup
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonColumn
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
@@ -709,8 +711,7 @@ fun SettingsScreen(
     val baseDrawParams = swipeDefaultParams(
         points = points,
         nests = nests,
-        backgroundColor = MaterialTheme.colorScheme.background,
-        showCircle = true
+        backgroundColor = MaterialTheme.colorScheme.background
     )
 
 
@@ -1108,7 +1109,6 @@ fun SettingsScreen(
                                             scope.launch {
                                                 // Stop dragging, don't animate point as it was merged
                                                 isDragging = false
-                                                selectedPoint = null
                                                 closestHoveredPoint = null
                                             }
 
@@ -1149,7 +1149,6 @@ fun SettingsScreen(
 
                                                 // Stop dragging
                                                 isDragging = false
-                                                selectedPoint = null
                                                 closestHoveredPoint = null
                                             }
                                         }
@@ -1265,7 +1264,7 @@ fun SettingsScreen(
 
                 val canGoback = currentNest.id != 0
 
-                MultiSelectConnectedButtonGroup(
+                MultiSelectConnectedButtonRow(
                     entries = NestEditTools.entries,
                     showLabel = false,
 
@@ -1308,19 +1307,11 @@ fun SettingsScreen(
                 val undoButtonEnabled = undoStack.isNotEmpty()
                 val redoButtonEnabled = redoStack.isNotEmpty()
 
-                MultiSelectConnectedButtonGroup(
+                MultiSelectConnectedButtonRow(
                     entries = UndRedoEditTools.entries,
                     showLabel = false,
 
                     isEnabled = {
-                        when (it) {
-                            UndRedoEditTools.UndoAll -> undoButtonEnabled
-                            UndRedoEditTools.Undo -> undoButtonEnabled
-                            UndRedoEditTools.Redo -> redoButtonEnabled
-                            UndRedoEditTools.RedoAll -> redoButtonEnabled
-                        }
-                    },
-                    isChecked = {
                         when (it) {
                             UndRedoEditTools.UndoAll -> undoButtonEnabled
                             UndRedoEditTools.Undo -> undoButtonEnabled
@@ -1346,7 +1337,7 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                MultiSelectConnectedButtonGroup(
+                MultiSelectConnectedButtonRow(
                     entries = PointsEditTools.entries,
                     showLabel = false,
                     isChecked = {
@@ -1376,7 +1367,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ToggleButton(
-                        checked = !aPointIsSelected,
+                        checked = false, // For the shape to be always the right one, and not a circle
                         onCheckedChange = {
                             selectedPoint?.let { point ->
                                 applyChange {
@@ -1487,7 +1478,7 @@ fun SettingsScreen(
                     Spacer(Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
 
                     ToggleButton(
-                        checked = !aPointIsSelected,
+                        checked = false,
                         onCheckedChange = {
                             selectedPoint?.let { point ->
                                 applyChange {
@@ -1517,21 +1508,34 @@ fun SettingsScreen(
             }
 
 
+            // Last Buttons Row, containing the Add/Remove/Copy and the Add circle and Remove circle buttons
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(15.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                CircleIconButton(
-                    icon = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_point),
-                    tint = MaterialTheme.colorScheme.primary,
-                    padding = 20.dp
-                ) { showAddDialog = true }
+                DragonButton(
+                    onClick = { showAddDialog = true },
+                    modifier = Modifier.padding(35.dp),
+                    colors = AppObjectsColors.buttonColors()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_point),
+                        modifier = Modifier.size(35.dp)
+                    )
+                }
 
+
+//                CircleIconButton(
+//                    icon = Icons.Default.Add,
+//                    contentDescription = stringResource(R.string.add_point),
+//                    tint = MaterialTheme.colorScheme.primary,
+//                    padding = 20.dp
+//
 
 
                 CircleIconButton(
@@ -1593,29 +1597,19 @@ fun SettingsScreen(
 
 
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(3.dp)
-                ) {
-                    CircleIconButton(
-                        text = "+1",
-                        contentDescription = stringResource(R.string.add_circle),
-                        padding = 7.dp,
-                        tint = addRemoveCirclesColor,
-                        modifier = Modifier.size(40.dp)
-                    ) { addCircle() }
+                MultiSelectConnectedButtonColumn(
+                    entries = AddRemoveCircleTools.entries,
+                    showLabel = false,
 
-
-                    val canRemoveCircle = circleNumber > 1
-
-
-                    CircleIconButton(
-                        text = "-1",
-                        contentDescription = stringResource(R.string.remove_circle),
-                        padding = 7.dp,
-                        enabled = canRemoveCircle,
-                        tint = addRemoveCirclesColor,
-                        modifier = Modifier.size(40.dp)
-                    ) { removeLastCircle() }
+                    isEnabled = { true },
+                    isChecked = { true }
+                ) { entry ->
+                    scope.launch {
+                        when (entry) {
+                            AddRemoveCircleTools.Add -> addCircle()
+                            AddRemoveCircleTools.Remove -> removeLastCircle()
+                        }
+                    }
                 }
             }
         }

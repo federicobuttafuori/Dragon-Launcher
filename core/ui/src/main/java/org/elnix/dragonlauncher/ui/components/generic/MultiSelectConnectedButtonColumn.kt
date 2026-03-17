@@ -2,7 +2,7 @@ package org.elnix.dragonlauncher.ui.components.generic
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.enumsui.ToggleButtonOption
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.internals.connectedBottomButtonShapes
+import org.elnix.dragonlauncher.ui.components.internals.connectedTopButtonShapes
 
 /**
  * A horizontally connected multi-select toggle button group built on Material3 Expressive's
@@ -43,7 +45,7 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun <T : ToggleButtonOption> MultiSelectConnectedButtonGroup(
+fun <T : ToggleButtonOption> MultiSelectConnectedButtonColumn(
     entries: List<T>,
 
     // Optional parameters
@@ -57,9 +59,9 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonGroup(
     val haptic = LocalHapticFeedback.current
 
 
-    Row(
-        Modifier.padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+    Column(
+        Modifier.padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
     ) {
         entries.forEachIndexed { index, entry ->
 
@@ -80,8 +82,8 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonGroup(
                 // Custom shapes
                 shapes =
                     when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        entries.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        0 -> connectedTopButtonShapes()
+                        entries.lastIndex -> connectedBottomButtonShapes()
                         else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                     }
             ) {

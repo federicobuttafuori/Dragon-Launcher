@@ -888,5 +888,6 @@
     <string name="redo_all">Redo All</string>
     <string name="move_point_clockwise">Move point clockwise</string>
     <string name="move_point_anticlockwise">Move point anticlockwise</string>
+    <string name="show_nest_preview">Show nest preview</string>
 
 </resources>

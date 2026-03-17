@@ -15,7 +15,7 @@ enum class PointsEditTools(
     override val iconEnabled: ImageVector,
     override val iconDisabled: ImageVector
 ) : ToggleButtonOption {
-    SnapPoints(R.string.snap_points, Icons.Default.GridOn, Icons.Default.GridOff),
-    AutoSeparate(R.string.auto_separate, Icons.Default.AutoMode, Icons.Default.LinearScale),
+    SnapPoints(R.string.snap_points, Icons.Default.GridOff, Icons.Default.GridOn),
+    AutoSeparate(R.string.auto_separate, Icons.Default.LinearScale, Icons.Default.AutoMode),
     FreeMove(R.string.free_move_dragged_point, Icons.Default.Link, Icons.Default.LinkOff)
 }
