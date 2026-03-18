@@ -81,7 +81,7 @@ fun PrivateSpaceLoadingOverlay(
             Spacer(modifier = Modifier.height(24.dp))
 
             LoadingIndicator(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(70.dp),
                 color = MaterialTheme.colorScheme.primary
             )
         }
