@@ -164,6 +164,17 @@ object UiSettingsStore : MapSettingsStore() {
         allowedRange = 1..10
     )
 
+
+    /**
+     * Whether to use my custom-made color schemes for objects, or the default Android colors schemes.
+     * For ex: my switch uses no borders, and other colors channels than the default one, while the android one has borders
+     * */
+    val useCustomColorChannels = Settings.boolean(
+        key = "useCustomColorChannels",
+        dataStoreName = dataStoreName,
+        default = true
+    )
+
     // unsing explicit this to avoid other stores that have the same name keys to be imported by mistake
     override val ALL: List<BaseSettingObject<*, *>> = listOf(
         this.rgbLoading,
@@ -188,6 +199,7 @@ object UiSettingsStore : MapSettingsStore() {
         this.wallpaperDimMainScreen,
         this.wallpaperDimDrawerScreen,
         this.globalFont,
-        this.maxNestsDepth
+        this.maxNestsDepth,
+        this.useCustomColorChannels
     )
 }

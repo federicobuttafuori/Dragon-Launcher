@@ -58,3 +58,8 @@ val LocalStartLineObject = compositionLocalOf<CustomObjectSerializable> {
 val LocalEndLineObject = compositionLocalOf<CustomObjectSerializable> {
     error("No LocalEndLine provided")
 }
+
+val LocalCuseCustomColorChannels = compositionLocalOf<Boolean> {
+    error("No LocalCuseCustomColorChannels provided")
+}
+

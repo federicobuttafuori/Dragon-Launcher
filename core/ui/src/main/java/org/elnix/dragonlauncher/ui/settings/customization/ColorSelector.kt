@@ -71,6 +71,7 @@ import org.elnix.dragonlauncher.enumsui.defaultThemeName
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
@@ -530,6 +531,14 @@ fun ColorSelectorTab(
 
 
         item { HorizontalDivider(color = MaterialTheme.colorScheme.outline) }
+
+        item {
+            SettingsSwitchRow(
+                setting = UiSettingsStore.useCustomColorChannels,
+                title = stringResource(R.string.use_custom_color_channels),
+                description = stringResource(R.string.use_custom_color_channels_desc)
+            )
+        }
 
         if (defaultTheme == CUSTOM) {
             item {
