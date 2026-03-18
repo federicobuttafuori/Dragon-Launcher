@@ -40,7 +40,8 @@ fun PointPreviewCanvas(
             point = editPoint,
             center = Offset(leftX, centerY),
             depth = 1,
-            drawParams = drawParams
+            drawParams = drawParams,
+            preventBgErasing = true
         )
 
         // Right action
@@ -49,7 +50,8 @@ fun PointPreviewCanvas(
             point = editPoint,
             center = Offset(rightX, centerY),
             depth = 1,
-            drawParams = drawParams
+            drawParams = drawParams,
+            preventBgErasing = true
         )
     }
 }
