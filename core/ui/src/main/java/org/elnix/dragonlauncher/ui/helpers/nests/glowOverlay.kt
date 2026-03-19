@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -82,11 +83,8 @@ fun DrawScope.drawNeonGlowLine(
     }
 }
 
-fun DrawScope.drawNeonGlowArc(
-    topLeft: Offset,
-    size: androidx.compose.ui.geometry.Size,
-    startAngle: Float,
-    sweepAngle: Float,
+fun DrawScope.drawNeonGlowShapePath(
+    path: androidx.compose.ui.graphics.Path,
     color: Color,
     lineStrokeWidth: Float,
     glowRadius: Float,
@@ -94,62 +92,32 @@ fun DrawScope.drawNeonGlowArc(
     erase: Boolean
 ) {
 
-    val left = topLeft.x
-    val top = topLeft.y
-    val right = left + size.width
-    val bottom = top + size.height
+    val nativePath = path.asAndroidPath()
 
-    // Glow overlay
     if (glowRadius > 0f) {
         drawIntoCanvas { canvas ->
             val frameworkPaint = customGlowPaint(glowColor ?: color, glowRadius)
-
-            canvas.nativeCanvas.drawArc(
-                left,
-                top,
-                right,
-                bottom,
-                startAngle,
-                sweepAngle,
-                false,
-                frameworkPaint
-            )
+            canvas.nativeCanvas.drawPath(nativePath, frameworkPaint)
         }
     }
 
     if (lineStrokeWidth > 0f) {
         if (erase) {
-            drawArc(
+            drawPath(
+                path = path,
                 color = Color.Transparent,
-                startAngle = startAngle,
-                sweepAngle = sweepAngle,
-                useCenter = false,
-                topLeft = topLeft,
-                size = size,
-                style = Stroke(
-                    width = lineStrokeWidth,
-                    cap = StrokeCap.Round
-                ),
+                style = Stroke(width = lineStrokeWidth, cap = StrokeCap.Round),
                 blendMode = BlendMode.Clear
             )
         }
 
-        // Sharp arc
-        drawArc(
+        drawPath(
+            path = path,
             color = color,
-            startAngle = startAngle,
-            sweepAngle = sweepAngle,
-            useCenter = false,
-            topLeft = topLeft,
-            size = size,
-            style = Stroke(
-                width = lineStrokeWidth,
-                cap = StrokeCap.Round
-            )
+            style = Stroke(width = lineStrokeWidth, cap = StrokeCap.Round)
         )
     }
 }
-
 
 private fun customGlowPaint(glowColor: Color, glowPx: Float): Paint {
     require(glowPx > 0f) { "Glow px < 0f: $glowPx" }

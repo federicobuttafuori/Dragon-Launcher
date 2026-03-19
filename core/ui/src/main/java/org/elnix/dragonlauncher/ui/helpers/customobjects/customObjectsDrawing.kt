@@ -41,6 +41,7 @@ fun DrawScope.customObject(
     if (baseSize.width > 0 ) {
         drawShapeWithColor(
             shape = shape,
+            rotation = customObject.rotation ?: default.rotation!!,
             center = center,
             size = baseSize,
             color = shapeColor,

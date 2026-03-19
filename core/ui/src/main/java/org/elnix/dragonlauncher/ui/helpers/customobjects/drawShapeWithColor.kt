@@ -10,12 +10,14 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.LayoutDirection
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.ANGLE_LINE_TAG
 
 fun DrawScope.drawShapeWithColor(
     shape: Shape,
+    rotation: Int,
     center: Offset,
     size: Size,
     color: Color,
@@ -47,21 +49,30 @@ fun DrawScope.drawShapeWithColor(
 
     logD(ANGLE_LINE_TAG) { "erase: $erase, strokeWidth: $strokeWidth" }
 
-    if (erase) {
+    withTransform(
+        {
+            rotate(
+                degrees = rotation.toFloat(),
+                pivot = center
+            )
+        }
+    ) {
+        if (erase) {
+            drawPath(
+                path = translatedPath,
+                color = Color.Transparent,
+                style = Fill,
+                blendMode = BlendMode.Clear
+            )
+        }
+
         drawPath(
             path = translatedPath,
-            color = Color.Transparent,
-            style = Fill,
-            blendMode = BlendMode.Clear
+            color = color,
+            style = if (strokeWidth > 0f)
+                Stroke(strokeWidth)
+            else
+                Fill
         )
     }
-
-    drawPath(
-        path = translatedPath,
-        color = color,
-        style = if (strokeWidth > 0f)
-            Stroke(strokeWidth)
-        else
-            Fill
-    )
 }

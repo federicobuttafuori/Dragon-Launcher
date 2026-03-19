@@ -24,14 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import org.elnix.dragonlauncher.common.utils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
-import org.elnix.dragonlauncher.ui.remembers.LocalCuseCustomColorChannels
+import org.elnix.dragonlauncher.ui.remembers.LocalUseCustomColorChannels
 
 object AppObjectsColors {
 
     @Composable
     fun switchColors(): SwitchColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             SwitchDefaults.colors(
                 checkedThumbColor = colors.outline,
                 checkedTrackColor = colors.primary,
@@ -52,7 +52,7 @@ object AppObjectsColors {
     @Composable
     fun buttonColors(containerColor: Color? = null): ButtonColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             ButtonDefaults.buttonColors(
                 containerColor = containerColor ?: colors.primary,
                 contentColor = colors.onPrimary
@@ -62,7 +62,7 @@ object AppObjectsColors {
 
     @Composable
     fun cancelButtonColors(): ButtonColors {
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             ButtonDefaults.outlinedButtonColors(
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.error
@@ -77,7 +77,7 @@ object AppObjectsColors {
         backgroundColor: Color? = null
     ): SliderColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             SliderDefaults.colors(
                 thumbColor = activeTrackColor?: colors.primary,
                 activeTrackColor = activeTrackColor?: colors.secondary,
@@ -94,7 +94,7 @@ object AppObjectsColors {
     @Composable
     fun checkboxColors(): CheckboxColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             CheckboxDefaults.colors(
                 checkedColor = colors.primary,
                 uncheckedColor = colors.outline,
@@ -113,7 +113,7 @@ object AppObjectsColors {
         removeBorder: Boolean = false
     ): TextFieldColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             OutlinedTextFieldDefaults.colors(
                 focusedTextColor = onBackgroundColor ?: colors.onBackground,
                 unfocusedTextColor = onBackgroundColor ?: colors.onBackground,
@@ -174,7 +174,7 @@ object AppObjectsColors {
     @Composable
     fun radioButtonColors(): RadioButtonColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             RadioButtonDefaults.colors(
                 selectedColor = colors.primary,
                 unselectedColor = colors.onSurface,
@@ -190,7 +190,7 @@ object AppObjectsColors {
         contentColor: Color? = null
     ): IconButtonColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             IconButtonDefaults.iconButtonColors(
                 containerColor = backgroundColor ?: colors.surface,
                 contentColor = contentColor ?: colors.primary,
@@ -203,7 +203,7 @@ object AppObjectsColors {
     @Composable
     fun cardColors(): CardColors {
         val colors = MaterialTheme.colorScheme
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             CardDefaults.cardColors(
                 colors.surface,
                 colors.onSurface,
@@ -216,7 +216,7 @@ object AppObjectsColors {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     fun toggleButtonColors(): ToggleButtonColors {
-        return if (LocalCuseCustomColorChannels.current) {
+        return if (LocalUseCustomColorChannels.current) {
             with(MaterialTheme.colorScheme) {
                 ToggleButtonDefaults.toggleButtonColors(
                     containerColor = primary,

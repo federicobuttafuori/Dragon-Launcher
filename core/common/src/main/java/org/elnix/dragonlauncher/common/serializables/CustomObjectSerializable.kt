@@ -17,6 +17,7 @@ data class CustomObjectSerializable(
     val stroke: Float? = null,
     @Contextual val color: Color? = null,
     val glow: CustomGlow? = null,
+    val rotation: Int? = null,
     val shape: IconShape? = null,
     val size: Float? = null,
     val eraseBackground: Boolean? = null
@@ -48,6 +49,7 @@ data class CustomObjectBlockProperties(
     val allowShapeCustomization: Boolean = true,
     val allowSizeCustomization: Boolean = true,
     val allowEraseBackgroundCustomization: Boolean = true,
+    val allowRotationCustomization: Boolean = true,
 
     val allowGlowCustomization: Boolean = true
 )

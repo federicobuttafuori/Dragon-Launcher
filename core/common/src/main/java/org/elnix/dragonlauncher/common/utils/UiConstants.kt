@@ -1,6 +1,7 @@
 package org.elnix.dragonlauncher.common.utils
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.CustomGlow
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
@@ -24,6 +25,7 @@ object UiConstants {
         /** Not used for the line as it goes from `start` to `end` */
         shape = null,
         size = null,
+        rotation = null, // No rotation for line, (it's nullable, but I use nul here to indicate that the rotation isn't available)
 
         eraseBackground = false
     )
@@ -37,6 +39,7 @@ object UiConstants {
         ),
         shape = IconShape.Circle,
         size = 50f,
+        rotation = 90,
         eraseBackground = false
     )
 
@@ -48,6 +51,7 @@ object UiConstants {
         ),
         shape = IconShape.Circle,
         size = 30f,
+        rotation = 0,
         eraseBackground = true
     )
 
@@ -59,6 +63,20 @@ object UiConstants {
         ),
         shape = IconShape.Circle,
         size = 8f,
+        rotation = 0,
+        eraseBackground = false
+    )
+
+
+    val defaultHoldCustomObject = CustomObjectSerializable(
+        stroke = 10f,
+        color = Color.Red,
+        glow = CustomGlow(
+            radius = 12f
+        ),
+        shape = IconShape.Circle,
+        size = 70f,
+        rotation = 0,
         eraseBackground = false
     )
 }

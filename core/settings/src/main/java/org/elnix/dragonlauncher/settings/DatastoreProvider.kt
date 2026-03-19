@@ -12,6 +12,7 @@ import org.elnix.dragonlauncher.settings.DataStoreName.COLOR_MODE
 import org.elnix.dragonlauncher.settings.DataStoreName.DEBUG
 import org.elnix.dragonlauncher.settings.DataStoreName.DRAWER
 import org.elnix.dragonlauncher.settings.DataStoreName.FLOATING_APPS
+import org.elnix.dragonlauncher.settings.DataStoreName.HOLD_TO_ACTIVATE
 import org.elnix.dragonlauncher.settings.DataStoreName.LANGUAGE
 import org.elnix.dragonlauncher.settings.DataStoreName.PRIVATE_APPS
 import org.elnix.dragonlauncher.settings.DataStoreName.PRIVATE_SETTINGS
@@ -31,6 +32,7 @@ import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.FloatingAppsSettingsStore
+import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateAppsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
@@ -64,7 +66,8 @@ enum class  DataStoreName(
     WELLBEING("wellbeingDatastore", "wellbeing"),
     SWIPE_MAP("swipeMapDataStore", "swipe_map"),
     STATUS_BAR_JSON("statusBarJsonDataStore", "status_bar_json"),
-    ANGLE_LINE("AngleLineDatastore", "angle_line")
+    ANGLE_LINE("AngleLineDatastore", "angle_line"),
+    HOLD_TO_ACTIVATE("HoldTOActivateDatastore", "hold_to_activate")
 }
 
 
@@ -87,7 +90,8 @@ object SettingsStoreRegistry {
         WELLBEING to WellbeingSettingsStore,
         SWIPE_MAP to SwipeMapSettingsStore,
         STATUS_BAR_JSON to StatusBarJsonSettingsStore,
-        ANGLE_LINE to AngleLineSettingsStore
+        ANGLE_LINE to AngleLineSettingsStore,
+        HOLD_TO_ACTIVATE to HoldToActivateArcSettingsStore
     )
 }
 
@@ -120,6 +124,7 @@ private val Context.wellbeingDatastore by preferencesDataStore(name = WELLBEING.
 private val Context.swipeMapDatastore by preferencesDataStore(name = SWIPE_MAP.value)
 private val Context.statusBarJsonDataStore by preferencesDataStore(name = STATUS_BAR_JSON.value)
 private val Context.angleLineDatastore by preferencesDataStore(name = ANGLE_LINE.value)
+private val Context.holeToActivateDatastore by preferencesDataStore(name = HOLD_TO_ACTIVATE.value)
 
 
 
@@ -144,5 +149,6 @@ fun Context.resolveDataStore(name: DataStoreName): DataStore<Preferences> {
         SWIPE_MAP -> appCtx.swipeMapDatastore
         STATUS_BAR_JSON -> appCtx.statusBarJsonDataStore
         ANGLE_LINE -> appCtx.angleLineDatastore
+        HOLD_TO_ACTIVATE -> appCtx.holeToActivateDatastore
     }
 }

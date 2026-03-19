@@ -62,7 +62,7 @@ fun HoldToActivateArc(
 }
 
 
-private fun DrawScope.holdTolerance(
+fun DrawScope.holdTolerance(
     center: Offset,
     tolerance: Float
 ) {

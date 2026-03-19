@@ -22,14 +22,10 @@ object BehaviorSettingsStore : MapSettingsStore() {
             this.rightPadding,
             this.topPadding,
             this.bottomPadding,
-            this.holdDelayBeforeStartingLongClickSettings,
-            this.longCLickSettingsDuration,
             this.disableHapticFeedbackGlobally,
             this.pointsActionSnapsToOuterCircle,
-            this.holdToActivateSettingsRadius,
-            this.holdToActivateSettingsStroke,
-            this.holdToActivateSettingsTolerance,
             this.useDifferentialLoadingForPrivateSpace,
+            this.superWarningMode,
             this.superWarningModeSound,
             this.metalPipesSound,
             this.alarmSound,
@@ -87,51 +83,6 @@ object BehaviorSettingsStore : MapSettingsStore() {
         default = 100,
         allowedRange = 0..300
     )
-
-
-    /*  ───────────── Hold to settings  ─────────────  */
-
-    val holdDelayBeforeStartingLongClickSettings = Settings.int(
-        key = "holdDelayBeforeStartingLongClickSettings",
-        dataStoreName = dataStoreName,
-        default = 500,
-        allowedRange = 200..2000
-    )
-
-    val longCLickSettingsDuration = Settings.int(
-        key = "longCLickSettingsDuration",
-        dataStoreName = dataStoreName,
-        default = 1000,
-        allowedRange = 200..5000
-    )
-
-    val holdToActivateSettingsRadius = Settings.int(
-        key = "holdToActivateSettingsRadius",
-        dataStoreName = dataStoreName,
-        default = 75,
-        allowedRange = 10..300
-    )
-
-    val holdToActivateSettingsStroke = Settings.int(
-        key = "holdToActivateSettingsStroke",
-        dataStoreName = dataStoreName,
-        default = 6,
-        allowedRange = 1..50
-    )
-
-    val holdToActivateSettingsTolerance = Settings.float(
-        key = "holdToActivateSettingsTolerance",
-        dataStoreName = dataStoreName,
-        default = 24f,
-        allowedRange = 1f..200f
-    )
-
-    val showToleranceOnMainScreen = Settings.boolean(
-        key = "showToleranceOnMainScreen",
-        dataStoreName = dataStoreName,
-        default = false,
-    )
-
 
     /*  ─────────────  Other Useful Settings  ─────────────  */
 

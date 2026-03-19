@@ -94,6 +94,7 @@ import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
@@ -123,9 +124,9 @@ import org.elnix.dragonlauncher.ui.remembers.LocalAngleLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalCuseCustomColorChannels
 import org.elnix.dragonlauncher.ui.remembers.LocalDefaultPoint
 import org.elnix.dragonlauncher.ui.remembers.LocalEndLineObject
+import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
 import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 import org.elnix.dragonlauncher.ui.remembers.LocalIcons
 import org.elnix.dragonlauncher.ui.remembers.LocalLineObject
@@ -134,6 +135,7 @@ import org.elnix.dragonlauncher.ui.remembers.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
+import org.elnix.dragonlauncher.ui.remembers.LocalUseCustomColorChannels
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
 import org.elnix.dragonlauncher.ui.settings.PermissionsTab
 import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
@@ -144,6 +146,7 @@ import org.elnix.dragonlauncher.ui.settings.customization.ColorSelectorTab
 import org.elnix.dragonlauncher.ui.settings.customization.DrawerTab
 import org.elnix.dragonlauncher.ui.settings.customization.FloatingAppsTab
 import org.elnix.dragonlauncher.ui.settings.customization.FontPickerScreen
+import org.elnix.dragonlauncher.ui.settings.customization.HoldToActivateArcTab
 import org.elnix.dragonlauncher.ui.settings.customization.IconPackTab
 import org.elnix.dragonlauncher.ui.settings.customization.NestEditingScreen
 import org.elnix.dragonlauncher.ui.settings.customization.StatusBarTab
@@ -689,7 +692,17 @@ fun MainAppUi(
         logW(ANGLE_LINE_TAG) { "Error decoding endLineObject" }
     }
 
+    val holdCustomObjectJson by HoldToActivateArcSettingsStore.holdToActivateArcCustomObject.asState()
+    val holdCustomObject = rememberDecodedObject(
+        jsonString = holdCustomObjectJson,
+        default = UiConstants.defaultHoldCustomObject,
+        json = json
+    ) {
+        logW(ANGLE_LINE_TAG) { "Error decoding endLineObject" }
+    }
+
     val useCustomColorChannels by UiSettingsStore.useCustomColorChannels.asState()
+
     /**
      * Main Composition local provider, I just for everything I can here to avoid having to import them everywhere
      * I know that I should carefully review what global locals I add, but until now it worked to I'll keep it that way until I notice lag
@@ -708,7 +721,9 @@ fun MainAppUi(
         LocalStartLineObject provides startLineObject,
         LocalEndLineObject provides endLineObject,
 
-        LocalCuseCustomColorChannels provides useCustomColorChannels
+        LocalHoldCustomObject provides holdCustomObject,
+
+        LocalUseCustomColorChannels provides useCustomColorChannels
     ) {
         Scaffold(
             topBar = {
@@ -849,6 +864,7 @@ fun MainAppUi(
                     noAnimComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.FONTS) { FontPickerScreen(::goAppearance) }
+                    noAnimComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::goAppearance) }
 
                     noAnimComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
 

@@ -1,20 +1,26 @@
 package org.elnix.dragonlauncher.ui.helpers.customobjects
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
 import org.elnix.dragonlauncher.common.utils.UiConstants
+import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Angle
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.End
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Line
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Start
-import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowArc
 import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowLine
+import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowShapePath
+import kotlin.math.abs
 
 fun DrawScope.actionLine(
     start: Offset,
@@ -48,7 +54,6 @@ fun DrawScope.actionLine(
                 }
             }
             Angle -> {
-                // The angle rotating around the start point (have to fix that and allow more customization) TODO
                 // The "do you hate it?" thing in settings
                 if (showAngleLineObjectPreview) {
                     angleObject(
@@ -113,49 +118,90 @@ private fun DrawScope.lineObject(
     )
 }
 
+/**
+ * Draws a custom-shaped angle indicator around a center point, trimmed proportionally
+ * to the given [sweepAngle].
+ *
+ * The shape outline is sourced from [angleLineCustomObject] (falling back to
+ * [UiConstants.defaultAngleCustomObject]), centered on [center], and partially revealed
+ * using [PathMeasure] based on the sweep ratio.
+ *
+ * @param center The point around which the shape is drawn and rotated.
+ * @param sweepAngle The angle in degrees, in the range `-360f..360f`.
+ *   - Positive values draw the shape **clockwise** from the top (12 o'clock).
+ *   - Negative values draw the shape **anticlockwise** from the top.
+ *   - `±360f` results in a fully drawn shape outline.
+ * @param lineColor The fallback color used if [angleLineCustomObject] has no color set.
+ * @param angleLineCustomObject The customization data driving shape, size, stroke,
+ *   glow, color, and erase behavior.
+ */
 private fun DrawScope.angleObject(
     center: Offset,
     sweepAngle: Float,
     lineColor: Color,
     angleLineCustomObject: CustomObjectSerializable,
 ) {
-    val arcStroke = (angleLineCustomObject.stroke ?: UiConstants.defaultAngleCustomObject.stroke!!).dp.toPx()
+    val strokeWidth = (angleLineCustomObject.stroke ?: UiConstants.defaultAngleCustomObject.stroke!!).dp.toPx()
+    if (strokeWidth <= 0f) return
 
-    if (arcStroke > 0f) {
-        val arcSize =
-            (angleLineCustomObject.size ?: UiConstants.defaultAngleCustomObject.size!!)
-                .dp.toPx() / 2
+    val shape = (angleLineCustomObject.shape ?: UiConstants.defaultAngleCustomObject.shape!!).resolveShape()
 
+    val radius = (angleLineCustomObject.size ?: UiConstants.defaultAngleCustomObject.size!!).dp.toPx() / 2
+    val diameterPx = radius * 2
 
-        val rect = Rect(
-            center.x - arcSize,
-            center.y - arcSize,
-            center.x + arcSize,
-            center.y + arcSize
+    val glowRadius = angleLineCustomObject.glow?.radius?.dp?.toPx() ?: 0f
+
+    val glowColor = angleLineCustomObject.glow?.color
+        ?: UiConstants.defaultAngleCustomObject.glow?.color
+
+    val composePath = when (val outline = shape.createOutline(
+        size = Size(diameterPx, diameterPx),
+        layoutDirection = layoutDirection,
+        density = this
+    )) {
+        is Outline.Generic -> outline.path
+        is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
+        is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
+    }
+
+    // Center path around (0,0) so translate(center) places it correctly
+    val matrix = Matrix()
+    matrix.translate(-diameterPx / 2f, -diameterPx / 2f)
+    composePath.transform(matrix)
+
+    // Derive progress and direction from sweepAngle
+    val isAnticlockwise = sweepAngle < 0f
+    val progress = (abs(sweepAngle) / 360f).coerceIn(0f, 1f)
+
+    val pathMeasurer = PathMeasure()
+    val destinationPath = Path()
+    pathMeasurer.setPath(composePath, false)
+
+    if (!isAnticlockwise) {
+        pathMeasurer.getSegment(0f, pathMeasurer.length * progress, destinationPath)
+    } else {
+        pathMeasurer.getSegment(pathMeasurer.length * (1f - progress), pathMeasurer.length, destinationPath)
+    }
+
+    val rotation = angleLineCustomObject.rotation ?: UiConstants.defaultAngleCustomObject.rotation!!
+
+    withTransform({
+        rotate(degrees = rotation.toFloat(), pivot = center)
+
+        scale(
+            scaleX = -1f,
+            scaleY = 1f,
+            pivot = center
         )
-
-        val angleGLow = angleLineCustomObject.glow
-
-
-        val glowRadius = if (angleGLow != null) {
-            (angleGLow.radius ?: UiConstants.defaultAngleCustomObject.glow!!.radius!!).dp.toPx()
-        } else 0f
-
-        val glowColor = if (angleGLow != null) {
-            angleGLow.color
-                ?: UiConstants.defaultAngleCustomObject.glow!!.color
-        } else null
-
-
-        drawNeonGlowArc(
-            topLeft = rect.topLeft,
-            size = Size(rect.width, rect.height),
-            startAngle = -90f,
-            sweepAngle = sweepAngle,
+        // Put the path tin the center
+        translate(center.x, center.y)
+    }) {
+        drawNeonGlowShapePath(
+            path = destinationPath,
             color = angleLineCustomObject.color ?: lineColor,
-            lineStrokeWidth = arcStroke,
+            lineStrokeWidth = strokeWidth,
             glowRadius = glowRadius,
-            glowColor = glowColor,
+            glowColor = glowColor ?: lineColor,
             erase = angleLineCustomObject.eraseBackground
                 ?: UiConstants.defaultLineCustomObject.eraseBackground!!
         )

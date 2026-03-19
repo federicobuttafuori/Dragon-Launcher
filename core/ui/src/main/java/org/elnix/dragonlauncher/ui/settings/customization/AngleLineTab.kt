@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +54,7 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
+import org.elnix.dragonlauncher.ui.remembers.rememberSweepAngle
 import kotlin.math.atan2
 
 
@@ -77,6 +80,7 @@ fun AngleLineTab(onBack: () -> Unit) {
     var showOrderDialog by remember { mutableStateOf(false) }
 
     val json = Json {
+        prettyPrint = true
         serializersModule = SerializersModule {
             contextual(Color::class, ColorSerializer)
         }
@@ -118,15 +122,81 @@ fun AngleLineTab(onBack: () -> Unit) {
         logE(ANGLE_LINE_TAG, it) { "Error decoding endLineObject" }
     }
 
+
+    // Instant mutators to avoid I/O overhead
+    var mutableLineObject by remember(lineObject) { mutableStateOf(lineObject) }
+    var mutableAngleLineObject by remember(angleLineObject) { mutableStateOf(angleLineObject) }
+    var mutableStartObject by remember(startLineObject) { mutableStateOf(startLineObject) }
+    var mutableEndObject by remember(endLineObject) { mutableStateOf(endLineObject) }
+
+
     val rgbLine by UiSettingsStore.rgbLine.asState()
 
 
     var dummyEnd by remember { mutableStateOf(Offset.Infinite) }
     var hasAlreadyBeenPlaced by remember { mutableStateOf(false) }
 
+
+    var start by remember { mutableStateOf(Offset(0f,0f)) }
+
+    val dx = dummyEnd.x - start.x
+    val dy = dummyEnd.y - start.y
+
+    // angle relative to UP = 0°
+    val angleRad = atan2(dx.toDouble(), -dy.toDouble())
+    val angleDeg = Math.toDegrees(angleRad).toFloat()
+
+
+    val sweepState = rememberSweepAngle()
+
+    LaunchedEffect(angleDeg) {
+        sweepState.onAngleChanged(angleDeg)
+    }
+
+
+    val sweep = sweepState.sweepAngle()
+
+
+
+    fun saveLine(newObject: CustomObjectSerializable) {
+        scope.launch {
+            AngleLineSettingsStore.lineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), newObject))
+        }
+    }
+
+    fun saveAngleLine(newObject: CustomObjectSerializable) {
+        scope.launch {
+            AngleLineSettingsStore.angleLineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), newObject))
+        }
+    }
+
+    fun saveStart(newObject: CustomObjectSerializable) {
+        scope.launch {
+            AngleLineSettingsStore.startLineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), newObject))
+        }
+    }
+
+    fun saveEnd(newObject: CustomObjectSerializable) {
+        scope.launch {
+            AngleLineSettingsStore.endLineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), newObject))
+        }
+    }
+
+    fun saveAll() {
+        scope.launch {
+            AngleLineSettingsStore.lineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), mutableLineObject))
+            AngleLineSettingsStore.angleLineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), mutableAngleLineObject))
+            AngleLineSettingsStore.startLineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), mutableStartObject))
+            AngleLineSettingsStore.endLineJson.set(ctx, json.encodeToString(CustomObjectSerializable.serializer(), mutableEndObject))
+        }
+    }
+
     SettingsLazyHeader(
         title = stringResource(R.string.angle_line),
-        onBack = onBack,
+        onBack = {
+            saveAll()
+            onBack()
+        },
         helpText = stringResource(R.string.angle_line_help),
         onReset = {
             scope.launch {
@@ -135,82 +205,78 @@ fun AngleLineTab(onBack: () -> Unit) {
         },
         Pair({ showOrderDialog = true }, Icons.Default.MoreVert),
         scrollableContent = true,
-        content = {
+        titleContent = {
 
-            /**
-             * Preview of the line
-             */
-            Box(
-                modifier = Modifier
-                    .settingsGroup()
-                    .aspectRatio(1f)
-                    .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        if (!hasAlreadyBeenPlaced) {
-                            val rect = coordinates.boundsInRoot()
-                            val rectSize = (rect.height * density.density).toInt() / 2
-
-                            dummyEnd = Offset(
-                                rect.left + (0..rectSize).random(),
-                                rect.top + (0..rectSize).random()
-                            )
-                            // Prevent the thing to move after first placement
-                            hasAlreadyBeenPlaced = true
-                        }
-                    }
-                    .pointerInput(Unit) {
-                        detectDragGestures { change, _ ->
-                            // Allow the user to move the end for cleaner preview
-                            dummyEnd = change.position
-                        }
-                    }
-            ) {
-
-                Canvas(
+            item {
+                /**
+                 * Preview of the line
+                 */
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            compositingStrategy = CompositingStrategy.Offscreen
+                        .settingsGroup()
+                        .aspectRatio(1f)
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            if (!hasAlreadyBeenPlaced) {
+                                val rect = coordinates.boundsInRoot()
+                                val rectSize = (rect.height * density.density).toInt() / 2
+
+                                dummyEnd = Offset(
+                                    rect.left + (0..rectSize).random(),
+                                    rect.top + (0..rectSize).random()
+                                )
+                                // Prevent the thing to move after first placement
+                                hasAlreadyBeenPlaced = true
+                            }
+                        }
+                        .pointerInput(Unit) {
+                            detectDragGestures { change, _ ->
+                                // Allow the user to move the end for cleaner preview
+                                dummyEnd = change.position
+                            }
                         }
                 ) {
 
-                    val start = Offset(size.width / 2f, size.height / 2f)
+                    Text(sweep.toInt().toString())
 
-                    val dx = dummyEnd.x - start.x
-                    val dy = dummyEnd.y - start.y
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                compositingStrategy = CompositingStrategy.Offscreen
+                            }
+                    ) {
 
-                    // angle relative to UP = 0°
-                    val angleRad = atan2(dx.toDouble(), -dy.toDouble())
-                    val angleDeg = Math.toDegrees(angleRad)
-                    val angle0to360 = if (angleDeg < 0) angleDeg + 360 else angleDeg
+                        start = Offset(size.width / 2f, size.height / 2f)
 
+                        val lineColor =
+                            if (rgbLine) Color.hsv(sweepState.angle360(), 1f, 1f)
+                            else extraColors.angleLine
 
-                    val lineColor =
-                        if (rgbLine) Color.hsv(angle0to360.toFloat(), 1f, 1f)
-                        else extraColors.angleLine
+                        actionLine(
+                            start = start,
+                            end = dummyEnd,
 
-                    actionLine(
-                        start = start,
-                        end = dummyEnd,
+                            order = order,
 
-                        order = order,
+                            showLineObjectPreview = showLineObjectPreview,
+                            showAngleLineObjectPreview = showAngleLineObjectPreview,
+                            showStartObjectPreview = showStartObjectPreview,
+                            showEndObjectPreview = showEndObjectPreview,
 
-                        showLineObjectPreview = showLineObjectPreview,
-                        showAngleLineObjectPreview = showAngleLineObjectPreview,
-                        showStartObjectPreview = showStartObjectPreview,
-                        showEndObjectPreview = showEndObjectPreview,
+                            lineCustomObject = mutableLineObject,
+                            angleLineCustomObject = mutableAngleLineObject,
+                            startCustomObject = mutableStartObject,
+                            endCustomObject = mutableEndObject,
+                            sweepAngle = sweep,
 
-                        lineCustomObject = lineObject,
-                        angleLineCustomObject = angleLineObject,
-                        startCustomObject = startLineObject,
-                        endCustomObject = endLineObject,
-                        sweepAngle = angle0to360.toFloat(),
-
-                        lineColor = lineColor
-                    )
+                            lineColor = lineColor
+                        )
+                    }
                 }
             }
-
+        },
+        content = {
             /** Line object setting */
             ExpandableSection(lineObjectExpandableSectionState) {
                 SettingsSwitchRow(
@@ -220,18 +286,14 @@ fun AngleLineTab(onBack: () -> Unit) {
                 )
                 AnimatedVisibility(showLineObjectPreview) {
                     EditCustomObjectBlock(
-                        editObject = lineObject,
+                        editObject = mutableLineObject,
                         default = UiConstants.defaultLineCustomObject,
                         properties = CustomObjectBlockProperties(
                             allowSizeCustomization = false,
-                            allowShapeCustomization = false
+                            allowShapeCustomization = false,
+                            allowRotationCustomization = false
                         )
-                    ) {
-                        val newLineJson = json.encodeToString(CustomObjectSerializable.serializer(), it)
-                        scope.launch {
-                            AngleLineSettingsStore.lineJson.set(ctx, newLineJson)
-                        }
-                    }
+                    ) { mutableLineObject = it }
                 }
             }
 
@@ -248,17 +310,9 @@ fun AngleLineTab(onBack: () -> Unit) {
 
                 AnimatedVisibility(showAngleLineObjectPreview) {
                     EditCustomObjectBlock(
-                        editObject = angleLineObject,
-                        default = UiConstants.defaultAngleCustomObject,
-                        properties = CustomObjectBlockProperties(
-                            allowShapeCustomization = false
-                        )
-                    ) {
-                        val newAngleJson = json.encodeToString(CustomObjectSerializable.serializer(), it)
-                        scope.launch {
-                            AngleLineSettingsStore.angleLineJson.set(ctx, newAngleJson)
-                        }
-                    }
+                        editObject = mutableAngleLineObject,
+                        default = UiConstants.defaultAngleCustomObject
+                    ) { mutableAngleLineObject = it }
                 }
             }
 
@@ -272,14 +326,9 @@ fun AngleLineTab(onBack: () -> Unit) {
 
                 AnimatedVisibility(showStartObjectPreview) {
                     EditCustomObjectBlock(
-                        editObject = startLineObject,
+                        editObject = mutableStartObject,
                         default = UiConstants.defaultStartCustomObject
-                    ) {
-                        val newStarJson = json.encodeToString(CustomObjectSerializable.serializer(), it)
-                        scope.launch {
-                            AngleLineSettingsStore.startLineJson.set(ctx, newStarJson)
-                        }
-                    }
+                    ) { mutableStartObject = it }
                 }
             }
 
@@ -293,14 +342,9 @@ fun AngleLineTab(onBack: () -> Unit) {
 
                 AnimatedVisibility(showEndObjectPreview) {
                     EditCustomObjectBlock(
-                        editObject = endLineObject,
+                        editObject = mutableEndObject,
                         default = UiConstants.defaultEndCustomObject
-                    ) {
-                        val newEndJson = json.encodeToString(CustomObjectSerializable.serializer(), it)
-                        scope.launch {
-                            AngleLineSettingsStore.endLineJson.set(ctx, newEndJson)
-                        }
-                    }
+                    ) { mutableEndObject = it }
                 }
             }
         }

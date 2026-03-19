@@ -35,12 +35,32 @@ fun EditCustomObjectBlock(
 
     var tempSize by remember { mutableStateOf(editObject.size) }
     var tempStroke by remember { mutableStateOf(editObject.stroke) }
+    var tempRotation by remember { mutableStateOf(editObject.rotation) }
     var tempColor by remember { mutableStateOf(editObject.color) }
 
     var tempGlowColor by remember { mutableStateOf(editObject.glow?.color) }
     var tempGlowRadius by remember { mutableStateOf(editObject.glow?.radius) }
 
     var showSelectedShapePickerDialog by remember { mutableStateOf(false) }
+
+
+    /**
+     * Triggers the edit, with all temp values copied, to avoid strange behaviors when editing a value,
+     * then another and resting one, only the modified is being edited, the others would be discarded otherwise
+     */
+    fun triggerEdit() {
+        onEdit(editObject.copy(
+            size = tempSize,
+            stroke = tempStroke,
+            rotation = tempRotation,
+            color = tempColor,
+            glow = editObject.glow?.copy(
+                color = tempGlowColor,
+                radius = tempGlowRadius
+            )
+        ))
+    }
+
 
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -56,9 +76,9 @@ fun EditCustomObjectBlock(
                 decimals = 1,
                 onReset = {
                     tempSize = null
-                    onEdit(editObject.copy(size = null))
+                    triggerEdit()
                 },
-                onDragStateChange = { onEdit(editObject.copy(size = tempSize)) }
+                onDragStateChange = { triggerEdit() }
             ) { tempSize = it }
         }
 
@@ -71,10 +91,24 @@ fun EditCustomObjectBlock(
                 decimals = 1,
                 onReset = {
                     tempStroke = null
-                    onEdit(editObject.copy(stroke = null))
+                    triggerEdit()
                 },
-                onDragStateChange = { onEdit(editObject.copy(stroke = tempStroke)) }
+                onDragStateChange = { triggerEdit() }
             ) { tempStroke = it }
+        }
+
+        if (properties.allowRotationCustomization) {
+            SliderWithLabel(
+                label = stringResource(R.string.rotation),
+                value = tempRotation ?: default.rotation!!,
+                valueRange = 0..360,
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                onReset = {
+                    tempRotation = null
+                    triggerEdit()
+                },
+                onDragStateChange = { triggerEdit() }
+            ) { tempRotation = it }
         }
 
         if (properties.allowColorCustomization) {
@@ -86,7 +120,7 @@ fun EditCustomObjectBlock(
                 backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                 onColorPicked = {
                     tempColor = it
-                    onEdit(editObject.copy(color = it))
+                    triggerEdit()
                 }
             )
         }
@@ -115,12 +149,7 @@ fun EditCustomObjectBlock(
                         backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                         onColorPicked = {
                             tempGlowColor = it
-                            onEdit(
-                                editObject.copy(
-                                    glow = (editObject.glow ?: CustomGlow())
-                                        .copy(color = it)
-                                )
-                            )
+                            triggerEdit()
                         }
                     )
 
@@ -133,19 +162,10 @@ fun EditCustomObjectBlock(
                         decimals = 1,
                         onReset = {
                             tempGlowRadius = null
-                            onEdit(
-                                editObject.copy(
-                                    glow = editObject.glow?.copy(radius = null)
-                                )
-                            )
+                            triggerEdit()
                         },
                         onDragStateChange = {
-                            onEdit(
-                                editObject.copy(
-                                    glow = (editObject.glow ?: CustomGlow())
-                                        .copy(radius = tempGlowRadius)
-                                )
-                            )
+                            triggerEdit()
                         }
                     ) { tempGlowRadius = it }
                 }

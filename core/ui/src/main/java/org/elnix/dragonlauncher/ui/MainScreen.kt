@@ -49,8 +49,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.ktx.toDp
-import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
@@ -59,6 +59,7 @@ import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
+import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
@@ -66,10 +67,11 @@ import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
-import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
+import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc3
 import org.elnix.dragonlauncher.ui.helpers.WallpaperDim
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
+import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 import org.elnix.dragonlauncher.ui.remembers.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.rememberHoldToOpenSettings
@@ -85,6 +87,8 @@ fun MainScreen(
     val ctx = LocalContext.current
     val points = LocalPoints.current
     val nests = LocalNests.current
+    val holdCustomObject = LocalHoldCustomObject.current
+
 
     val appsViewModel = LocalAppsViewModel.current
     val floatingAppsViewModel = LocalFloatingAppsViewModel.current
@@ -107,14 +111,13 @@ fun MainScreen(
     val bottomPadding by BehaviorSettingsStore.bottomPadding.asState()
 
 
-    val holdDelayBeforeStartingLongClickSettings by BehaviorSettingsStore.holdDelayBeforeStartingLongClickSettings.asState()
-    val longCLickSettingsDuration by BehaviorSettingsStore.longCLickSettingsDuration.asState()
-    val holdToActivateSettingsRadius by BehaviorSettingsStore.holdToActivateSettingsRadius.asState()
-    val holdToActivateSettingsStroke by BehaviorSettingsStore.holdToActivateSettingsStroke.asState()
-    val holdToActivateSettingsTolerance by BehaviorSettingsStore.holdToActivateSettingsTolerance.asState()
-    val showToleranceOnMainScreen by BehaviorSettingsStore.showToleranceOnMainScreen.asState()
+    val holdDelayBeforeStartingLongClickSettings by HoldToActivateArcSettingsStore.holdDelayBeforeStartingLongClickSettings.asState()
+    val longCLickSettingsDuration by HoldToActivateArcSettingsStore.longCLickSettingsDuration.asState()
+    val holdToActivateSettingsTolerance by HoldToActivateArcSettingsStore.holdToActivateSettingsTolerance.asState()
+    val showToleranceOnMainScreen by HoldToActivateArcSettingsStore.showToleranceOnMainScreen.asState()
+    val rotationPerSecond by HoldToActivateArcSettingsStore.rotationPerSecond.asState()
+
     val rgbLoading by UiSettingsStore.rgbLoading.asState()
-    val defaultColor = Color.Red
 
 
     var start by remember { mutableStateOf<Offset?>(null) }
@@ -350,18 +353,16 @@ fun MainScreen(
             onLaunch = { launchAction(it) }
         )
 
-        HoldToActivateArc(
+        HoldToActivateArc3(
             center = hold.centerProvider(),
             progress = hold.progressProvider(),
-            defaultColor = defaultColor,
             rgbLoading = rgbLoading,
-            radius = holdToActivateSettingsRadius,
-            stroke = holdToActivateSettingsStroke,
+            rotationsPerSecond = rotationPerSecond,
+            customObjectSerializable = holdCustomObject,
             showHoldTolerance = if (showToleranceOnMainScreen) {
                 { holdToActivateSettingsTolerance }
             } else null
         )
-
         if (tempStartPos != null) {
             DropdownMenu(
                 expanded = showDropDownMenuSettings,

@@ -29,6 +29,7 @@ object SETTINGS {
     const val EXTENSIONS = "settings/advanced/extensions"
     const val NESTS_EDIT = "settings/nest"
     const val ANGLE_LINE_EDIT = "settings/advanced/angleLineEdit"
+    const val HOLD_TO_ACTIVATE_ARC = "settings/advanced/hold_to_activate"
 }
 
 object ROUTES {

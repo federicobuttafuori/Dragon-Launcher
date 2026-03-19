@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +58,7 @@ import org.elnix.dragonlauncher.ui.remembers.LocalLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 import org.elnix.dragonlauncher.ui.remembers.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
+import org.elnix.dragonlauncher.ui.remembers.rememberSweepAngle
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.hypot
@@ -76,8 +76,8 @@ fun MainScreenOverlay(
         val dx: Float,
         val dy: Float,
         val dist: Float,
-        val angle0to360: Double,
-        val angleDeg: Double
+        val angle0to360: Float,
+        val angleDeg: Float
     )
 
     val ctx = LocalContext.current
@@ -120,6 +120,9 @@ fun MainScreenOverlay(
 
     val isDragging = start != null && current != null
 
+    val sweepState = rememberSweepAngle()
+
+
     // Optimization: Calculate geometric values only when dragging and using derivedStateOf
     // to avoid recomposing the entire overlay on every pixel move if the end result doesn't change.
     val dragData by remember(start, current) {
@@ -128,13 +131,19 @@ fun MainScreenOverlay(
                 val dxVal = current.x - start.x
                 val dyVal = current.y - start.y
                 val distVal = hypot(dxVal, dyVal)
+
                 val angleRadVal = atan2(dxVal.toDouble(), -dyVal.toDouble())
                 val angleDegVal = Math.toDegrees(angleRadVal)
-                val angle360 = if (angleDegVal < 0) angleDegVal + 360 else angleDegVal
 
-                DragData(dxVal, dyVal, distVal, angle360, angleDegVal)
+                sweepState.onAngleChanged(angleDegVal.toFloat())
+
+
+//                val angle360 = if (angleDegVal < 0) angleDegVal + 360 else angleDegVal
+
+                DragData(dxVal, dyVal, distVal, sweepState.angle360(), sweepState.sweepAngle())
             } else {
-                DragData(0f, 0f, 0f, 0.0, 0.0)
+                sweepState.reset()
+                DragData(0f, 0f, 0f, 0f, 0f)
             }
         }
     }
@@ -142,46 +151,24 @@ fun MainScreenOverlay(
     val dx = dragData.dx
     val dy = dragData.dy
     val dist = dragData.dist
-    val angle0to360 = dragData.angle0to360
-    val angleDeg = dragData.angleDeg
+    val angle360 = dragData.angle0to360
+    val sweepAngle = dragData.angleDeg
+
+
+
 
     val currentNest = remember(nests, nestId) { nests.find { it.id == nestId } ?: CircleNest() }
-
-    var lastAngle by remember { mutableStateOf<Double?>(null) }
-    var cumulativeAngle by remember { mutableDoubleStateOf(0.0) }   // continuous rotation without jumps
 
     val dragRadii = currentNest.dragDistances
     val haptics = currentNest.haptic
     val minAngles = currentNest.minAngleActivation
 
     val lineColor: Color = if (isDragging) {
-        if (rgbLine) Color.hsv(angle0to360.toFloat(), 1f, 1f)
+        if (rgbLine) Color.hsv(angle360, 1f, 1f)
         else extraColors.angleLine
     } else {
         Color.Transparent
     }
-
-    if (isDragging) {
-        // --- smooth 360° tracking ---
-        lastAngle?.let { prev ->
-            val diff = angle0to360 - prev
-
-            val adjustedDiff = when {
-                diff > 180 -> diff - 360   // jumped CW past 360→0
-                diff < -180 -> diff + 360   // jumped CCW past 0→360
-                else -> diff                // normal small movement
-            }
-
-            cumulativeAngle += adjustedDiff
-        }
-        @Suppress("AssignedValueIsNeverRead")
-        lastAngle = angle0to360
-    } else {
-        lastAngle = null
-        cumulativeAngle = 0.0
-    }
-
-    val sweepAngle = (cumulativeAngle % 360).toFloat()
 
     var exposedClosest by remember { mutableStateOf<SwipePointSerializable?>(null) }
     var exposedAsbAngle by remember { mutableStateOf<Double?>(null) }
@@ -229,14 +216,14 @@ fun MainScreenOverlay(
         val closestPoint =
             points.filter { it.nestId == nestId && it.circleNumber == targetCircle }
                 .minByOrNull {
-                    val d = abs(it.angleDeg - angle0to360)
+                    val d = abs(it.angleDeg - angle360)
                     minOf(d, 360 - d)
                 }
 
         exposedClosest = closestPoint
 
         val selectedPoint = closestPoint?.let { p ->
-            val d = abs(p.angleDeg - angle0to360)
+            val d = abs(p.angleDeg - angle360)
             val shortest = minOf(d, 360 - d)
             exposedAsbAngle = shortest
 
@@ -335,11 +322,11 @@ fun MainScreenOverlay(
                     color = Color.White, fontSize = 12.sp
                 )
                 Text(
-                    text = "angle raw = %.1f°".format(angleDeg),
+                    text = "sweep raw = %.1f°".format(sweepAngle),
                     color = Color.White, fontSize = 12.sp
                 )
                 Text(
-                    text = "angle 0–360 = %.1f°".format(angle0to360),
+                    text = "angle 0–360 = %.1f°".format(angle360),
                     color = Color.White, fontSize = 12.sp
                 )
                 Text(
