@@ -150,7 +150,6 @@ import org.elnix.dragonlauncher.ui.settings.customization.HoldToActivateArcTab
 import org.elnix.dragonlauncher.ui.settings.customization.IconPackTab
 import org.elnix.dragonlauncher.ui.settings.customization.NestEditingScreen
 import org.elnix.dragonlauncher.ui.settings.customization.StatusBarTab
-import org.elnix.dragonlauncher.ui.settings.customization.ThemesTab
 import org.elnix.dragonlauncher.ui.settings.customization.WallpaperTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.debug.LogsTab
@@ -833,7 +832,7 @@ fun MainAppUi(
                         )
                     }
                     noAnimComposable(SETTINGS.STATUS_BAR) { StatusBarTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.THEME) { ThemesTab(::goAppearance) }
+//                    noAnimComposable(SETTINGS.THEME) { ThemesTab(::goAppearance) }
                     noAnimComposable(SETTINGS.PERMISSIONS) { PermissionsTab { goAdvSettingsRoot() } }
 
                     noAnimComposable(SETTINGS.BEHAVIOR) {
@@ -849,13 +848,7 @@ fun MainAppUi(
                         )
                     }
                     noAnimComposable(SETTINGS.COLORS) { ColorSelectorTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.DEBUG) {
-                        DebugTab(
-                            navController = navController,
-                            onShowWelcome = ::goWelcome,
-                            onBack = ::goAdvSettingsRoot
-                        )
-                    }
+                    noAnimComposable(SETTINGS.DEBUG) { DebugTab(navController, ::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.LOGS) { LogsTab(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::goDebug) }
                     noAnimComposable(SETTINGS.LANGUAGE) { LanguageTab(::goAdvSettingsRoot) }

@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Polyline
 import androidx.compose.material.icons.filled.ShapeLine
 import androidx.compose.material.icons.filled.SignalCellular4Bar
-import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material.icons.filled.Widgets
@@ -135,12 +134,13 @@ fun AppearanceTab(
             ) { navController.navigate(SETTINGS.STATUS_BAR) }
         }
 
-        item {
-            SettingsItem(
-                title = stringResource(R.string.theme_selector),
-                icon = Icons.Default.Style
-            ) { navController.navigate(SETTINGS.THEME) }
-        }
+        // Disabled cause it's shitty, and I don't want shotty things in my app. it is also broken, as I did not make the color update
+//        item {
+//            SettingsItem(
+//                title = stringResource(R.string.theme_selector),
+//                icon = Icons.Default.Style
+//            ) { navController.navigate(SETTINGS.THEME) }
+//        }
 
         item {
             SettingsItem(

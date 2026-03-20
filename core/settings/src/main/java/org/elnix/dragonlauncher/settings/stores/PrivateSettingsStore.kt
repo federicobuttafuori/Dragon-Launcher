@@ -70,6 +70,16 @@ object PrivateSettingsStore : MapSettingsStore() {
         allowedRange = Long.MIN_VALUE..Long.MAX_VALUE
     )
 
+    /**
+     * Used to remember the page the user left when exiting the welcome screen, and going, for example to the default launcher selection
+     */
+    val welcomeScreenTempPage = Settings.int(
+        key = "welcomeScreenTempPage",
+        dataStoreName = dataStoreName,
+        default = 0,
+        allowedRange = 0..6,
+    )
+
     override val ALL: List<BaseSettingObject<*,*>> = listOf(
         this.hasSeenWelcome,
         this.hasInitialized,

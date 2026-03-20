@@ -59,7 +59,6 @@ import org.elnix.dragonlauncher.ui.wellbeing.OverlayReminderService
 @Composable
 fun DebugTab(
     navController: NavController,
-    onShowWelcome: () -> Unit,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
@@ -115,7 +114,11 @@ fun DebugTab(
                 }
 
                 DragonButton(
-                    onClick = { onShowWelcome() },
+                    onClick = {
+                        scope.launch {
+                            PrivateSettingsStore.hasSeenWelcome.set(ctx, false)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Show welcome screen")

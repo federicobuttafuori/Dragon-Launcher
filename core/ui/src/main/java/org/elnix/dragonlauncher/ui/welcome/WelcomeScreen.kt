@@ -24,6 +24,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,8 +36,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.WELCOME_TAG
 import org.elnix.dragonlauncher.models.BackupResult
 import org.elnix.dragonlauncher.settings.DataStoreName
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
@@ -51,12 +58,46 @@ fun WelcomeScreen(
     onEnterSettings: () -> Unit,
     onEnterApp: () -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 6 })
+    val pagerState = rememberPagerState(pageCount = { 5 })
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
     val backupViewModel = LocalBackupViewModel.current
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                scope.launch {
+                    val pagerPage = PrivateSettingsStore.welcomeScreenTempPage.getOrNull(ctx)
+
+                    if (pagerPage != null) {
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerPage)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+
+    LaunchedEffect(pagerState.currentPage) {
+        val pageId = pagerState.currentPage
+
+        logD(WELCOME_TAG) { "Setting the pager to $pageId" }
+        // Set the current page to remember it
+        scope.launch {
+            PrivateSettingsStore.welcomeScreenTempPage.set(ctx, pageId)
+        }
+    }
 
     var selectedStoresForImport by remember { mutableStateOf(setOf<DataStoreName>()) }
     var importJson by remember { mutableStateOf<JSONObject?>(null) }
@@ -91,12 +132,17 @@ fun WelcomeScreen(
     )
 
 
-
     // Prevent the user to quit
     BackHandler { }
 
     fun setHasSeen() {
-        scope.launch { PrivateSettingsStore.hasSeenWelcome.set(ctx, true) }
+        scope.launch {
+            with(PrivateSettingsStore) {
+                hasSeenWelcome.set(ctx, true)
+                // Resets the pager, that is only used to scroll to the page the user left when it re-enters the welcome screen
+                welcomeScreenTempPage.reset(ctx)
+            }
+        }
     }
 
     Box(
@@ -129,11 +175,12 @@ fun WelcomeScreen(
                             )
                         )
                     }
+
                     1 -> WelcomePagePrivacy()
                     2 -> WelcomePageTutorial()
-                    3 -> WelcomePageTheme()
-                    4 -> WelcomePageLauncher()
-                    5 -> WelcomePageFinish(
+//                    3 -> WelcomePageTheme()
+                    3 -> WelcomePageLauncher()
+                    4 -> WelcomePageFinish(
                         onEnterSettings = {
                             setHasSeen()
                             onEnterSettings()
@@ -191,7 +238,7 @@ fun WelcomeScreen(
 
                     scope.launch {
                         try {
-                            SettingsBackupManager.importSettingsFromJson(ctx, json , selectedStoresForImport)
+                            SettingsBackupManager.importSettingsFromJson(ctx, json, selectedStoresForImport)
                             backupViewModel.setResult(
                                 BackupResult(
                                     export = false,

@@ -202,6 +202,7 @@ object Constants {
         val SAMSUNG_INTEGRATION_TAG = LogTag("SamsungIntegration")
         val EXTENSION_MANAGER_TAG = LogTag("ExtensionManager")
         val HAPTIC_TAG = LogTag("HapticDebug")
+        val WELCOME_TAG = LogTag("WelcomeDebug")
     }
 
     /*  ─────────────  Links  ─────────────  */
