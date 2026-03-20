@@ -59,6 +59,13 @@ abstract class BaseSettingsStore<T, B> {
     /** Identifier of the [androidx.datastore.core.DataStore] used to persist these settings. */
     abstract val dataStoreName: DataStoreName
 
+    var onAnySettingChanged: (() -> Unit)? = null
+        set(value) {
+            field = value
+            ALL.forEach { it.onChanged = value }
+        }
+
+
     /**
      * List of all individual settings in this store.
      *

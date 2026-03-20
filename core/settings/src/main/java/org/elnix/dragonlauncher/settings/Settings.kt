@@ -49,7 +49,8 @@ object Settings {
     fun boolean(
         key: String,
         dataStoreName: DataStoreName,
-        default: Boolean
+        default: Boolean,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Boolean, Boolean> =
         BaseSettingObject(
             key = key,
@@ -57,14 +58,16 @@ object Settings {
             default = default,
             preferenceKey = booleanPreferencesKey(key),
             encode = { it },
-            decode = { raw -> getBooleanStrict(raw, default) }
+            decode = { raw -> getBooleanStrict(raw, default) },
+            onChanged = onChange
         )
 
     fun int(
         key: String,
         dataStoreName: DataStoreName,
         default: Int,
-        allowedRange: ClosedRange<Int>
+        allowedRange: ClosedRange<Int>,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Int, Int> =
         BaseSettingObject(
             key = key,
@@ -72,7 +75,8 @@ object Settings {
             default = default,
             preferenceKey = intPreferencesKey(key),
             encode = { it },
-            decode = { raw -> getIntStrict(raw, default).coerceIn(allowedRange) }
+            decode = { raw -> getIntStrict(raw, default).coerceIn(allowedRange) },
+            onChanged = onChange
         )
 
 
@@ -80,7 +84,8 @@ object Settings {
         key: String,
         dataStoreName: DataStoreName,
         default: Float,
-        allowedRange: ClosedRange<Float>
+        allowedRange: ClosedRange<Float>,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Float, Float> =
         BaseSettingObject(
             key = key,
@@ -88,14 +93,16 @@ object Settings {
             default = default,
             preferenceKey = floatPreferencesKey(key),
             encode = { it },
-            decode = { raw -> getFloatStrict(raw, default).coerceIn(allowedRange) }
+            decode = { raw -> getFloatStrict(raw, default).coerceIn(allowedRange) },
+            onChanged = onChange
         )
 
     fun long(
         key: String,
         dataStoreName: DataStoreName,
         default: Long,
-        allowedRange: ClosedRange<Long>
+        allowedRange: ClosedRange<Long>,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Long, Long> =
         BaseSettingObject(
             key = key,
@@ -103,14 +110,16 @@ object Settings {
             default = default,
             preferenceKey = longPreferencesKey(key),
             encode = { it },
-            decode = { raw -> getLongStrict(raw, default).coerceIn(allowedRange) }
+            decode = { raw -> getLongStrict(raw, default).coerceIn(allowedRange) },
+            onChanged = onChange
         )
 
     fun double(
         key: String,
         dataStoreName: DataStoreName,
         default: Double,
-        allowedRange: ClosedRange<Double>
+        allowedRange: ClosedRange<Double>,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Double, Double> =
         BaseSettingObject(
             key = key,
@@ -118,14 +127,16 @@ object Settings {
             default = default,
             preferenceKey = doublePreferencesKey(key),
             encode = { it },
-            decode = { raw -> getDoubleStrict(raw, default).coerceIn(allowedRange) }
+            decode = { raw -> getDoubleStrict(raw, default).coerceIn(allowedRange) },
+            onChanged = onChange
         )
 
 
     fun string(
         key: String,
         dataStoreName: DataStoreName,
-        default: String
+        default: String,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<String, String> =
         BaseSettingObject(
             key = key,
@@ -133,13 +144,15 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { it },
-            decode = { raw -> getStringStrict(raw, default) }
+            decode = { raw -> getStringStrict(raw, default) },
+            onChanged = onChange
         )
 
     fun stringSet(
         key: String,
         dataStoreName: DataStoreName,
-        default: Set<String>
+        default: Set<String>,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Set<String>, Set<String>> =
         BaseSettingObject(
             key = key,
@@ -147,14 +160,16 @@ object Settings {
             default = default,
             preferenceKey = stringSetPreferencesKey(key),
             encode = { it },
-            decode = { raw -> getStringSetStrict(raw, default) }
+            decode = { raw -> getStringSetStrict(raw, default) },
+            onChanged = onChange
         )
 
     fun <E : Enum<E>> enum(
         key: String,
         dataStoreName: DataStoreName,
         default: E,
-        enumClass: Class<E>
+        enumClass: Class<E>,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<E, String> =
         BaseSettingObject(
             key = key,
@@ -162,13 +177,15 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { it.name },
-            decode = { raw -> getEnumStrict(raw, default, enumClass) }
+            decode = { raw -> getEnumStrict(raw, default, enumClass) },
+            onChanged = onChange
         )
 
     fun color(
         key: String,
         dataStoreName: DataStoreName,
-        default: Color
+        default: Color,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<Color, String> =
         BaseSettingObject(
             key = key,
@@ -176,13 +193,15 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { it.toHexWithAlpha(false) },
-            decode = { raw -> getColorStrict(raw, default) }
+            decode = { raw -> getColorStrict(raw, default) },
+            onChanged = onChange
         )
 
     fun swipeAction(
         key: String,
         dataStoreName: DataStoreName,
-        default: SwipeActionSerializable
+        default: SwipeActionSerializable,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<SwipeActionSerializable, String> =
         BaseSettingObject(
             key = key,
@@ -190,14 +209,16 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { raw -> SwipeJson.encodeAction(raw) },
-            decode = { raw -> getSwipeActionSerializableStrict(raw, default) }
+            decode = { raw -> getSwipeActionSerializableStrict(raw, default) },
+            onChanged = onChange
         )
 
 
     fun shape(
         key: String,
         dataStoreName: DataStoreName,
-        default: IconShape
+        default: IconShape,
+        onChange: (() -> Unit)? = null
     ): BaseSettingObject<IconShape, String> =
         BaseSettingObject(
             key = key,
@@ -205,7 +226,8 @@ object Settings {
             default = default,
             preferenceKey = stringPreferencesKey(key),
             encode = { value -> IconShapeGson.encode(value) },
-            decode = { raw -> IconShapeGson.decode(raw, default) }
+            decode = { raw -> IconShapeGson.decode(raw, default) },
+            onChanged = onChange
         )
 }
 

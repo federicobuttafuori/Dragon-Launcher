@@ -65,6 +65,7 @@ import org.elnix.dragonlauncher.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.models.BackupViewModel
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
+import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
@@ -165,7 +166,7 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                     val info = try {
                         widgetHolder.getAppWidgetInfo(widgetId)
                     } catch (e: SecurityException) {
-                        logW(WIDGET_TAG) {
+                        logE(WIDGET_TAG, e) {
                             "DRAGON_FLOW: SecurityException on attempt $attempt for ID $widgetId"
                         }
                         null
@@ -384,6 +385,18 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
             logI(STARTUP_TAG) {
                 "AppsViewModel.loadAll() finished at ${System.currentTimeMillis() - startTime}ms total."
             }
+
+
+
+            // All stores excepted private, cause it triggers updates constantly since it updates the last backup time
+            backupableStores.forEach { (_, store) ->
+                store.onAnySettingChanged = {
+                    // Schedule backup using the Settings backup manager
+                    lifecycleScope.launch {
+                        SettingsBackupManager.triggerBackup(this@MainActivity)
+                    }
+                }
+            }
         }
 
         setContent {
@@ -580,9 +593,6 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
 
         /* ──────────────── Returns back to home if outside for too long ─────────────────── */
         appLifecycleViewModel.onPause()
-        lifecycleScope.launch {
-            SettingsBackupManager.triggerBackup(this@MainActivity)
-        }
     }
 
     override fun onResume() {
@@ -606,9 +616,6 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
 
 
         /* ──────────────── Returns back to home if outside for too long ─────────────────── */
-        lifecycleScope.launch {
-            SettingsBackupManager.triggerBackup(this@MainActivity)
-        }
 
         val currentRoute = navControllerHolder.value
             ?.currentBackStackEntry

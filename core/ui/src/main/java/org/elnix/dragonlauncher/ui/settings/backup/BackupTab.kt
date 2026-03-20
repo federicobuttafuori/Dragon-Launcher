@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Deselect
@@ -132,7 +133,6 @@ fun BackupTab(onBack: () -> Unit) {
                 }
             }
         }
-
 
 
     val settingsImportLauncher = rememberSettingsImportLauncher(
@@ -358,30 +358,31 @@ fun BackupTab(onBack: () -> Unit) {
                         Text(stringResource(R.string.select_all))
                     }
                 }
+            }
 
-                backupableStores.forEach { entry ->
-                    val dataStoreName = entry.key
-                    val settingsStore = entry.value
-                    val isSelected = backupStores.contains(dataStoreName.value)
+        }
 
-                    DragonSurfaceRow(
-                        onClick = {
-                            scope.launch {
-                                val updated = if (isSelected) backupStores - dataStoreName.value
-                                              else backupStores + dataStoreName.value
-                                BackupSettingsStore.backupStores.set(ctx, updated)
-                            }
-                        }
-                    ) {
-                        Text(
-                            text = settingsStore.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Checkbox(checked = isSelected, onCheckedChange = null)
+        items(backupableStores.entries.toList()) { entry ->
+            val dataStoreName = entry.key
+            val settingsStore = entry.value
+            val isSelected = backupStores.contains(dataStoreName.value)
+
+            DragonSurfaceRow(
+                onClick = {
+                    scope.launch {
+                        val updated = if (isSelected) backupStores - dataStoreName.value
+                        else backupStores + dataStoreName.value
+                        BackupSettingsStore.backupStores.set(ctx, updated)
                     }
                 }
+            ) {
+                Text(
+                    text = settingsStore.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                Checkbox(checked = isSelected, onCheckedChange = null)
             }
         }
     }
@@ -427,7 +428,7 @@ fun BackupTab(onBack: () -> Unit) {
                             )
                             importJson = null
                         } catch (e: Exception) {
-                            logE(BACKUP_TAG, e) { "Import failed"}
+                            logE(BACKUP_TAG, e) { "Import failed" }
                             backupViewModel.setResult(
                                 BackupResult(
                                     export = false,

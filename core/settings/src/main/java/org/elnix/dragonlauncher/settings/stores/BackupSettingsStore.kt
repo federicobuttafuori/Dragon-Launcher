@@ -44,4 +44,11 @@ object BackupSettingsStore : MapSettingsStore() {
         dataStoreName = dataStoreName,
         default = defaultBackupStores
     )
+
+    val numberOfBackupsToKeep = Settings.int(
+        key = "numberOfBackupsToKeep",
+        dataStoreName = dataStoreName,
+        default = 2,
+        allowedRange = 1..10
+    )
 }

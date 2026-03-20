@@ -16,7 +16,8 @@ class BaseSettingObject <T, R> (
     val default: T,
     private val preferenceKey: Preferences.Key<R>,
     val encode: (T) -> R?,
-    val decode: (Any?) -> T
+    val decode: (Any?) -> T,
+    var onChanged: (() -> Unit)?
 ) : AnySettingObject {
 
 
@@ -157,6 +158,8 @@ class BaseSettingObject <T, R> (
                 it.remove(preferenceKey)
             }
         }
+
+        onChanged?.invoke()
     }
 
 
@@ -169,5 +172,7 @@ class BaseSettingObject <T, R> (
         ctx.resolveDataStore(dataStoreName).edit {
             it.remove(preferenceKey)
         }
+
+        onChanged?.invoke()
     }
 }
