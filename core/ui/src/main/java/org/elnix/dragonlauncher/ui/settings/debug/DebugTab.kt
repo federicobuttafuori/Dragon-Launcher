@@ -119,6 +119,13 @@ fun DebugTab(
                     description = "Disabling that shows the welcome screen"
                 )
 
+
+                SettingsSwitchRow(
+                    setting = PrivateSettingsStore.showSetDefaultLauncherBanner,
+                    title = "Show set default launcher banner",
+                    description = "If disabled, it won't appear if Dragon isn't the default launcher"
+                )
+
                 DragonButton(
                     onClick = {
                         scope.launch {

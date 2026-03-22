@@ -200,9 +200,7 @@ fun BackupTab(onBack: () -> Unit) {
     }
 
 
-    // ───────────────────────────────────────
-    // UI
-    // ───────────────────────────────────────
+    // ──────── UI ───────────────────────────────────────
     SettingsLazyHeader(
         title = ctx.getString(R.string.backup_restore),
         onBack = onBack,
