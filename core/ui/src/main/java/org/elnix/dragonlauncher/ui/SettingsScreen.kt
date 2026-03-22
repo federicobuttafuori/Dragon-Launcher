@@ -1258,10 +1258,23 @@ fun SettingsScreen(
 
             }
 
+
+
+            // ──────────────────────────────────────────────────
+            // Bottom toolbars
+            // ──────────────────────────────────────────────────
+
+
+
+
+            // Row with nest toolbar and toggle buttons toolbar
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
+
+                // ──────────────────────────────────────────────────
+                // Nests toolbar
                 val nestToGo =
                     if (selectedPoint?.action is SwipeActionSerializable.OpenCircleNest) {
                         (selectedPoint!!.action as SwipeActionSerializable.OpenCircleNest).nestId
@@ -1311,40 +1324,11 @@ fun SettingsScreen(
                         }
                     }
                 }
+                // ──────────────────────────────────────────────────
 
-                val undoButtonEnabled = undoStack.isNotEmpty()
-                val redoButtonEnabled = redoStack.isNotEmpty()
 
-                MultiSelectConnectedButtonRow(
-                    entries = UndRedoEditTools.entries,
-                    showLabel = false,
 
-                    isEnabled = {
-                        when (it) {
-                            UndRedoEditTools.UndoAll -> undoButtonEnabled
-                            UndRedoEditTools.Undo -> undoButtonEnabled
-                            UndRedoEditTools.Redo -> redoButtonEnabled
-                            UndRedoEditTools.RedoAll -> redoButtonEnabled
-                        }
-                    }
-                ) { entry ->
-                    scope.launch {
-                        when (entry) {
-                            UndRedoEditTools.UndoAll -> undoAll()
-                            UndRedoEditTools.Undo -> undo()
-                            UndRedoEditTools.Redo -> redo()
-                            UndRedoEditTools.RedoAll -> redoAll()
-                        }
-                    }
-                }
-            }
-
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
+                // ──────────────────────────────────────────────────
                 // The 3 points settings tools: Snap points / Auto separate / Lock to circle
                 MultiSelectConnectedButtonRow(
                     entries = PointsEditTools.entries,
@@ -1366,12 +1350,21 @@ fun SettingsScreen(
                         }
                     }
                 }
+                // ──────────────────────────────────────────────────
+            }
+
+            // Undo/Redo and move bars
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
 
+                // ──────────────────────────────────────────────────
                 // The move left/right and text field entry, that animates on avery selected point
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .height(70.dp)
                         .padding(5.dp),
                     horizontalArrangement = Arrangement.Center,
@@ -1516,6 +1509,40 @@ fun SettingsScreen(
                         )
                     }
                 }
+                // ──────────────────────────────────────────────────
+
+
+
+                // ──────────────────────────────────────────────────
+                // Undo/Redo bar
+
+                val undoButtonEnabled = undoStack.isNotEmpty()
+                val redoButtonEnabled = redoStack.isNotEmpty()
+
+                MultiSelectConnectedButtonRow(
+                    entries = UndRedoEditTools.entries,
+                    showLabel = false,
+
+                    isEnabled = {
+                        when (it) {
+                            UndRedoEditTools.UndoAll -> undoButtonEnabled
+                            UndRedoEditTools.Undo -> undoButtonEnabled
+                            UndRedoEditTools.Redo -> redoButtonEnabled
+                            UndRedoEditTools.RedoAll -> redoButtonEnabled
+                        }
+                    }
+                ) { entry ->
+                    scope.launch {
+                        when (entry) {
+                            UndRedoEditTools.UndoAll -> undoAll()
+                            UndRedoEditTools.Undo -> undo()
+                            UndRedoEditTools.Redo -> redo()
+                            UndRedoEditTools.RedoAll -> redoAll()
+                        }
+                    }
+                }
+                // ──────────────────────────────────────────────────
+
             }
 
 
