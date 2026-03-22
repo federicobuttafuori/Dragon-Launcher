@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentPaste
@@ -212,14 +211,15 @@ fun HapticFeedbackEditor(
 
                 TextDivider(stringResource(R.string.presets))
 
-                LazyRow(
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    items(hapticFeedbackSerializablePresets) { (name, preset) ->
+                    hapticFeedbackSerializablePresets.forEach { (name, preset) ->
                         DragonButton(
                             onClick = { selectPreset(preset) }
                         ) {
@@ -301,15 +301,15 @@ fun HapticFeedbackEditor(
                         )
                     }
                 } else {
-                    LazyColumn(
-                        state = reorderState.listState,
+
+                    Column(
                         modifier = Modifier
+                            .verticalScroll(rememberScrollState())
                             .detectReorderAfterLongPress(reorderState)
                             .reorderable(reorderState),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        itemsIndexed(entries, key = { _, item -> item.id }) { index, entry ->
-
+                        entries.forEachIndexed { index, entry ->
                             ReorderableItem(
                                 state = reorderState,
                                 key = entry.id
