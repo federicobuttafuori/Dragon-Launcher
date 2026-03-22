@@ -201,6 +201,8 @@ fun SettingsScreen(
     var closestHoveredPoint by remember { mutableStateOf<SwipePointSerializable?>(null) }
     var closestHoveredTempOffset by remember { mutableStateOf<Offset?>(null) }
     var ableToLaunchHoverAction by remember { mutableStateOf(false) }
+    var showSubNestSizeSlider by remember { mutableStateOf(false) }
+
 
     val hoveredPointRadialGradientProgress by animateFloatAsState(
         targetValue = if (ableToLaunchHoverAction) Constants.Settings.HOVER_GRADIENT_RADIUS else 1f
@@ -809,6 +811,16 @@ fun SettingsScreen(
                                         contentDescription = null
                                     )
                                     Text(stringResource(R.string.edit_nest))
+                                },
+
+                                BurgerAction(
+                                    onClick = { showSubNestSizeSlider = !showSubNestSizeSlider }
+                                ) {
+                                    Icon(
+                                        imageVector = if (showSubNestSizeSlider) Icons.Default.Check else Icons.Default.Check,
+                                        contentDescription = null
+                                    )
+                                    Text(stringResource(R.string.show_sub_nest_size_slider))
                                 },
                                 BurgerAction(
                                     onClick = {
@@ -1536,9 +1548,9 @@ fun SettingsScreen(
                     showLabel = false,
                     isChecked = { true },
                     isEnabled = { aPointIsSelected }
-                ) {
+                ) { option ->
                     scope.launch {
-                        when (it) {
+                        when (option) {
                             SelectedPointEditTools.Edit -> showEditDialog = selectedPoint
                             SelectedPointEditTools.Remove -> {
 
@@ -1595,9 +1607,7 @@ fun SettingsScreen(
         }
 
         // Only show the toggler if user has a point that opens a nest, otherwise it may be confusing
-        AnimatedVisibility(
-            visible = points.any { it.action is SwipeActionSerializable.OpenCircleNest }
-        ) {
+        AnimatedVisibility(showSubNestSizeSlider) {
             SettingsSlider(
                 setting = SwipeMapSettingsStore.subNestDefaultRadius,
                 title = "",

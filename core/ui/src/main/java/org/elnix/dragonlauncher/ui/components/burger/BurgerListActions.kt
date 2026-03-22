@@ -30,11 +30,6 @@ fun BurgerListAction(
         modifier = modifier
             .width(IntrinsicSize.Max)
             .clip(RoundedCornerShape(25.dp)),
-//            .clickable(
-//                indication = LocalIndication.current,
-//                interactionSource = remember { MutableInteractionSource() },
-//                onClick = {}
-//            ),
         verticalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         actions.forEach { action ->
@@ -43,7 +38,7 @@ fun BurgerListAction(
 
             CompositionLocalProvider(
                 LocalContentColor provides contentColor,
-                LocalTextStyle provides MaterialTheme.typography.bodyMedium
+                LocalTextStyle provides MaterialTheme.typography.labelSmall
             ) {
                 Row(
                     modifier = Modifier

@@ -930,4 +930,5 @@
     <string name="rotation_per_second_desc">How many turns on itself it does in one second</string>
     <string name="enable_backup">Enable backup</string>
     <string name="choose_a_auto_backup_file">Choose a auto backup file</string>
+    <string name="show_sub_nest_size_slider">Show sub-nests size slider</string>
 </resources>
