@@ -102,7 +102,6 @@ fun DrawScope.actionsInCircle(
     } ?: IconShape.Circle
 
 
-
     // Prevent overloading since the drawing is recursive
     if (depth <= maxDepth) {
 
@@ -118,14 +117,29 @@ fun DrawScope.actionsInCircle(
 
             val borderShape = borderIconShape.resolveShape()
 
-            val translatedPath = drawParams.drawPathCache.getOrCompute(borderIconShape, iconSize, center) {
-                shapeToPath(borderShape, iconSize, center)
+
+            // ── Path rendering ────────────────────────────────────────────────────────────
+            // The path is cached by (shape, size) and reused across frames to avoid
+            // re-allocating and re-computing the outline on every draw call.
+            // See DrawPathCache for eviction strategy and sizing guidance.
+            val path = drawParams.drawPathCache.getOrCompute(borderIconShape, iconSize) {
+                shapeToPath(borderShape, iconSize)
             }
 
+            // The cached path is always origin-centered (top-left at 0,0).
+            // Instead of translating the path itself — which would require a new Path
+            // allocation — we translate the canvas matrix directly. save/restore is a
+            // pure matrix stack operation with zero allocations, and unlike withTransform,
+            // it does not create an offscreen layer that would intercept BlendMode.Clear.
+            val tx = center.x - iconSize.width / 2f
+            val ty = center.y - iconSize.height / 2f
+
+            drawContext.canvas.save()
+            drawContext.canvas.translate(tx, ty)
 
             // 1. Erases the color, instead of putting it, that lets the wallpaper pass through
             drawPath(
-                path = translatedPath,
+                path = path,
                 color = Color.Transparent,
                 style = Fill,
                 blendMode = BlendMode.Clear
@@ -134,7 +148,7 @@ fun DrawScope.actionsInCircle(
             // 2. If requested to not erase the bg, draw it (this avoids the more tinted bg when using a half transparent bg color
             if (!eraseBg) {
                 drawPath(
-                    path = translatedPath,
+                    path = path,
                     color = backgroundColor,
                     style = Fill
                 )
@@ -145,12 +159,14 @@ fun DrawScope.actionsInCircle(
                 if (borderColor.alpha != 0f) {
 
                     drawPath(
-                        path = translatedPath,
+                        path = path,
                         color = borderColor,
                         style = Stroke(width = borderStroke)
                     )
                 }
             }
+
+            drawContext.canvas.restore()
 
 
             val icon = point.id.let { icons[it] }
@@ -168,6 +184,7 @@ fun DrawScope.actionsInCircle(
                         else null
                 )
             }
+
         } else {
             nests.find { it.id == action.nestId }?.let { nest ->
 

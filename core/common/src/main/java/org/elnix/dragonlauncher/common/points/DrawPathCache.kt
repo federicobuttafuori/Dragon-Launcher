@@ -1,76 +1,96 @@
 package org.elnix.dragonlauncher.common.points
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
+import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.logging.logW
 import org.elnix.dragonlauncher.common.serializables.IconShape
+import org.elnix.dragonlauncher.common.utils.Constants
 
 /**
- * An LRU (Least Recently Used) cache for [androidx.compose.ui.graphics.Path] objects derived from [IconShape], used to avoid
+ * An LRU (Least Recently Used) cache for [Path] objects derived from [IconShape], used to avoid
  * recomputing shape outlines on every draw frame in the recursive nest drawing system.
  *
  * ## Why this exists
- * Shape-to-path conversion (`shapeToPath`) involves outline creation, path allocation, and
- * translation — all of which are expensive when called recursively across many points per frame.
- * Since the vast majority of points share the same shape/size/center combination across frames,
- * caching the resulting [androidx.compose.ui.graphics.Path] objects yields a significant reduction in per-frame allocations.
+ * Shape-to-path conversion (`shapeToPath`) involves outline creation and path allocation —
+ * both expensive when called recursively across many points per frame. Since most points share
+ * the same `(shape, size)` combination across frames, caching the base [Path] and translating
+ * it at draw time yields a significant reduction in per-frame allocations.
+ *
+ * ## Translation at draw time
+ * The cached [Path] is always centered at the origin `(0, 0)`. The caller is responsible for
+ * translating it to the correct [androidx.compose.ui.geometry.Offset] at draw time via
+ * `withTransform` or `translate`. This is intentionally cheap — it is a
+ * canvas matrix operation with no path re-allocation — which is why [androidx.compose.ui.geometry.Offset] was deliberately
+ * excluded from the cache key.
  *
  * ## Eviction strategy
  * Backed by a [LinkedHashMap] in access-order mode. When the number of cached entries exceeds
- * [maxSize], the least recently accessed entry is automatically evicted. This means no manual
- * cache invalidation is needed — stale entries for points that are no longer visible will
- * naturally age out as new entries are added.
+ * [maxSize], the least recently accessed entry is automatically evicted. No manual cache
+ * invalidation is needed — stale entries for points no longer on screen age out naturally.
  *
  * ## Sizing guidance
- * The default [maxSize] of 64 is intentionally generous relative to the number of points
- * typically visible on screen (usually < 20). Raising it costs memory; lowering it increases
- * the chance of cache misses for complex nested nests.
+ * [maxSize] is set in [SwipeDrawParams] to the current number of points, so the cache is
+ * sized exactly to the working set with no wasted memory. Call [updateMaxCacheSize] whenever
+ * the point count changes to keep the limit accurate.
  *
  * ## Thread safety
- * This cache is **not thread-safe**. It is intended to be created with `remember` at the
- * composable level and used exclusively on the main thread during `DrawScope` callbacks.
+ * This cache is **not thread-safe**. It must be created with `remember` at the composable
+ * level and accessed exclusively on the main thread inside `DrawScope` callbacks.
  *
- * @param maxSize Maximum number of [androidx.compose.ui.graphics.Path] entries to keep before evicting the least recently used.
- * It is initialized in [SwipeDrawParams] at the number of points you have to avoid boilerplate
- * Can be edited when points size changes
+ * @param initialMaxSize Maximum number of [Path] entries before LRU eviction kicks in.
+ *   Updated dynamically via [updateMaxCacheSize] as the point count changes.
  */
-class DrawPathCache(val initialMaxSize: Int = 64) {
+class DrawPathCache(initialMaxSize: Int = 64) {
 
     private var maxSize = initialMaxSize
 
+    /**
+     * Updates the maximum number of cached entries.
+     * Call this whenever the number of points changes to keep the cache sized to the working set.
+     *
+     * @param newSize The new maximum entry count.
+     */
     fun updateMaxCacheSize(newSize: Int) {
         maxSize = newSize
     }
 
-    private val paths = object : LinkedHashMap<Triple<IconShape, Size, Offset>, Path>(
+    private val paths = object : LinkedHashMap<Pair<IconShape, Size>, Path>(
         maxSize, 0.75f, true // accessOrder = true → promotes on get, enabling LRU eviction
     ) {
         override fun removeEldestEntry(
-            eldest: MutableMap.MutableEntry<Triple<IconShape, Size, Offset>, Path>
+            eldest: MutableMap.MutableEntry<Pair<IconShape, Size>, Path>
         ) = size > maxSize
     }
 
     /**
-     * Returns the cached [Path] for the given [shape], [size], and [center] combination,
-     * computing and storing it via [compute] if no entry exists yet.
+     * Returns the cached [Path] for the given [shape] and [size], computing and storing it
+     * via [compute] on a cache miss.
      *
-     * The cache key is the triple `(shape, size, center)`. Two calls with identical values
-     * for all three parameters will return the same [Path] instance without recomputation.
+     * The returned path is always origin-centered. The caller must apply the correct
+     * draw-time translation — see the class-level doc for rationale.
      *
-     * @param shape The [IconShape] that defines the outline geometry.
+     * @param shape The [IconShape] defining the outline geometry.
      * @param size The [Size] at which the shape is rendered.
-     * @param center The [Offset] to which the path is translated on the canvas.
-     * @param compute Lambda that produces the [Path] on a cache miss. Only called when no
-     *   cached entry exists for the given key.
+     * @param compute Produces the [Path] on a cache miss. Only invoked when no entry exists
+     *   for `(shape, size)`.
      * @return The cached or freshly computed [Path].
      */
     fun getOrCompute(
         shape: IconShape,
         size: Size,
-        center: Offset,
         compute: () -> Path
     ): Path {
-        return paths.getOrPut(Triple(shape, size, center), compute)
+
+        // Debug, remove when release TODO
+        val cached = paths[Pair(shape, size)]
+        if (cached != null) {
+            logD(Constants.Logging.SWIPE_TAG) { "Cache hit for ($shape, $size)" }
+        } else {
+            logW(Constants.Logging.SWIPE_TAG) { "Cache miss — computing path for ($shape, $size)" }
+        }
+
+        return paths.getOrPut(Pair(shape, size), compute)
     }
 
     /**
@@ -78,4 +98,10 @@ class DrawPathCache(val initialMaxSize: Int = 64) {
      * Useful for debugging or logging cache pressure.
      */
     val size: Int get() = paths.size
+
+
+    /**
+     * Reusable path instance used to avoid lots of [Path] instances allocations
+     */
+    val scratchPath = Path()
 }
