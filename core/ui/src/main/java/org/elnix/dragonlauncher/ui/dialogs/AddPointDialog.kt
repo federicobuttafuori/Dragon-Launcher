@@ -387,6 +387,7 @@ fun AddPointColumn(
         }
         is SwipeActionSerializable.OpenUrl -> stringResource(R.string.open_url)
         is SwipeActionSerializable.OpenFile -> stringResource(R.string.open_file)
+        is SwipeActionSerializable.OpenCircleNest -> stringResource(R.string.open_nest_circle)
         else -> actionLabel(action)
     }
 

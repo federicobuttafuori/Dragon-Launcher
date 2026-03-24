@@ -84,7 +84,7 @@ fun EditPointDialog(
 
     val currentActionColor = actionColor(editPoint.action, extraColors)
 
-    val label = actionLabel(editPoint.action, editPoint.customName)
+    val label = editPoint.customName ?: actionLabel(editPoint.action)
     val actionColor =
         actionColor(editPoint.action, extraColors, editPoint.customActionColor?.let { Color(it) })
 

@@ -48,7 +48,7 @@ fun AppPreviewTitle(
     val icons = LocalIcons.current
     val iconShape = LocalIconShape.current
 
-    val label = actionLabel(point.action, point.customName)
+    val label = point.customName ?: actionLabel(point.action)
 
     val shape = point.customIcon?.shape ?: iconShape
 
