@@ -326,7 +326,7 @@ fun FloatingAppsTab(
         }
 
 
-        /* ---------------- Widget canvas ---------------- */
+        /* ──────────────── Widget canvas ──────────────── */
         floatingApps
             .filter { it.nestId == nestId }
             .sortedBy { it.id == selected?.id } // Selected is always displayed first for easier click access
@@ -619,9 +619,9 @@ private fun DraggableFloatingApp(
             )
 
 
-            // ------------------------------------------
+            // ──────────────────────────────────────────
             // Resize handles - only visible when selected
-            // ------------------------------------------
+            // ──────────────────────────────────────────
 
             val dotSize = 12.dp
             val hitboxPadding = 20.dp
@@ -736,9 +736,9 @@ private fun DraggableFloatingApp(
         }
     }
 
-    // ------------------------------------------
+    // ──────────────────────────────────────────
     // Ghost Toggle, to prevent clicks
-    // ------------------------------------------
+    // ──────────────────────────────────────────
 
 
     // If close to top

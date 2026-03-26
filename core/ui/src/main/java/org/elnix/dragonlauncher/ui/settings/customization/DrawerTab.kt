@@ -339,7 +339,7 @@ fun DrawerTab(
             ) {
 
                 if (leftActionNotDisabled) {
-                    // LEFT PANEL -----------------------------------------------------------
+                    // LEFT PANEL ──────────────────────────────────────────────────────────-
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -374,7 +374,7 @@ fun DrawerTab(
 
                 if (rightActionNotDisabled) {
 
-                    // DRAG HANDLE RIGHT ----------------------------------------------------
+                    // DRAG HANDLE RIGHT ────────────────────────────────────────────────────
                     DragHandle(
                         onDrag = { dx ->
                             if (totalWidthPx > 0f) {
@@ -388,7 +388,7 @@ fun DrawerTab(
                         }
                     )
 
-                    // RIGHT PANEL ----------------------------------------------------------
+                    // RIGHT PANEL ──────────────────────────────────────────────────────────
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()

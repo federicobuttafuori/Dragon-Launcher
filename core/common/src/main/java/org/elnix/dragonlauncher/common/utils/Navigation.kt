@@ -1,7 +1,7 @@
 package org.elnix.dragonlauncher.common.utils
 
 
-// -------------------- SETTINGS --------------------
+// ──────────────────── SETTINGS ────────────────────
 
 object SETTINGS {
     const val ROOT = "settings"
