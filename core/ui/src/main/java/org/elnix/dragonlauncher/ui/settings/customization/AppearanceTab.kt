@@ -177,6 +177,15 @@ fun AppearanceTab(
             )
         }
 
+
+        item {
+            SettingsSwitchRow(
+                setting = UiSettingsStore.chargingAnimation,
+                title = stringResource(R.string.charging_animation),
+                description = stringResource(R.string.charging_animation_desc)
+            )
+        }
+
         item {
             ExpandableSection(topOverlaySettingsState) {
 

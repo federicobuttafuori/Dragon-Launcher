@@ -62,6 +62,7 @@ import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.components.ChargingAnimation
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
 import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
@@ -172,6 +173,8 @@ fun MainScreen(
     val cellSizePx = floatingAppsViewModel.cellSizePx
 
     val appIconOverlaySize by UiSettingsStore.appIconOverlaySize.asState()
+
+    val chargingAnimation by UiSettingsStore.chargingAnimation.asState()
 
     /**
      * Reload all point icons on every change of the points, nestId, appIconOverlaySize, or default point
@@ -308,6 +311,10 @@ fun MainScreen(
             .onSizeChanged { size = it }
             .then(hold.pointerModifier)
     ) {
+
+        if (chargingAnimation) {
+            ChargingAnimation(modifier = Modifier.fillMaxSize())
+        }
 
         filteredFloatingAppObjects.forEach { floatingAppObject ->
             key(floatingAppObject.id, nestId) {

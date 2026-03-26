@@ -175,6 +175,13 @@ object UiSettingsStore : MapSettingsStore() {
         default = true
     )
 
+
+    val chargingAnimation = Settings.boolean(
+        key = "chargingAnimation",
+        dataStoreName = dataStoreName,
+        default = true
+    )
+
     // unsing explicit this to avoid other stores that have the same name keys to be imported by mistake
     override val ALL: List<BaseSettingObject<*, *>> = listOf(
         this.rgbLoading,
@@ -200,6 +207,7 @@ object UiSettingsStore : MapSettingsStore() {
         this.wallpaperDimDrawerScreen,
         this.globalFont,
         this.maxNestsDepth,
-        this.useCustomColorChannels
+        this.useCustomColorChannels,
+        this.chargingAnimation
     )
 }

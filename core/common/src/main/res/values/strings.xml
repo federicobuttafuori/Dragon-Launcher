@@ -935,4 +935,6 @@
     <string name="search_bar">Search Bar</string>
     <string name="toolbars_order">Toolbars order</string>
     <string name="loading">Loading…</string>
+    <string name="charging_animation">Charging animation</string>
+    <string name="charging_animation_desc">Play a beatiful charging animation when the phone is charging</string>
 </resources>
