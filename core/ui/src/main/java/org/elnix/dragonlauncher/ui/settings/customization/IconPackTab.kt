@@ -23,6 +23,7 @@ import org.elnix.dragonlauncher.common.utils.definedOrNull
 import org.elnix.dragonlauncher.models.AppsViewModel
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
+import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.ui.helpers.iconPackListContent
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
@@ -41,7 +42,7 @@ fun IconPackTab(
     val selectedPack by appsViewModel.selectedIconPack.collectAsState()
     val packs by appsViewModel.iconPacksList.collectAsState()
 
-    val iconPackTint by UiSettingsStore.iconPackTint.flow(ctx).collectAsState(null)
+    val iconPackTint by UiSettingsStore.iconPackTint.asStateNull()
 
 
     // Used to delay the grid showing up, to prevent lag

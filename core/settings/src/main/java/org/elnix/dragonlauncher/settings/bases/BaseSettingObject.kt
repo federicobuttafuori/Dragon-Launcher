@@ -123,7 +123,6 @@ class BaseSettingObject <T, R> (
      */
     fun flow(ctx: Context): Flow<T> {
 
-
         return ctx.applicationContext
             .resolveDataStore(dataStoreName)
             .data

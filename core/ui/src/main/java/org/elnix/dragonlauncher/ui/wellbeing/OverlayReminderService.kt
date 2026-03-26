@@ -29,7 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
@@ -153,9 +152,9 @@ class OverlayReminderService : Service() {
             try {
                 // Read user preferences (which stats to show)
                 val showSession = WellbeingSettingsStore.popupShowSessionTime.get(this@OverlayReminderService)
-                val showToday = WellbeingSettingsStore.popupShowTodayTime.flow(this@OverlayReminderService).first()
+                val showToday = WellbeingSettingsStore.popupShowTodayTime.get(this@OverlayReminderService)
                 val showRemaining =
-                    WellbeingSettingsStore.popupShowRemainingTime.flow(this@OverlayReminderService).first()
+                    WellbeingSettingsStore.popupShowRemainingTime.get(this@OverlayReminderService)
 
                 val isWarning = mode == "time_warning"
 

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -23,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.AppModel
-import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.components.settings.asState
 
 @Composable
@@ -32,7 +31,7 @@ fun GridSizeSlider(apps: List<AppModel>) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val gridSize by DrawerSettingsStore.gridSize.flow(ctx).collectAsState(initial = 1)
+    val gridSize by DrawerSettingsStore.gridSize.asState()
     val showIcons by DrawerSettingsStore.showAppIconsInDrawer.asState()
     val showLabels by DrawerSettingsStore.showAppLabelInDrawer.asState()
     val useCategory by DrawerSettingsStore.useCategory.asState()

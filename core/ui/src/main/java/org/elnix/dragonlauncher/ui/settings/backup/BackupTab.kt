@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +53,7 @@ import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
+import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
@@ -73,11 +73,10 @@ fun BackupTab(onBack: () -> Unit) {
 
     val scope = rememberCoroutineScope()
 
-    val autoBackupEnabled by BackupSettingsStore.autoBackupEnabled.flow(ctx).collectAsState(initial = false)
-    val autoBackupUriString by BackupSettingsStore.autoBackupUri.flow(ctx).collectAsState(initial = null)
-    val lastBackupTime by PrivateSettingsStore.lastBackupTime.flow(ctx).collectAsState(initial = 0L)
-
-    val backupStores by BackupSettingsStore.backupStores.flow(ctx).collectAsState(initial = emptySet())
+    val autoBackupEnabled by BackupSettingsStore.autoBackupEnabled.asState()
+    val autoBackupUriString by BackupSettingsStore.autoBackupUri.asState()
+    val lastBackupTime by PrivateSettingsStore.lastBackupTime.asState()
+    val backupStores by BackupSettingsStore.backupStores.asState()
 
     LaunchedEffect(lastBackupTime) {
         ctx.showToast(lastBackupTime)

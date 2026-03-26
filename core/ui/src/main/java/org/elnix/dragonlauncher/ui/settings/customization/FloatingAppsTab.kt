@@ -77,6 +77,7 @@ import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
+import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.dialogs.NestManagementDialog
 import org.elnix.dragonlauncher.ui.helpers.CircleIconButton
@@ -101,8 +102,7 @@ fun FloatingAppsTab(
     val floatingAppsViewModel = LocalFloatingAppsViewModel.current
     val scope = rememberCoroutineScope()
 
-    val widgetsDebugInfos by DebugSettingsStore.widgetsDebugInfo.flow(ctx)
-        .collectAsState(initial = false)
+    val widgetsDebugInfos by DebugSettingsStore.widgetsDebugInfo.asState()
 
     val floatingApps by floatingAppsViewModel.floatingApps.collectAsState()
 

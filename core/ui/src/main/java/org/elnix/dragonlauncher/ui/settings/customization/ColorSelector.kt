@@ -402,7 +402,7 @@ fun ColorSelectorTab(
     val openCircleNest by ColorSettingsStore.openCircleNestColor.asStateNull()
     val goParentCircle by ColorSettingsStore.goParentNestColor.asStateNull()
 
-    val selectedDefaultTheme by ColorModesSettingsStore.defaultTheme.flow(ctx).collectAsState(initial = DARK)
+    val selectedDefaultTheme by ColorModesSettingsStore.defaultTheme.asState()
 
 
     var showResetValidation by remember { mutableStateOf(false) }

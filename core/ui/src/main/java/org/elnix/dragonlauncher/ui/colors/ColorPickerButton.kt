@@ -14,7 +14,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +38,7 @@ import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.RANDOM
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.RESET
 import org.elnix.dragonlauncher.enumsui.colorPickerButtonIcon
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
+import org.elnix.dragonlauncher.ui.components.settings.asState
 
 
 @Composable
@@ -132,8 +132,7 @@ fun ColorPickerButtonOne(
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val button by ColorModesSettingsStore.colorPickerButtonOne.flow(ctx)
-        .collectAsState(ColorModesSettingsStore.colorPickerButtonOne.default)
+    val button by ColorModesSettingsStore.colorPickerButtonOne.asState()
 
     ColorPickerButton(
         button = button,
@@ -162,8 +161,7 @@ fun ColorPickerButtonTwo(
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val button by ColorModesSettingsStore.colorPickerButtonTwo.flow(ctx)
-        .collectAsState(ColorModesSettingsStore.colorPickerButtonTwo.default)
+    val button by ColorModesSettingsStore.colorPickerButtonTwo.asState()
 
     ColorPickerButton(
         button = button,
