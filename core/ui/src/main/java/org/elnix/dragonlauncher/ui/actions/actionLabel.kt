@@ -87,6 +87,7 @@ fun actionLabel(action: SwipeActionSerializable): String {
             nests
                 .find { it.id == action.nestId }
                 ?.name
+                ?.takeIf { it.trim().isNotEmpty() }
                 ?: stringResource(R.string.open_nest_circle)
         }
 

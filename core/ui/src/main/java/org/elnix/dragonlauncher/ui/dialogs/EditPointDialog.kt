@@ -304,7 +304,7 @@ fun EditPointDialog(
                                 },
                                 label = { Text(stringResource(R.string.custom_name)) },
                                 trailingIcon = {
-                                    if (editPoint.customName != null && editPoint.customName!!.isNotEmpty()) {
+                                    if (editPoint.customName != null) {
                                         DragonIconButton(
                                             onClick = {
                                                 editPoint = editPoint.copy(customName = null)
