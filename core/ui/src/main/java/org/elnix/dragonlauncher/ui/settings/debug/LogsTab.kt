@@ -166,7 +166,7 @@ fun LogsTab(
                     val flags = info.requestedPermissionsFlags
                     val granted = (flags != null && (flags[index] and 0x00000002) != 0) ||
                             ContextCompat.checkSelfPermission(ctx, perm) == PackageManager.PERMISSION_GRANTED
-                    appendLine("${perm.substringAfterLast(".")}: ${if (granted) "GRANTED" else "DENIED"}")
+                    appendLine("${perm.substringAfterLast(".")}: ${if (granted) "✅" else "❌"}")
                 }
             } catch (e: Exception) {
                 appendLine("Error reading permissions")
