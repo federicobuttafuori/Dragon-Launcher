@@ -2,16 +2,15 @@ package org.elnix.dragonlauncher.ui.helpers.settings
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -73,83 +72,69 @@ fun SettingsLazyHeader(
         onBack()
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeDrawing.exclude(WindowInsets.ime))
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(horizontal = 16.dp)
     ) {
-
         Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .imePadding(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                SettingsTitle(
-                    title = title,
-                    otherIcons = otherIcons,
-                    helpIcon = { showHelpDialog = true },
-                    resetIcon = if (onReset != null) {
-                        { showResetDialog = true }
-                    } else null,
-                ) { onBack() }
+            SettingsTitle(
+                title = title,
+                otherIcons = otherIcons,
+                helpIcon = { showHelpDialog = true },
+                resetIcon = if (onReset != null) {
+                    { showResetDialog = true }
+                } else null,
+            ) { onBack() }
 
+            Spacer(Modifier.height(5.dp))
 
-                if (titleContent != null) titleContent()
-            }
+            if (titleContent != null) titleContent()
+
+            Spacer(Modifier.height(16.dp))
 
             if (lazyContent != null) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else 400.dp),
-                    modifier = if (reorderState != null) {
-                        modifier
-                            .reorderable(reorderState)
-                            .detectReorderAfterLongPress(reorderState)
-                    } else modifier,
+                    modifier = modifier
+                        .conditional(reorderState != null) {
+                            val state = reorderState!!
+                            reorderable(state)
+                                .detectReorderAfterLongPress(state)
+                        },
                     state = reorderState?.listState ?: listState ?: rememberLazyListState()
-                ) {
-                    lazyContent()
+                ) { lazyContent() }
 
-                    if (bottomContent != null) {
-                        item {
-                            Spacer(Modifier.weight(1f))
-                        }
-                        item {
-                            bottomContent()
-                        }
-                    }
-
-                }
             } else {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = if (reorderState != null) {
-                        modifier
-                            .conditional(scrollableContent) {
-                                verticalScroll(rememberScrollState())
-                            }
-                            .reorderable(reorderState)
-                            .detectReorderAfterLongPress(reorderState)
-                    } else modifier
+                    modifier = modifier
                         .conditional(scrollableContent) {
                             verticalScroll(rememberScrollState())
-                        },
-                ) {
-                    content!!()
+                        }
+                        .conditional(reorderState != null) {
+                            val state = reorderState!!
+                            reorderable(state)
+                                .detectReorderAfterLongPress(state)
+                        }
+                ) { content!!() }
+            }
+        }
 
-                    if (bottomContent != null) {
-                        Spacer(Modifier.weight(1f))
-                        bottomContent()
-                    }
-                }
+        if (bottomContent != null) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+                Spacer(Modifier.weight(1f))
+                bottomContent()
             }
         }
     }
