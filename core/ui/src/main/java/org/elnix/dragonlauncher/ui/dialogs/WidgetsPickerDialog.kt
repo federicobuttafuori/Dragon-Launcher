@@ -37,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 
 @Composable
@@ -62,6 +65,10 @@ fun WidgetPickerDialog(
     onDismiss: () -> Unit
 ) {
     val ctx = LocalContext.current
+    val appsViewModel = LocalAppsViewModel.current
+
+    val apps by appsViewModel.allApps.collectAsState()
+
     val appWidgetManager = remember { AppWidgetManager.getInstance(ctx) }
     val launcherWidgetHolder = remember(ctx) { LauncherWidgetHolder.getInstance(ctx) }
 
@@ -80,7 +87,7 @@ fun WidgetPickerDialog(
             widgets.filter { provider ->
                 val widgetLabel = provider.loadLabel(pm)
                 val appLabel = try {
-                    pm.getApplicationLabel(pm.getApplicationInfo(provider.provider.packageName, 0)).toString()
+                    apps.find { it.packageName == provider.provider.packageName }?.name ?: ""
                 } catch (_: Exception) {
                     ""
                 }
@@ -153,6 +160,7 @@ fun WidgetPickerDialog(
                             WidgetItem(
                                 provider = provider,
                                 launcherWidgetHolder = launcherWidgetHolder,
+                                apps = apps,
                                 onBindCustomWidget = onBindCustomWidget,
                                 onDismiss = onDismiss
                             )
@@ -168,6 +176,7 @@ fun WidgetPickerDialog(
 private fun WidgetItem(
     provider: AppWidgetProviderInfo,
     launcherWidgetHolder: LauncherWidgetHolder,
+    apps: List<AppModel>,
     onBindCustomWidget: (Int, ComponentName) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -199,14 +208,10 @@ private fun WidgetItem(
 
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                val appLabel = remember(provider.provider.packageName) {
-                    try {
-                        ctx.packageManager.getApplicationLabel(
-                            ctx.packageManager.getApplicationInfo(provider.provider.packageName, 0)
-                        ).toString()
-                    } catch (_: Exception) {
-                        ""
-                    }
+                val appLabel = try {
+                    apps.find { it.packageName == provider.provider.packageName }?.name ?: ""
+                } catch (_: Exception) {
+                    ""
                 }
 
                 Text(

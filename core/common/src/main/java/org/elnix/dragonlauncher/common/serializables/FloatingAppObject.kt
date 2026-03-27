@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.common.serializables
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.FLOATING_APPS_TAG
@@ -18,7 +17,8 @@ data class FloatingAppObject(
     val y: Float = 0f,
     val angle: Float = 0f,
     val ghosted: Boolean? = false,
-    val foreground: Boolean? = true
+    val foreground: Boolean? = true,
+    val shape: IconShape? = null
 )
 
 

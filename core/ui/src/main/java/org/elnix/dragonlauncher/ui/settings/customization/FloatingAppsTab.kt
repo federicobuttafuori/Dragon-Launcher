@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.FormatClear
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.GridOff
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.LinearScale
 import androidx.compose.material.icons.filled.MoveDown
 import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material.icons.filled.Remove
@@ -45,6 +46,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -57,18 +59,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,12 +94,16 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.dialogs.NestManagementDialog
 import org.elnix.dragonlauncher.ui.helpers.CircleIconButton
+import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.UpDownButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun FloatingAppsTab(
@@ -122,6 +132,9 @@ fun FloatingAppsTab(
     var snapMove by remember { mutableStateOf(true) }
     var snapResize by remember { mutableStateOf(true) }
 
+    var showScaleDropdown by remember { mutableStateOf(false) }
+    var widgetsScale by remember { mutableFloatStateOf(0.80f) }
+
     fun removeWidget(floatingApp: FloatingAppObject) {
         onRemoveWidget(floatingApp)
         if (selected == floatingApp) selected = null
@@ -141,10 +154,126 @@ fun FloatingAppsTab(
     val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
 
 
-    /** ───────────────────────────────────────────────────────────────── */
+    /* ───────────────────────────────────────────────────────────────── */
+
+    /**
+     * The widgets and the grid, displayed first, to keep access to the buttons
+     *
+     * The pointerInput is used to disable any widgets on click outside
+     */
+    Box(
+        Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    selected = null
+                }
+            }
+            .scale(widgetsScale)
+            .border(1.dp, MaterialTheme.colorScheme.primary, DragonShape)
+    ) {
+
+        /**
+         * Draw the grid of snapping that fills the entire screen
+         */
+        if (snapMove) {
+            Canvas(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val lineWidth = 1f
+                val color = Color.White.copy(alpha = 0.25f)
+
+                // Vertical lines
+                var x = 0f
+                while (x <= size.width) {
+                    drawLine(
+                        color = color,
+                        start = Offset(x, 0f),
+                        end = Offset(x, size.height),
+                        strokeWidth = lineWidth
+                    )
+                    x += cellSizePx
+                }
+
+                // Horizontal lines
+                var y = 0f
+                while (y <= size.height) {
+                    drawLine(
+                        color = color,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = lineWidth
+                    )
+                    y += cellSizePx
+                }
+            }
+        }
+
+        /* ──────────────── Widget canvas ──────────────── */
+        floatingApps
+            .filter { it.nestId == nestId }
+            .sortedBy { it.id == selected?.id } // Selected is always displayed first for easier click access
+            .forEach { floatingApp ->
+                key(floatingApp.id, nestId) {
+                    DraggableFloatingApp(
+                        floatingAppsViewModel = floatingAppsViewModel,
+                        app = floatingApp,
+                        selected = floatingApp.id == selected?.id,
+                        widgetHostProvider = widgetHostProvider,
+                        onSelect = { selected = floatingApp },
+                        onPrecisionModeChange = { isPrecisionModeActive = it },
+                        onMove = { dx, dy ->
+                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, dx, dy, false)
+                        },
+                        onRotateEnd = {
+                            floatingAppsViewModel.rotateFloatingApp(floatingApp.id, it, true)
+                        },
+                        onMoveEnd = {
+                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, snapMove)
+                        },
+                        onResize = { corner, dx, dy ->
+                            floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, dx, dy, false)
+                        },
+                        onResizeEnd = { corner ->
+                            floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
+                        },
+                        onEdit = {
+                            floatingAppsViewModel.editFloatingApp(it)
+                        }
+                    )
+                }
+            }
 
 
-    Column {
+        AnimatedVisibility(
+            visible = isPrecisionModeActive,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 32.dp),
+            enter = fadeIn() + slideInVertically { -it },
+            exit = fadeOut() + slideOutVertically { -it }
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
+                contentColor = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+            ) {
+                Text(
+                    text = stringResource(R.string.precision_mode_active),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+
+
+    /**
+     * The settings scaffold, with on top the optional status bar
+     */
+    Column(
+        Modifier.fillMaxSize()
+    ) {
 
         AnimatedVisibility(showStatusBar && isRealFullscreen) {
             StatusBar(null)
@@ -159,6 +288,11 @@ fun FloatingAppsTab(
                     floatingAppsViewModel.resetAllFloatingApps()
                 }
             },
+            otherIcons = arrayOf(
+                ({
+                    showScaleDropdown = !showScaleDropdown
+                } to Icons.Default.LinearScale)
+            ),
             bottomContent = {
                 /* ───────────── Bottom controls ───────────── */
                 Row(
@@ -273,125 +407,50 @@ fun FloatingAppsTab(
                 }
             },
             content = {
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .pointerInput(Unit) {
-                            detectTapGestures {
-                                selected = null
+                Column(Modifier.fillMaxSize()) {
+                    AnimatedVisibility(showScaleDropdown) {
+                        Column(
+                            modifier = Modifier.settingsGroup()
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = buildAnnotatedString {
+                                        withStyle(
+                                            style = MaterialTheme.typography.bodyMedium.toSpanStyle()
+                                        ) {
+                                            append(stringResource(R.string.widget_number))
+                                            append(": ")
+                                        }
+
+                                        withStyle(
+                                            style = MaterialTheme.typography.bodyLarge.toSpanStyle().copy(
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        ) {
+                                            append(floatingApps.size.toString())
+                                        }
+                                    },
+                                )
                             }
+
+                            SliderWithLabel(
+                                value = widgetsScale,
+                                valueRange = 0.5f..1f,
+                                onReset = { widgetsScale = 0.85f }
+                            ) { widgetsScale = it }
                         }
-                )
+                    }
+                }
             }
         )
     }
 
 
-    /**
-     * Draw the grid of snapping that fills the entire screen
-     */
-    Box(
-        Modifier
-            .fillMaxSize()
-            .graphicsLayer {
-                scaleX = 0.85f
-                scaleY = 0.85f
-            }
-            .border(1.dp, MaterialTheme.colorScheme.primary, DragonShape)
-
-    ) {
-
-        if (snapMove) {
-            Canvas(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val lineWidth = 1f
-                val color = Color.White.copy(alpha = 0.25f)
-
-                // Vertical lines
-                var x = 0f
-                while (x <= size.width) {
-                    drawLine(
-                        color = color,
-                        start = Offset(x, 0f),
-                        end = Offset(x, size.height),
-                        strokeWidth = lineWidth
-                    )
-                    x += cellSizePx
-                }
-
-                // Horizontal lines
-                var y = 0f
-                while (y <= size.height) {
-                    drawLine(
-                        color = color,
-                        start = Offset(0f, y),
-                        end = Offset(size.width, y),
-                        strokeWidth = lineWidth
-                    )
-                    y += cellSizePx
-                }
-            }
-        }
-
-
-        /* ──────────────── Widget canvas ──────────────── */
-        floatingApps
-            .filter { it.nestId == nestId }
-            .sortedBy { it.id == selected?.id } // Selected is always displayed first for easier click access
-            .forEach { floatingApp ->
-                key(floatingApp.id, nestId) {
-                    DraggableFloatingApp(
-                        floatingAppsViewModel = floatingAppsViewModel,
-                        app = floatingApp,
-                        selected = floatingApp.id == selected?.id,
-                        widgetHostProvider = widgetHostProvider,
-                        onPrecisionModeChange = { isPrecisionModeActive = it },
-                        onSelect = { selected = floatingApp },
-                        onMove = { dx, dy ->
-                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, dx, dy, false)
-                        },
-                        onRotateEnd = {
-                            floatingAppsViewModel.rotateFloatingApp(floatingApp.id, it, true)
-                        },
-                        onMoveEnd = { isPrecision ->
-                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, if (isPrecision) false else snapMove)
-                        },
-                        onResize = { corner, dx, dy ->
-                            floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, dx, dy, false)
-                        },
-                        onResizeEnd = { corner ->
-                            floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
-                        },
-                        onEdit = {
-                            floatingAppsViewModel.editFloatingApp(it)
-                        }
-                    )
-                }
-            }
-
-        AnimatedVisibility(
-            visible = isPrecisionModeActive,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 32.dp),
-            enter = fadeIn() + slideInVertically { -it },
-            exit = fadeOut() + slideOutVertically { -it }
-        ) {
-            Surface(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
-                contentColor = MaterialTheme.colorScheme.surface,
-                shape = CircleShape
-            ) {
-                Text(
-                    text = stringResource(R.string.precision_mode_active),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
-
+    // ─── Dialogs ───────────────────────────
 
     if (widgetsDebugInfos) {
         Box(
@@ -465,7 +524,6 @@ fun FloatingAppsTab(
  * @param onSelect Callback when widget is tapped/selected
  * @param onMove Callback for position drag deltas (dx, dy in pixels)
  * @param onResize Callback for resize drag (corner, dx, dy in pixels)
- * @param onRemove Callback for long-press removal
  */
 @SuppressLint("LocalContextResourcesRead")
 @Composable
@@ -506,7 +564,7 @@ private fun DraggableFloatingApp(
     var widgetAngle by remember(app.angle) { mutableFloatStateOf(app.angle) }
     var isPrecisionMode by remember { mutableStateOf(false) }
 
-    androidx.compose.runtime.LaunchedEffect(isPrecisionMode) {
+    LaunchedEffect(isPrecisionMode) {
         onPrecisionModeChange(isPrecisionMode)
     }
 
@@ -563,7 +621,7 @@ private fun DraggableFloatingApp(
                                 kotlinx.coroutines.withTimeout(viewConfiguration.longPressTimeoutMillis) {
                                     tryAwaitRelease()
                                 }
-                            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                            } catch (_: kotlinx.coroutines.TimeoutCancellationException) {
                                 isPrecisionMode = true
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
@@ -577,8 +635,8 @@ private fun DraggableFloatingApp(
 
                             val angleRad = Math.toRadians(widgetAngle.toDouble())
 
-                            val cos = kotlin.math.cos(angleRad)
-                            val sin = kotlin.math.sin(angleRad)
+                            val cos = cos(angleRad)
+                            val sin = sin(angleRad)
 
                             val amountX = if (isPrecisionMode) dragAmount.x / 2f else dragAmount.x
                             val amountY = if (isPrecisionMode) dragAmount.y / 2f else dragAmount.y
