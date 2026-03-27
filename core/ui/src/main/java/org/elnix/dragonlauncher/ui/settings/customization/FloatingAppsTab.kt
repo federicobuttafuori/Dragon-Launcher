@@ -101,7 +101,8 @@ fun FloatingAppsTab(
     onBack: () -> Unit,
     onLaunchSystemWidgetPicker: (nestId: Int) -> Unit,
     onResetWidgetSize: (id: Int, widgetId: Int) -> Unit,
-    onRemoveWidget: (FloatingAppObject) -> Unit
+    onRemoveWidget: (FloatingAppObject) -> Unit,
+    initialNestId: Int = 0
 ) {
     val showStatusBar = LocalShowStatusBar.current
 
@@ -128,7 +129,7 @@ fun FloatingAppsTab(
 
     var showAddDialog by remember { mutableStateOf(false) }
     var showNestPickerDialog by remember { mutableStateOf(false) }
-    var nestId by remember { mutableIntStateOf(0) }
+    var nestId by remember { mutableIntStateOf(initialNestId) }
     var isPrecisionModeActive by remember { mutableStateOf(false) }
 
     /**
