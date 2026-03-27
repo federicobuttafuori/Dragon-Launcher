@@ -4,6 +4,10 @@ package org.elnix.dragonlauncher.ui.settings.customization
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +42,7 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -61,6 +66,8 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -122,6 +129,7 @@ fun FloatingAppsTab(
     var showAddDialog by remember { mutableStateOf(false) }
     var showNestPickerDialog by remember { mutableStateOf(false) }
     var nestId by remember { mutableIntStateOf(0) }
+    var isPrecisionModeActive by remember { mutableStateOf(false) }
 
     /**
      * Status bar things, copy paste from the getters, do not change that, it's just for displaying
@@ -266,7 +274,7 @@ fun FloatingAppsTab(
             content = {
                 Box(
                     Modifier
-                        .fillMaxSize()
+                        .weight(1f)
                         .pointerInput(Unit) {
                             detectTapGestures {
                                 selected = null
@@ -337,6 +345,7 @@ fun FloatingAppsTab(
                         app = floatingApp,
                         selected = floatingApp.id == selected?.id,
                         widgetHostProvider = widgetHostProvider,
+                        onPrecisionModeChange = { isPrecisionModeActive = it },
                         onSelect = { selected = floatingApp },
                         onMove = { dx, dy ->
                             floatingAppsViewModel.moveFloatingApp(floatingApp.id, dx, dy, false)
@@ -344,8 +353,8 @@ fun FloatingAppsTab(
                         onRotateEnd = {
                             floatingAppsViewModel.rotateFloatingApp(floatingApp.id, it, true)
                         },
-                        onMoveEnd = {
-                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, snapMove)
+                        onMoveEnd = { isPrecision ->
+                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, if (isPrecision) false else snapMove)
                         },
                         onResize = { corner, dx, dy ->
                             floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, dx, dy, false)
@@ -353,13 +362,33 @@ fun FloatingAppsTab(
                         onResizeEnd = { corner ->
                             floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
                         },
-                        onRemove = { removeWidget(floatingApp) },
                         onEdit = {
                             floatingAppsViewModel.editFloatingApp(it)
                         }
                     )
                 }
             }
+
+        AnimatedVisibility(
+            visible = isPrecisionModeActive,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 32.dp),
+            enter = fadeIn() + slideInVertically { -it },
+            exit = fadeOut() + slideOutVertically { -it }
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
+                contentColor = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+            ) {
+                Text(
+                    text = stringResource(R.string.precision_mode_active),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
     }
 
 
@@ -444,16 +473,17 @@ private fun DraggableFloatingApp(
     app: FloatingAppObject,
     selected: Boolean,
     widgetHostProvider: WidgetHostProvider,
+    onPrecisionModeChange: (Boolean) -> Unit,
     onSelect: () -> Unit,
     onMove: (Float, Float) -> Unit,
     onRotateEnd: (Float) -> Unit,
-    onMoveEnd: () -> Unit,
+    onMoveEnd: (Boolean) -> Unit,
     onResize: (FloatingAppsViewModel.ResizeCorner, Float, Float) -> Unit,
     onResizeEnd: (FloatingAppsViewModel.ResizeCorner) -> Unit,
-    onRemove: () -> Unit,
     onEdit: (FloatingAppObject) -> Unit
 ) {
     val ctx = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
 
     val cellSizePx = floatingAppsViewModel.cellSizePx
@@ -473,6 +503,11 @@ private fun DraggableFloatingApp(
     var widgetCenter by remember { mutableStateOf(Offset.Zero) }
     var handleCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
     var widgetAngle by remember(app.angle) { mutableFloatStateOf(app.angle) }
+    var isPrecisionMode by remember { mutableStateOf(false) }
+
+    androidx.compose.runtime.LaunchedEffect(isPrecisionMode) {
+        onPrecisionModeChange(isPrecisionMode)
+    }
 
     Box(
         modifier = Modifier
@@ -520,8 +555,18 @@ private fun DraggableFloatingApp(
                 .matchParentSize()
                 .pointerInput(app.id) {
                     detectTapGestures(
-                        onPress = { onSelect() },
-                        onLongPress = { onRemove() }
+                        onPress = {
+                            isPrecisionMode = false
+                            onSelect()
+                            try {
+                                kotlinx.coroutines.withTimeout(viewConfiguration.longPressTimeoutMillis) {
+                                    tryAwaitRelease()
+                                }
+                            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                                isPrecisionMode = true
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        }
                     )
                 }
                 .pointerInput(app.id) {
@@ -534,13 +579,22 @@ private fun DraggableFloatingApp(
                             val cos = kotlin.math.cos(angleRad)
                             val sin = kotlin.math.sin(angleRad)
 
-                            val worldDx = (dragAmount.x * cos - dragAmount.y * sin).toFloat()
-                            val worldDy = (dragAmount.x * sin + dragAmount.y * cos).toFloat()
+                            val amountX = if (isPrecisionMode) dragAmount.x / 2f else dragAmount.x
+                            val amountY = if (isPrecisionMode) dragAmount.y / 2f else dragAmount.y
+
+                            val worldDx = (amountX * cos - amountY * sin).toFloat()
+                            val worldDy = (amountX * sin + amountY * cos).toFloat()
 
                             change.consume()
                             onMove(worldDx, worldDy)
                         },
-                        onDragEnd = { onMoveEnd() }
+                        onDragEnd = {
+                            onMoveEnd(isPrecisionMode)
+                            isPrecisionMode = false
+                        },
+                        onDragCancel = {
+                            isPrecisionMode = false
+                        }
                     )
                 }
         )
