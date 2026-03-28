@@ -5,15 +5,15 @@ import org.elnix.dragonlauncher.settings.Settings
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.bases.JsonArraySettingsStore
 
-object FloatingAppsSettingsStore : JsonArraySettingsStore() {
+object WidgetsSettingsStore : JsonArraySettingsStore() {
 
-    override val name: String = "Floating Apps"
+    override val name: String = "Widgets"
     override val dataStoreName: DataStoreName
-        get() = DataStoreName.FLOATING_APPS
+        get() = DataStoreName.WIDGETS
 
 
     override val jsonSetting = Settings.string(
-        key = "floating_apps",
+        key = "widgets",
         dataStoreName = dataStoreName,
         default = ""
     )

@@ -89,7 +89,7 @@ import org.elnix.dragonlauncher.enumsui.WidgetsToolsMoveUpDown
 import org.elnix.dragonlauncher.enumsui.WidgetsToolsUpDown
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.settings.stores.FloatingAppsSettingsStore
+import org.elnix.dragonlauncher.settings.stores.WidgetsSettingsStore
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonColumn
@@ -171,7 +171,7 @@ fun FloatingAppsTab(
 
     fun save() {
         scope.launch {
-            FloatingAppsSettingsStore.jsonSetting.set(ctx, FloatingAppsJson.encodeFloatingApps(snapshotWidgets()))
+            WidgetsSettingsStore.jsonSetting.set(ctx, FloatingAppsJson.encodeFloatingApps(snapshotWidgets()))
         }
     }
 

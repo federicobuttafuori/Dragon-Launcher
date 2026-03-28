@@ -31,12 +31,12 @@ object FloatingAppsJson {
     fun encodeFloatingApps(floatingAppObjects: List<FloatingAppObject>): String =
         jsonConfig.encodeToString(floatingAppObjects)
 
-    fun decodeFloatingApps(json: String): List<FloatingAppObject> {
+    fun decodeFloatingApps(jsonString: String): List<FloatingAppObject>? {
         return try {
-            jsonConfig.decodeFromString<List<FloatingAppObject>>(json)
+            jsonConfig.decodeFromString<List<FloatingAppObject>>(jsonString)
         } catch (e: Exception) {
-            logE(FLOATING_APPS_TAG, e) { "Floating Apps decode failed, using empty list" }
-            emptyList()
+            logE(FLOATING_APPS_TAG, e) { "Floating Apps decode failed, trying legacy" }
+            null
         }
     }
 }

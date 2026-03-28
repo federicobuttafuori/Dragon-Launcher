@@ -12,7 +12,8 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.serializables.FloatingAppsJson
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.settings.stores.FloatingAppsSettingsStore
+import org.elnix.dragonlauncher.settings.stores.LegacyFloatingAppsSettingsStore
+import org.elnix.dragonlauncher.settings.stores.WidgetsSettingsStore
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -28,11 +29,12 @@ class FloatingAppsViewModel(
 
 
 
-    val cellSizePx = (30.dp * ctx.resources.displayMetrics.density).value
+    private val dm = ctx.resources.displayMetrics
 
-    private val screenWidth = ctx.resources.displayMetrics.widthPixels.toFloat()
-    private val screenHeight = ctx.resources.displayMetrics.heightPixels.toFloat()
-
+    val cellSizePx = (30.dp * dm.density).value
+    private val screenWidth = dm.widthPixels.toFloat()
+    private val screenHeight = dm.heightPixels.toFloat()
+    private val minSize = 1.5f
 
     init {
         loadFloatingApps()
@@ -150,8 +152,8 @@ class FloatingAppsViewModel(
     fun resetFloatingAppSize(appId: Int, info: AppWidgetProviderInfo? = null) {
         updateApp(appId) { app ->
             app.copy(
-                spanX = calculateSpanX(info?.minWidth?.toFloat() ?: 1.5f),
-                spanY = calculateSpanY(info?.minHeight?.toFloat() ?: 1.5f),
+                spanX = calculateSpanX(info?.minWidth?.toFloat()),
+                spanY = calculateSpanY(info?.minHeight?.toFloat()),
                 angle = 0f
             )
         }
@@ -191,22 +193,22 @@ class FloatingAppsViewModel(
 
             when (corner) {
                 ResizeCorner.Left -> {
-                    newSpanX = (app.spanX - deltaSpanX).coerceAtLeast(1.5f)
+                    newSpanX = (app.spanX - deltaSpanX).coerceAtLeast(minSize)
                     posDeltaX = deltaPosX  // Compensate position to keep left edge fixed
                 }
 
                 ResizeCorner.Right -> {
-                    newSpanX = (app.spanX + deltaSpanX).coerceAtLeast(1.5f)
+                    newSpanX = (app.spanX + deltaSpanX).coerceAtLeast(minSize)
                     // Right edge extends naturally
                 }
 
                 ResizeCorner.Top -> {
-                    newSpanY = (app.spanY - deltaSpanY).coerceAtLeast(1.5f)
+                    newSpanY = (app.spanY - deltaSpanY).coerceAtLeast(minSize)
                     posDeltaY = deltaPosY  // Compensate position to keep top edge fixed
                 }
 
                 ResizeCorner.Bottom -> {
-                    newSpanY = (app.spanY + deltaSpanY).coerceAtLeast(1.5f)
+                    newSpanY = (app.spanY + deltaSpanY).coerceAtLeast(minSize)
                     // Bottom edge extends naturally
                 }
             }
@@ -251,7 +253,7 @@ class FloatingAppsViewModel(
         _floatingApps.value = emptyList()
 
         viewModelScope.launch {
-            FloatingAppsSettingsStore.resetAll(ctx)
+            WidgetsSettingsStore.resetAll(ctx)
         }
     }
 
@@ -277,18 +279,20 @@ class FloatingAppsViewModel(
 
     private fun loadFloatingApps() {
         viewModelScope.launch {
-            val floatingAppsJsonString = FloatingAppsSettingsStore.jsonSetting.get(ctx)
+            val floatingAppsJsonString = WidgetsSettingsStore.jsonSetting.get(ctx)
             _floatingApps.value = FloatingAppsJson.decodeFloatingApps(floatingAppsJsonString)
+                // If null try to load legacy floating apps
+                ?: LegacyFloatingAppsSettingsStore.legacyLoadFloatingApps(ctx)
         }
     }
 
-    private fun calculateSpanX(minWidthDp: Float): Float {
+    private fun calculateSpanX(minWidthDp: Float?): Float {
         val cellWidthDp = 100
-        return (minWidthDp / cellWidthDp).coerceAtLeast(1.5f)
+        return ((minWidthDp ?: minSize) / cellWidthDp).coerceAtLeast(minSize)
     }
 
-    private fun calculateSpanY(minHeightDp: Float): Float {
+    private fun calculateSpanY(minHeightDp: Float?): Float {
         val cellHeightDp = 100
-        return (minHeightDp / cellHeightDp).coerceAtLeast(1.5f)
+        return ((minHeightDp ?: minSize) / cellHeightDp).coerceAtLeast(minSize)
     }
 }

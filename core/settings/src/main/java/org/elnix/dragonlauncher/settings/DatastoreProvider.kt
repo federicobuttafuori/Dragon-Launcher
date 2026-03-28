@@ -11,9 +11,9 @@ import org.elnix.dragonlauncher.settings.DataStoreName.COLOR
 import org.elnix.dragonlauncher.settings.DataStoreName.COLOR_MODE
 import org.elnix.dragonlauncher.settings.DataStoreName.DEBUG
 import org.elnix.dragonlauncher.settings.DataStoreName.DRAWER
-import org.elnix.dragonlauncher.settings.DataStoreName.FLOATING_APPS
 import org.elnix.dragonlauncher.settings.DataStoreName.HOLD_TO_ACTIVATE
 import org.elnix.dragonlauncher.settings.DataStoreName.LANGUAGE
+import org.elnix.dragonlauncher.settings.DataStoreName.LEGACY_FLOATING_APPS
 import org.elnix.dragonlauncher.settings.DataStoreName.PRIVATE_APPS
 import org.elnix.dragonlauncher.settings.DataStoreName.PRIVATE_SETTINGS
 import org.elnix.dragonlauncher.settings.DataStoreName.STATUS_BAR
@@ -22,6 +22,7 @@ import org.elnix.dragonlauncher.settings.DataStoreName.SWIPE
 import org.elnix.dragonlauncher.settings.DataStoreName.SWIPE_MAP
 import org.elnix.dragonlauncher.settings.DataStoreName.UI
 import org.elnix.dragonlauncher.settings.DataStoreName.WELLBEING
+import org.elnix.dragonlauncher.settings.DataStoreName.WIDGETS
 import org.elnix.dragonlauncher.settings.DataStoreName.WORKSPACES
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.settings.stores.AngleLineSettingsStore
@@ -31,9 +32,9 @@ import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
-import org.elnix.dragonlauncher.settings.stores.FloatingAppsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
+import org.elnix.dragonlauncher.settings.stores.LegacyFloatingAppsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateAppsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
@@ -42,6 +43,7 @@ import org.elnix.dragonlauncher.settings.stores.SwipeMapSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
+import org.elnix.dragonlauncher.settings.stores.WidgetsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WorkspaceSettingsStore
 
 enum class  DataStoreName(
@@ -62,7 +64,8 @@ enum class  DataStoreName(
     BEHAVIOR("behaviorDatastore", "behavior"),
     BACKUP("backupDatastore", "backup"),
     STATUS_BAR("statusDatastore", "status_bar"),
-    FLOATING_APPS("floatingAppsDatastore", "floating_apps"),
+    LEGACY_FLOATING_APPS("floatingAppsDatastore", "floating_apps", false), // No user backup for this one because it's legacy
+    WIDGETS("widgetsDatastore", "widgets"),
     WELLBEING("wellbeingDatastore", "wellbeing"),
     SWIPE_MAP("swipeMapDataStore", "swipe_map"),
     STATUS_BAR_JSON("statusBarJsonDataStore", "status_bar_json"),
@@ -86,7 +89,8 @@ object SettingsStoreRegistry {
         BEHAVIOR to BehaviorSettingsStore,
         BACKUP to BackupSettingsStore,
         STATUS_BAR to StatusBarSettingsStore,
-        FLOATING_APPS to FloatingAppsSettingsStore,
+        LEGACY_FLOATING_APPS to LegacyFloatingAppsSettingsStore,
+        WIDGETS to WidgetsSettingsStore,
         WELLBEING to WellbeingSettingsStore,
         SWIPE_MAP to SwipeMapSettingsStore,
         STATUS_BAR_JSON to StatusBarJsonSettingsStore,
@@ -119,7 +123,8 @@ private val Context.privateAppsDatastore by preferencesDataStore(name = PRIVATE_
 private val Context.behaviorDataStore by preferencesDataStore(name = BEHAVIOR.value)
 private val Context.backupDatastore by preferencesDataStore(name = BACKUP.value)
 private val Context.statusBarDatastore by preferencesDataStore(name = STATUS_BAR.value)
-private val Context.floatingAppsDatastore by preferencesDataStore(name = FLOATING_APPS.value)
+private val Context.legacyFloatingAppsDatastore by preferencesDataStore(name = LEGACY_FLOATING_APPS.value)
+private val Context.widgetsDatastore by preferencesDataStore(name = WIDGETS.value)
 private val Context.wellbeingDatastore by preferencesDataStore(name = WELLBEING.value)
 private val Context.swipeMapDatastore by preferencesDataStore(name = SWIPE_MAP.value)
 private val Context.statusBarJsonDataStore by preferencesDataStore(name = STATUS_BAR_JSON.value)
@@ -144,7 +149,8 @@ fun Context.resolveDataStore(name: DataStoreName): DataStore<Preferences> {
         BEHAVIOR -> appCtx.behaviorDataStore
         BACKUP -> appCtx.backupDatastore
         STATUS_BAR -> appCtx.statusBarDatastore
-        FLOATING_APPS -> appCtx.floatingAppsDatastore
+        LEGACY_FLOATING_APPS -> appCtx.legacyFloatingAppsDatastore
+        WIDGETS -> appCtx.widgetsDatastore
         WELLBEING -> appCtx.wellbeingDatastore
         SWIPE_MAP -> appCtx.swipeMapDatastore
         STATUS_BAR_JSON -> appCtx.statusBarJsonDataStore

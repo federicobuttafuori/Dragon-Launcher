@@ -237,4 +237,7 @@ object Constants {
         const val AUTO_UPDATE_EXTENSION_PKG = "org.elnix.dragonlauncher.autoupdate"
         const val FONT_EXTENSION_PKG = "org.elnix.dragonlauncher.fonts"
     }
+
+    const val MY_PACKAGE_NAME = "org.elnix.dragonlauncher"
+
 }
