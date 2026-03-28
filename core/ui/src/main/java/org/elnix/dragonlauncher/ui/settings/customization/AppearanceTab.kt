@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Polyline
 import androidx.compose.material.icons.filled.ShapeLine
@@ -165,6 +166,14 @@ fun AppearanceTab(
                 icon = Icons.Default.ShapeLine
             ) { navController.navigate(SETTINGS.HOLD_TO_ACTIVATE_ARC) }
         }
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.main_screen_layers),
+                icon = Icons.Default.Layers
+            ) { navController.navigate(SETTINGS.MAINS_SCREEN_LAYERS) }
+        }
+
 
         item { TextDivider(stringResource(R.string.app_display)) }
 

@@ -5,8 +5,6 @@ package org.elnix.dragonlauncher.ui.settings.customization
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -53,14 +51,12 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.WallpaperDim
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 
 @SuppressLint("LocalContextResourcesRead", "LocalContextGetResourceValueCall")
 @Composable
 fun WallpaperTab(onBack: () -> Unit) {
     val ctx = LocalContext.current
-    val showStatusBar = LocalShowStatusBar.current
 
     val scope = rememberCoroutineScope()
 
@@ -82,12 +78,7 @@ fun WallpaperTab(onBack: () -> Unit) {
         WallpaperEditMode.DRAWER -> wallpaperDimDrawerScreen
     }
 
-//    WallpaperBlur(blurRadius)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        WallpaperDim(dimAmount)
-    }
-
-
+    WallpaperDim(dimAmount)
 
     fun applyWallpaper(target: WallpaperTarget) {
         val bitmap = wallpaperHelper.createPlainWallpaperBitmap(ctx, plainColor)
@@ -100,21 +91,11 @@ fun WallpaperTab(onBack: () -> Unit) {
     }
 
 
-    /**
-     * Status bar things, copy paste from the getters, do no change that, it's just for displaying
-     * the status bar if enabled to preview more easily
-     */
-    val systemInsets = WindowInsets.systemBars.asPaddingValues()
-
-    val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
-
     /** ───────────────────────────────────────────────────────────────── */
 
 
     Column {
-        AnimatedVisibility(showStatusBar && isRealFullscreen) {
-            StatusBar(null)
-        }
+        StatusBar(null)
 
         SettingsLazyHeader(
             title = stringResource(R.string.wallpaper),

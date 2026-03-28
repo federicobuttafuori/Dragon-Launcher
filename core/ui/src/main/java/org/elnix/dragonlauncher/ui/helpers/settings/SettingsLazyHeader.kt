@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.burnoutcrew.reorderable.ReorderableLazyListState
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -55,6 +56,7 @@ fun SettingsLazyHeader(
     listState: LazyListState? = null,
     titleContent: @Composable (ColumnScope.() -> Unit)? = null,
     bottomContent: @Composable (ColumnScope.() -> Unit)? = null,
+    bottomPadding: Dp = 400.dp,
     content: @Composable (ColumnScope.() -> Unit)? = null,
     scrollableContent: Boolean = false,
     lazyContent: (LazyListScope.() -> Unit)? = null
@@ -100,7 +102,7 @@ fun SettingsLazyHeader(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else 400.dp),
+                    contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else bottomPadding),
                     modifier = modifier
                         .conditional(reorderState != null) {
                             val state = reorderState!!

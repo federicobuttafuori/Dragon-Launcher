@@ -943,4 +943,16 @@
     <string name="shape">Shape</string>
     <string name="scale">Scale</string>
     <string name="current_nest">Current nest</string>
+    <string name="first_dim">First Dim</string>
+    <string name="drag_overlay">Drag overlay</string>
+    <string name="hold_to_activate">Hold to activate</string>
+    <string name="main_screen_layers">Main screen layers</string>
+    <string name="main_screen_layers_help">Configure the man screen layers order and display</string>
+    <string name="main_screen_layers_reset">Are you sure you want to reset the layers to their default value?</string>
+    <string name="main_screen_layers_reset_title">Reset main screen layers</string>
+    <string name="custom_dim">Custom Dim</string>
+    <string name="show_after">Show After</string>
+    <string name="show_after_help">How long it waits, after dragging started to show up</string>
+    <string name="dim_amount">Dim Amount</string>
+    <string name="dim_amount_help">How much dim (wallpaper color) is appliedon the screen</string>
 </resources>

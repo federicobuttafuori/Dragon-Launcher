@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
 import org.elnix.dragonlauncher.common.serializables.IconShape
+import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.models.AppLifecycleViewModel
@@ -20,28 +21,24 @@ val LocalDefaultPoint = compositionLocalOf<SwipePointSerializable> { error("No d
 val LocalStatusBarElements = compositionLocalOf<List<StatusBarSerializable>> {
     error("No status bar elements provided")
 }
-val LocalShowStatusBar = compositionLocalOf<Boolean> {
-    error("No show status bar provided")
-}
 
 
+
+// ViewModels
 val LocalAppsViewModel = compositionLocalOf<AppsViewModel> {
     error("No AppsViewModel bar provided")
 }
-
-
 val LocalAppLifecycleViewModel = compositionLocalOf<AppLifecycleViewModel> {
     error("No AppLifecycleViewModel bar provided")
 }
-
-
 val LocalBackupViewModel = compositionLocalOf<BackupViewModel> {
     error("No BackupViewModel bar provided")
 }
-
 val LocalFloatingAppsViewModel = compositionLocalOf<FloatingAppsViewModel> {
     error("No FloatingAppsViewModel bar provided")
 }
+
+
 
 val LocalLineObject = compositionLocalOf<CustomObjectSerializable> {
     error("No LocalLine provided")
@@ -65,4 +62,8 @@ val LocalUseCustomColorChannels = compositionLocalOf<Boolean> {
 
 val LocalHoldCustomObject = compositionLocalOf<CustomObjectSerializable> {
     error("No LocalHoldCustomObject provided")
+}
+
+val LocalMainScreenLayers = compositionLocalOf<List<MainScreenLayer>> {
+    error("No LocalMainScreenLayers provided")
 }

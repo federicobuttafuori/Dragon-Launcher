@@ -1,17 +1,13 @@
 package org.elnix.dragonlauncher.ui
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.util.DisplayMetrics
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Wallpaper
@@ -47,19 +43,21 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.ktx.toDp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
+import org.elnix.dragonlauncher.common.serializables.enabled
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
-import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.ChargingAnimation
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
@@ -67,11 +65,13 @@ import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
+import org.elnix.dragonlauncher.ui.helpers.CustomDim
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.WallpaperDim
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
+import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 import org.elnix.dragonlauncher.ui.remembers.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.rememberHoldToOpenSettings
@@ -85,12 +85,13 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
     val points = LocalPoints.current
     val nests = LocalNests.current
     val holdCustomObject = LocalHoldCustomObject.current
-
+    val mainScreenLayers = LocalMainScreenLayers.current
 
     val appsViewModel = LocalAppsViewModel.current
     val floatingAppsViewModel = LocalFloatingAppsViewModel.current
 
     val scope = rememberCoroutineScope()
+
 
     var lastClickTime by remember { mutableLongStateOf(0L) }
 
@@ -121,6 +122,7 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
     var current by remember { mutableStateOf<Offset?>(null) }
     var size by remember { mutableStateOf(IntSize.Zero) }
 
+    var showCustomDim by remember { mutableStateOf(false) }
 
     var tempStartPos by remember { mutableStateOf(start) }
     var showDropDownMenuSettings by remember { mutableStateOf(false) }
@@ -140,18 +142,6 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
 
     /* ───────────── status bar things ───────────── */
 
-    val showStatusBar by StatusBarSettingsStore.showStatusBar.asState()
-    val systemInsets = WindowInsets.systemBars.asPaddingValues()
-    val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
-
-    /* Dim wallpaper system */
-    val mainBlurRadius by UiSettingsStore.wallpaperDimMainScreen.asState()
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        WallpaperDim(mainBlurRadius)
-    }
-
-
     LaunchedEffect(Unit) { lastClickTime = 0 }
 
     val nestNavigation = rememberNestNavigation(nests)
@@ -170,7 +160,6 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
 
     val appIconOverlaySize by UiSettingsStore.appIconOverlaySize.asState()
 
-    val chargingAnimation by UiSettingsStore.chargingAnimation.asState()
 
     /**
      * Reload all point icons on every change of the points, nestId, appIconOverlaySize, or default point
@@ -228,6 +217,11 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
         }
     }
 
+
+    /* Dim wallpaper system */
+    val mainBlurRadius by UiSettingsStore.wallpaperDimMainScreen.asState()
+
+    WallpaperDim(mainBlurRadius)
 
     Box(
         modifier = Modifier
@@ -308,128 +302,157 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
             .then(hold.pointerModifier)
     ) {
 
-        if (chargingAnimation) {
-            ChargingAnimation(modifier = Modifier.fillMaxSize())
-        }
+        mainScreenLayers.forEach { layer ->
+            if (layer.enabled) {
+                when (layer) {
+                    is MainScreenLayer.ChargingAnimation -> {
+                        ChargingAnimation(modifier = Modifier.fillMaxSize())
+                    }
 
-        filteredFloatingAppObjects.forEach { floatingAppObject ->
-            key(floatingAppObject.id, nestId) {
-                FloatingAppsHostView(
-                    floatingAppObject = floatingAppObject,
-                    cellSizePx = cellSizePx,
-                    modifier = Modifier
-                        .offset {
-                            IntOffset(
-                                x = (floatingAppObject.x * dm.widthPixels).toInt(),
-                                y = (floatingAppObject.y * dm.heightPixels).toInt()
-                            )
+                    is MainScreenLayer.CustomDim -> {
+
+                        LaunchedEffect(start) {
+                            if (start != null) {
+                                delay(layer.showAfter.toLong())
+                                showCustomDim = true
+                            } else {
+                                showCustomDim = false
+                            }
                         }
-                        .size(
-                            width = (floatingAppObject.spanX * cellSizePx).toDp,
-                            height = (floatingAppObject.spanY * cellSizePx).toDp
+
+                        if (showCustomDim) {
+                            CustomDim(layer)
+                        }
+                    }
+
+                    is MainScreenLayer.DragOverlay -> {
+                        MainScreenOverlay(
+                            start = start,
+                            current = current,
+                            nestId = nestId,
+                            onLaunch = { launchAction(it) }
                         )
-                        .graphicsLayer {
-                            rotationZ = floatingAppObject.angle
-                            transformOrigin = TransformOrigin.Center
-                        },
-                    onLaunchAction = {
-                        launchAction(
-                            dummySwipePoint(
-                                action = floatingAppObject.action
-                            )
+                    }
+
+                    is MainScreenLayer.HoldToActivate -> {
+                        // Hold to activate
+                        HoldToActivateArc(
+                            center = hold.centerProvider(),
+                            progress = hold.progressProvider(),
+                            rgbLoading = rgbLoading,
+                            rotationsPerSecond = rotationPerSecond,
+                            customObjectSerializable = holdCustomObject,
+                            showHoldTolerance = if (showToleranceOnMainScreen) {
+                                { holdToActivateSettingsTolerance }
+                            } else null
                         )
-                    },
-                    blockTouches = floatingAppObject.ghosted == true
-                )
-            }
-        }
 
-        if (showStatusBar && isRealFullscreen) {
-            StatusBar(
-                launchAction = { launchAction(dummySwipePoint(it)) },
-            )
-        }
+                        if (tempStartPos != null) {
+                            DropdownMenu(
+                                expanded = showDropDownMenuSettings,
+                                onDismissRequest = {
+                                    showDropDownMenuSettings = false
+                                    tempStartPos = null
+                                },
+                                containerColor = Color.Transparent,
+                                shadowElevation = 0.dp,
+                                tonalElevation = 0.dp,
+                                offset = with(density) {
+                                    DpOffset(
+                                        x = tempStartPos!!.x.toDp(),
+                                        y = tempStartPos!!.y.toDp()
+                                    )
+                                }
+                            ) {
+                                BurgerListAction(
+                                    actions = listOf(
+                                        BurgerAction(
+                                            onClick = {
+                                                showDropDownMenuSettings = false
+                                                onSettings(SETTINGS.ROOT)
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Settings,
+                                                contentDescription = null
+                                            )
+                                            Text(stringResource(R.string.settings))
+                                        },
+                                        BurgerAction(
+                                            onClick = {
+                                                showDropDownMenuSettings = false
+                                                onSettings("${SETTINGS.WIDGETS_FLOATING_APPS}?nestId=$nestId")
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Widgets,
+                                                contentDescription = null
+                                            )
+                                            Text(stringResource(R.string.widgets))
+                                        },
+                                        BurgerAction(
+                                            onClick = {
+                                                showDropDownMenuSettings = false
+                                                onSettings(SETTINGS.WALLPAPER)
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Wallpaper,
+                                                contentDescription = null
+                                            )
+                                            Text(stringResource(R.string.wallpaper))
+                                        }
+                                    )
+                                )
+                            }
+                        }
+                    }
 
-        MainScreenOverlay(
-            start = start,
-            current = current,
-            nestId = nestId,
-            onLaunch = { launchAction(it) }
-        )
+                    is MainScreenLayer.StatusBar -> {
+                        StatusBar(
+                            launchAction = { launchAction(dummySwipePoint(it)) },
+                        )
+                    }
 
-        HoldToActivateArc(
-            center = hold.centerProvider(),
-            progress = hold.progressProvider(),
-            rgbLoading = rgbLoading,
-            rotationsPerSecond = rotationPerSecond,
-            customObjectSerializable = holdCustomObject,
-            showHoldTolerance = if (showToleranceOnMainScreen) {
-                { holdToActivateSettingsTolerance }
-            } else null
-        )
-        if (tempStartPos != null) {
-            DropdownMenu(
-                expanded = showDropDownMenuSettings,
-                onDismissRequest = {
-                    showDropDownMenuSettings = false
-                    tempStartPos = null
-                },
-                containerColor = Color.Transparent,
-                shadowElevation = 0.dp,
-                tonalElevation = 0.dp,
-                offset = with(density) {
-                    DpOffset(
-                        x = tempStartPos!!.x.toDp(),
-                        y = tempStartPos!!.y.toDp()
-                    )
+                    is MainScreenLayer.Widgets -> {
+                        filteredFloatingAppObjects.forEach { floatingAppObject ->
+                            key(floatingAppObject.id, nestId) {
+                                FloatingAppsHostView(
+                                    floatingAppObject = floatingAppObject,
+                                    cellSizePx = cellSizePx,
+                                    modifier = Modifier
+                                        .offset {
+                                            IntOffset(
+                                                x = (floatingAppObject.x * dm.widthPixels).toInt(),
+                                                y = (floatingAppObject.y * dm.heightPixels).toInt()
+                                            )
+                                        }
+                                        .size(
+                                            width = (floatingAppObject.spanX * cellSizePx).toDp,
+                                            height = (floatingAppObject.spanY * cellSizePx).toDp
+                                        )
+                                        .graphicsLayer {
+                                            rotationZ = floatingAppObject.angle
+                                            transformOrigin = TransformOrigin.Center
+                                        },
+                                    onLaunchAction = {
+                                        launchAction(
+                                            dummySwipePoint(
+                                                action = floatingAppObject.action
+                                            )
+                                        )
+                                    },
+                                    blockTouches = floatingAppObject.ghosted == true
+                                )
+                            }
+
+                        }
+                    }
                 }
-            ) {
-                BurgerListAction(
-                    actions = listOf(
-                        BurgerAction(
-                            onClick = {
-                                showDropDownMenuSettings = false
-                                onSettings(SETTINGS.ROOT)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = null
-                            )
-                            Text(stringResource(R.string.settings))
-                        },
-                        BurgerAction(
-                            onClick = {
-                                showDropDownMenuSettings = false
-                                onSettings("${SETTINGS.WIDGETS_FLOATING_APPS}?nestId=$nestId")
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Widgets,
-                                contentDescription = null
-                            )
-                            Text(
-                                stringResource(R.string.widgets),
-                            )
-                        },
-                        BurgerAction(
-                            onClick = {
-                                showDropDownMenuSettings = false
-                                onSettings(SETTINGS.WALLPAPER)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Wallpaper,
-                                contentDescription = null
-                            )
-                            Text(
-                                stringResource(R.string.wallpaper),
-                            )
-                        }
-                    )
-                )
             }
         }
+
+
     }
 }
 

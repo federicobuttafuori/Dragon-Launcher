@@ -11,12 +11,6 @@ object StatusBarSettingsStore : MapSettingsStore() {
     override val name: String = "Status Bar"
     override val dataStoreName: DataStoreName = DataStoreName.STATUS_BAR
 
-    val showStatusBar = Settings.boolean(
-        key = "showStatusBar",
-        dataStoreName = dataStoreName,
-        default = false
-    )
-
     val barBackgroundColor = Settings.color(
         key = "barBackgroundColor",
         dataStoreName = dataStoreName,
@@ -59,7 +53,6 @@ object StatusBarSettingsStore : MapSettingsStore() {
 
 
     override val ALL: List<BaseSettingObject<*,*>> = listOf(
-        this.showStatusBar,
         this.barBackgroundColor,
         this.barTextColor,
         this.leftPadding,

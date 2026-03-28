@@ -99,12 +99,8 @@ private fun SliderWithLabelInternal(
 ) {
     val displayColor = color.semiTransparentIfDisabled(enabled)
 
-//    val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
-
-
     var editingText by remember { mutableStateOf(valueText) }
-//    var isEditing by remember { mutableStateOf(false) }
 
 
     // Edit the visual value whenever the real value changes to keep consistency

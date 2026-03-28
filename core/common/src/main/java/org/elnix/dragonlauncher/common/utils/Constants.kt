@@ -203,6 +203,7 @@ object Constants {
         val EXTENSION_MANAGER_TAG = LogTag("ExtensionManager")
         val HAPTIC_TAG = LogTag("HapticDebug")
         val WELCOME_TAG = LogTag("WelcomeDebug")
+        val MAIN_SCREEN_LAYERS_TAG = LogTag("MainScreenLayersTag")
     }
 
     /*  ─────────────  Links  ─────────────  */

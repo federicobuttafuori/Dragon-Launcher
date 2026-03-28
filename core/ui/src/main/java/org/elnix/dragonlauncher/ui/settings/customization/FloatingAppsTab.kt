@@ -18,14 +18,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -103,7 +100,6 @@ import org.elnix.dragonlauncher.ui.helpers.SmallShapeRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -118,7 +114,6 @@ fun FloatingAppsTab(
     initialNestId: Int = 0
 ) {
     val ctx = LocalContext.current
-    val showStatusBar = LocalShowStatusBar.current
 
     val floatingAppsViewModel = LocalFloatingAppsViewModel.current
     val cellSizePx = floatingAppsViewModel.cellSizePx
@@ -142,13 +137,6 @@ fun FloatingAppsTab(
     var nestId by remember { mutableIntStateOf(initialNestId) }
     var isPrecisionModeActive by remember { mutableStateOf(false) }
 
-    /**
-     * Status bar things, copy paste from the getters, do not change that, it's just for displaying
-     * the status bar if enabled to preview more easily
-     */
-    val systemInsets = WindowInsets.systemBars.asPaddingValues()
-
-    val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
 
 
     /* ───────────────────────────────────────────────────────────────── */
@@ -263,7 +251,8 @@ fun FloatingAppsTab(
         /* ──────────────── Widget canvas ──────────────── */
         floatingApps
             .filter { it.nestId == nestId }
-            .sortedBy { it.id == selected?.id } // Selected is always displayed first for easier click access
+            // Dont sort them, because when you press the reorder buttons, it feels strange
+//            .sortedBy { it.id == selected?.id } // Selected is always displayed first for easier click access
             .forEach { floatingApp ->
                 key(floatingApp.id, nestId) {
                     DraggableFloatingApp(
@@ -336,9 +325,7 @@ fun FloatingAppsTab(
         Modifier.fillMaxSize()
     ) {
 
-        AnimatedVisibility(showStatusBar && isRealFullscreen) {
-            StatusBar(null)
-        }
+        StatusBar(null)
 
         SettingsLazyHeader(
             title = stringResource(R.string.widgets),

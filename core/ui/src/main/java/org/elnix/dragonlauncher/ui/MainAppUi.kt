@@ -97,7 +97,6 @@ import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
-import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
@@ -108,9 +107,11 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.dialogs.FilePickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.GoogleLockingWarning
+import org.elnix.dragonlauncher.ui.dialogs.MainScreeLayersOrderScreen
 import org.elnix.dragonlauncher.ui.dialogs.PinUnlockDialog
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
+import org.elnix.dragonlauncher.ui.dialogs.rememberMainScreenLayerOrder
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
 import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
 import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
@@ -130,9 +131,9 @@ import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
 import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 import org.elnix.dragonlauncher.ui.remembers.LocalIcons
 import org.elnix.dragonlauncher.ui.remembers.LocalLineObject
+import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 import org.elnix.dragonlauncher.ui.remembers.LocalPoints
-import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
 import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 import org.elnix.dragonlauncher.ui.remembers.LocalUseCustomColorChannels
@@ -648,9 +649,6 @@ fun MainAppUi(
     val defaultPoint by SwipeSettingsStore.getDefaultPointFlow(ctx)
         .collectAsState(defaultSwipePointsValues)
 
-
-    val showStatusBar by StatusBarSettingsStore.showStatusBar.asState()
-
     val colorTestMode by ColorModesSettingsStore.colorTestMode.asState()
 
     val elementsJson by StatusBarJsonSettingsStore.jsonSetting.asState()
@@ -717,6 +715,8 @@ fun MainAppUi(
     }
 
     val useCustomColorChannels by UiSettingsStore.useCustomColorChannels.asState()
+    val layersOrder by rememberMainScreenLayerOrder()
+
 
     /**
      * Main Composition local provider, I just for everything I can here to avoid having to import them everywhere
@@ -729,16 +729,16 @@ fun MainAppUi(
         LocalPoints provides points,
         LocalNests provides nests,
         LocalStatusBarElements provides elements,
-        LocalShowStatusBar provides showStatusBar,
 
         LocalLineObject provides lineObject,
+
         LocalAngleLineObject provides angleLineObject,
         LocalStartLineObject provides startLineObject,
         LocalEndLineObject provides endLineObject,
-
         LocalHoldCustomObject provides holdCustomObject,
 
-        LocalUseCustomColorChannels provides useCustomColorChannels
+        LocalUseCustomColorChannels provides useCustomColorChannels,
+        LocalMainScreenLayers provides layersOrder
     ) {
         Scaffold(
             topBar = {
@@ -871,6 +871,7 @@ fun MainAppUi(
                     noAnimComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
                     noAnimComposable(SETTINGS.FONTS) { FontTab(::goAppearance) }
                     noAnimComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::goAppearance) }
+                    noAnimComposable(SETTINGS.MAINS_SCREEN_LAYERS) { MainScreeLayersOrderScreen(::goAppearance) }
 
                     noAnimComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
 

@@ -3,9 +3,6 @@ package org.elnix.dragonlauncher.ui.settings.customization
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -19,35 +16,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
+import org.elnix.dragonlauncher.common.serializables.MainScreenLayerJson
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
 import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
-import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
+import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
-import org.elnix.dragonlauncher.ui.remembers.LocalShowStatusBar
+import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.statusbar.EditStatusBar
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
+import org.elnix.dragonlauncher.ui.statusbar.showStatusBar
 
 @Composable
 fun StatusBarTab(
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val showStatusBar = LocalShowStatusBar.current
     val scope = rememberCoroutineScope()
 
-    val systemInsets = WindowInsets.systemBars.asPaddingValues()
-    val isRealFullscreen = systemInsets.calculateTopPadding() == 0.dp
+    val mainScreenLayers = LocalMainScreenLayers.current
+    val showStatusBar = showStatusBar()
 
     val paddingsSectionState = rememberExpandableSection(stringResource(R.string.padding))
 
     Column {
-        AnimatedVisibility(showStatusBar && isRealFullscreen) {
-            StatusBar(null)
-        }
+        StatusBar(null)
 
         SettingsLazyHeader(
             title = stringResource(R.string.status_bar),
@@ -61,13 +59,21 @@ fun StatusBarTab(
             },
             modifier = Modifier.verticalScroll(rememberScrollState()),
             content = {
-                SettingsSwitchRow(
-                    setting = StatusBarSettingsStore.showStatusBar,
-                    title = stringResource(R.string.show_status_bar),
-                    description = stringResource(R.string.show_status_bar_desc),
+                SwitchRow(
+                    text = stringResource(R.string.show_status_bar),
+                    subText = stringResource(R.string.show_status_bar_desc),
+                    state = showStatusBar()
                 ) {
                     scope.launch {
-                        StatusBarSettingsStore.showStatusBar.set(ctx, it)
+                        UiSettingsStore.mainScreenLayers.set(
+                            ctx,
+                            MainScreenLayerJson.encode(
+                                mainScreenLayers.map {
+                                    if (it is MainScreenLayer.StatusBar) it.copy(enabled = !it.enabled)
+                                    else it
+                                }
+                            )
+                        )
                     }
                 }
 

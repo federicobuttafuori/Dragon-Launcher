@@ -182,6 +182,12 @@ object UiSettingsStore : MapSettingsStore() {
         default = true
     )
 
+    val mainScreenLayers = Settings.string(
+        key = "mainScreenLayers",
+        dataStoreName = dataStoreName,
+        default = ""
+    )
+
     // unsing explicit this to avoid other stores that have the same name keys to be imported by mistake
     override val ALL: List<BaseSettingObject<*, *>> = listOf(
         this.rgbLoading,
@@ -208,6 +214,7 @@ object UiSettingsStore : MapSettingsStore() {
         this.globalFont,
         this.maxNestsDepth,
         this.useCustomColorChannels,
-        this.chargingAnimation
+        this.chargingAnimation,
+        this.mainScreenLayers
     )
 }

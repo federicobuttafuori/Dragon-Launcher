@@ -151,8 +151,7 @@ fun AngleLineObjectsOrderDialog(
 }
 
 
-@Composable
-fun rememberLineObjectsOrder(): MutableState<List<AngleLineObjects>> {
+@Composable fun rememberLineObjectsOrder(): MutableState<List<AngleLineObjects>> {
     val orderString by AngleLineSettingsStore.angleLineObjectsOrder.asState()
 
     return remember(orderString) {

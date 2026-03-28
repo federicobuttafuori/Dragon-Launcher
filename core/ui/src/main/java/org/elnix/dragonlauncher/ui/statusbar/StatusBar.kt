@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -58,6 +61,7 @@ import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
 import org.elnix.dragonlauncher.common.serializables.StatusBarJson
 import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
@@ -79,6 +83,7 @@ import org.elnix.dragonlauncher.ui.helpers.CustomActionSelector
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.modifiers.conditional
+import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 
 enum class DateFormat(val pattern: String, val displayName: String) {
@@ -108,6 +113,16 @@ fun StatusBar(
     val view = LocalView.current
     val density = LocalDensity.current
 
+    /**
+     * Don't show the status bar if not in full screen.
+     * For instance, when the system status bar is displayed
+     */
+    val systemInsets = WindowInsets.systemBars.asPaddingValues()
+    if (systemInsets.calculateTopPadding() != 0.dp) return
+
+    val showStatusBar = showStatusBar()
+
+
     val statusBarBackground by StatusBarSettingsStore.barBackgroundColor.asState()
     val statusBarText by StatusBarSettingsStore.barTextColor.asState()
 
@@ -127,39 +142,41 @@ fun StatusBar(
         topCutout?.width() ?: 0
     }
 
-    CompositionLocalProvider(
-        LocalContentColor provides statusBarText
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(statusBarBackground)
-                .padding(
-                    start = leftStatusBarPadding.dp,
-                    top = topStatusBarPadding.dp,
-                    end = rightStatusBarPadding.dp,
-                    bottom = bottomStatusBarPadding.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically,
+    AnimatedVisibility(showStatusBar) {
+        CompositionLocalProvider(
+            LocalContentColor provides statusBarText
         ) {
-            elements.forEach { element ->
-                if (element !is StatusBarSerializable.Spacer) {
-                    StatusBarItem(element, launchAction)
-                } else {
-                    val modifier = Modifier.conditional(
-                        condition = element.width == -1,
-                        block = { Modifier.weight(1f) },
-                        fallback = {
-                            // If this is the "Auto" spacer, and we have a cutout, we use cutout width
-                            // Otherwise use the defined width
-                            width(element.width.dp)
-                        }
-                    )
-
-                    if (element.width == -2) { // Special ID for Notch Spacer
-                        Spacer(Modifier.width(with(density) { totalCutoutWidth.toDp() }))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(statusBarBackground)
+                    .padding(
+                        start = leftStatusBarPadding.dp,
+                        top = topStatusBarPadding.dp,
+                        end = rightStatusBarPadding.dp,
+                        bottom = bottomStatusBarPadding.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                elements.forEach { element ->
+                    if (element !is StatusBarSerializable.Spacer) {
+                        StatusBarItem(element, launchAction)
                     } else {
-                        Spacer(modifier)
+                        val modifier = Modifier.conditional(
+                            condition = element.width == -1,
+                            block = { Modifier.weight(1f) },
+                            fallback = {
+                                // If this is the "Auto" spacer, and we have a cutout, we use cutout width
+                                // Otherwise use the defined width
+                                width(element.width.dp)
+                            }
+                        )
+
+                        if (element.width == -2) { // Special ID for Notch Spacer
+                            Spacer(Modifier.width(with(density) { totalCutoutWidth.toDp() }))
+                        } else {
+                            Spacer(modifier)
+                        }
                     }
                 }
             }
@@ -745,4 +762,13 @@ fun StatusBarItem(
             StatusBarNextAlarm(element, forceShowIcon = previewMode)
         }
     }
+}
+
+
+@Composable
+fun showStatusBar(): Boolean {
+    val mainScreensLayers = LocalMainScreenLayers.current
+
+    return ((mainScreensLayers.find { it is MainScreenLayer.StatusBar }
+        ?: error("No status bar provided in the list")) as MainScreenLayer.StatusBar).enabled
 }

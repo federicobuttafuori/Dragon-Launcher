@@ -30,6 +30,7 @@ object SETTINGS {
     const val NESTS_EDIT = "settings/nest"
     const val ANGLE_LINE_EDIT = "settings/advanced/angleLineEdit"
     const val HOLD_TO_ACTIVATE_ARC = "settings/advanced/hold_to_activate"
+    const val MAINS_SCREEN_LAYERS = "settings/advanced/main_screen_layers"
 }
 
 object ROUTES {
