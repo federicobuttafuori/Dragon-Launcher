@@ -80,7 +80,6 @@ import org.elnix.dragonlauncher.common.utils.Constants.Navigation.transparentScr
 import org.elnix.dragonlauncher.common.utils.ROUTES
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.UiConstants
-import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
@@ -172,7 +171,6 @@ import org.elnix.dragonlauncher.ui.whatsnew.WhatsNewBottomSheet
 @Composable
 fun MainAppUi(
     navController: NavHostController,
-    widgetHostProvider: WidgetHostProvider,
     onBindCustomWidget: (Int, ComponentName, nestId: Int) -> Unit,
     onResetWidgetSize: (id: Int, widgetId: Int) -> Unit,
     onRemoveFloatingApp: (FloatingAppObject) -> Unit
@@ -778,10 +776,7 @@ fun MainAppUi(
             ) {
                 // Main App (LauncherScreen)
                 noAnimComposable(ROUTES.MAIN) {
-                    MainScreen(
-                        widgetHostProvider = widgetHostProvider,
-                        onLaunchAction = ::launchAction
-                    )
+                    MainScreen(::launchAction)
                 }
 
                 composable(
@@ -891,7 +886,6 @@ fun MainAppUi(
                         arguments = listOf(navArgument("nestId") { type = NavType.IntType; defaultValue = 0 })
                     ) { backStack ->
                         FloatingAppsTab(
-                            widgetHostProvider = widgetHostProvider,
                             onBack = ::goAppearance,
                             onLaunchSystemWidgetPicker = ::launchWidgetsPicker,
                             onResetWidgetSize = onResetWidgetSize,

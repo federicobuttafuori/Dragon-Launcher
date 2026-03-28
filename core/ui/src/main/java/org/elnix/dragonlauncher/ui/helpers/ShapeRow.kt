@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Restore
@@ -20,9 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.IconShape
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.SHAPES_TAG
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
@@ -32,11 +31,9 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 fun ShapeRow(
     selected: IconShape,
     title: String = stringResource(R.string.edit_icons_shape),
-    onReset:() -> Unit,
+    onReset: () -> Unit,
     onClick: () -> Unit
 ) {
-    logD(SHAPES_TAG) { "Selected: $selected" }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,8 +51,10 @@ fun ShapeRow(
             modifier = Modifier.weight(1f)
         ) {
 
-            ShapePreview(selected)
-            logD(SHAPES_TAG) { "Current Shape: $selected" }
+            ShapePreview(
+                selected,
+                modifier = Modifier.size(60.dp)
+            )
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -85,5 +84,40 @@ fun ShapeRow(
                 contentDescription = stringResource(R.string.reset),
             )
         }
+    }
+}
+
+
+@Composable
+fun SmallShapeRow(
+    selected: IconShape,
+    onReset: () -> Unit,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(DragonShape)
+            .clickable { onClick() }
+            .background(MaterialTheme.colorScheme.surface),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        ShapePreview(
+            iconShape = selected,
+            modifier = Modifier.size(40.dp)
+        )
+
+        Text(
+            text = stringResource(R.string.shape),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        DragonIconButton(
+            onClick = onReset,
+            icon = Icons.Default.Restore
+        )
     }
 }

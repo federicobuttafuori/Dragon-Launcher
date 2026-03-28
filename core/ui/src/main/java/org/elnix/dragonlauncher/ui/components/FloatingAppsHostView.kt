@@ -4,7 +4,6 @@ package org.elnix.dragonlauncher.ui.components
 
 import android.appwidget.AppWidgetManager
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.clickable
@@ -16,14 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
 import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.ui.actions.ActionIcon
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 import kotlin.math.min
 
@@ -34,12 +33,11 @@ fun FloatingAppsHostView(
     cellSizePx: Float,
     modifier: Modifier = Modifier,
     blockTouches: Boolean = false,
-    widgetHostProvider: WidgetHostProvider,
     onLaunchAction: () -> Unit
 ) {
     val ctx = LocalContext.current
+    val density = LocalDensity.current.density
     val currentView = LocalView.current
-    val iconShape = LocalIconShape.current
 
 
     if (floatingAppObject.action is SwipeActionSerializable.OpenWidget) {
@@ -57,7 +55,6 @@ fun FloatingAppsHostView(
 
         // Apply size options when span changes
         DisposableEffect(floatingAppObject.spanX, floatingAppObject.spanY) {
-            val density = ctx.resources.displayMetrics.density
             val widthDp = (floatingAppObject.spanX * cellSizePx / density).toInt()
             val heightDp = (floatingAppObject.spanY * cellSizePx / density).toInt()
 
@@ -74,12 +71,17 @@ fun FloatingAppsHostView(
         AndroidView(
             modifier = modifier
                 .fillMaxSize()
+                .clip(floatingAppObject.shape.resolveShape(default = IconShape.Square))
                 .pointerInteropFilter { blockTouches },
             factory = {
                 // Remove from previous parent if any (Compose safe re-attachment)
                 (hostView.parent as? ViewGroup)?.removeView(hostView)
 
+                hostView.setPadding(0, 0, 0, 0)
+
                 FrameLayout(it).apply {
+                    clipChildren = true
+                    clipToPadding = true
                     addView(
                         hostView,
                         FrameLayout.LayoutParams(
@@ -100,7 +102,7 @@ fun FloatingAppsHostView(
             action = floatingAppObject.action,
             modifier = modifier
                 .fillMaxSize()
-                .clip(iconShape.resolveShape())
+                .clip(floatingAppObject.shape.resolveShape(default = IconShape.Square))
                 .let { mod ->
                     if (blockTouches) { mod } else { mod.clickable{ onLaunchAction() } }
                 },

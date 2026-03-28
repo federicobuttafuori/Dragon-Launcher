@@ -557,7 +557,6 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                     LocalFloatingAppsViewModel provides floatingAppsViewModel
                 ) {
                     MainAppUi(
-                        widgetHostProvider = this,
                         navController = navController,
                         onBindCustomWidget = { widgetId, provider, nestId ->
                             pendingAddNestId = nestId

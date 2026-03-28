@@ -116,28 +116,6 @@ private fun SliderWithLabelInternal(
         focusManager.clearFocus()
     }
 
-
-//    // If the user presses back when editing, the value is commited (I use that because I do back to quit the slider label thing
-//    BackHandler(isEditing) {
-//        editValue()
-//    }
-
-//    // Observe focus via InteractionSource
-//    LaunchedEffect(interactionSource) {
-//        interactionSource.interactions.collect { interaction ->
-//            when (interaction) {
-//                is FocusInteraction.Focus -> {
-//                    isEditing = true
-//                }
-//
-//                is FocusInteraction.Unfocus -> {
-//                    commitEditText(editingText, valueRange, onDragStateChange, onChange)
-//                    isEditing = false
-//                }
-//            }
-//        }
-//    }
-
     var isEditing by remember { mutableStateOf(false) }
 
 

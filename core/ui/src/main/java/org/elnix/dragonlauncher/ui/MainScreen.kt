@@ -56,7 +56,6 @@ import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.SETTINGS
-import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
@@ -81,10 +80,7 @@ import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable
-fun MainScreen(
-    widgetHostProvider: WidgetHostProvider,
-    onLaunchAction: (SwipePointSerializable) -> Unit
-) {
+fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
     val ctx = LocalContext.current
     val points = LocalPoints.current
     val nests = LocalNests.current
@@ -343,8 +339,7 @@ fun MainScreen(
                             )
                         )
                     },
-                    blockTouches = floatingAppObject.ghosted == true,
-                    widgetHostProvider = widgetHostProvider
+                    blockTouches = floatingAppObject.ghosted == true
                 )
             }
         }

@@ -54,7 +54,7 @@ import org.elnix.dragonlauncher.ui.remembers.LocalNests
 fun NestManagementDialog(
     onDismissRequest: () -> Unit,
     title: String? = null,
-    nests:  List<CircleNest>? = null,
+    nests: List<CircleNest>? = null,
     onNewNest: (() -> Unit)? = null,
     onNameChange: ((id: Int, name: String) -> Unit)?,
     onDelete: ((id: Int) -> Unit)?,
@@ -121,7 +121,6 @@ fun NestManagementDialog(
 }
 
 
-
 @Composable
 private fun NestManagementItem(
     nest: CircleNest,
@@ -132,6 +131,7 @@ private fun NestManagementItem(
 ) {
     val ctx = LocalContext.current
 
+    val canEditName = onNameChange != null
 
     val drawParams = swipeDefaultParams(
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -202,27 +202,28 @@ private fun NestManagementItem(
                 )
             }
 
-            if (onNameChange != null) {
-
-                TextField(
-                    value = tempCustomName,
-                    onValueChange = {
+            TextField(
+                value = tempCustomName,
+                enabled = canEditName,
+                onValueChange = {
+                    if (canEditName) {
                         tempCustomName = it
+
                         onNameChange(nest.id, it)
-                    },
-                    placeholder = {
-                        Text(
-                            text = stringResource(R.string.custom_name),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    colors = AppObjectsColors.outlinedTextFieldColors(removeBorder = true),
-                    singleLine = true,
-                    modifier = Modifier
-                        .clip(DragonShape)
-                        .weight(1f)
-                )
-            }
+                    }
+                },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.custom_name),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                colors = AppObjectsColors.outlinedTextFieldColors(removeBorder = true),
+                singleLine = true,
+                modifier = Modifier
+                    .clip(DragonShape)
+                    .weight(1f)
+            )
         }
 
 

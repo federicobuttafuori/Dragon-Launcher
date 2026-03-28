@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material3.Icon
@@ -27,6 +26,7 @@ import org.elnix.dragonlauncher.ui.modifiers.conditional
 @Composable
 fun ShapePreview(
     iconShape: IconShape,
+    modifier: Modifier = Modifier,
     selected: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
@@ -37,7 +37,7 @@ fun ShapePreview(
     Box(
         modifier = Modifier
             .padding(5.dp)
-            .size(60.dp)
+            .then(modifier)
             .aspectRatio(1f)
             .clip(DragonShape)
             .conditional(onClick != null) {

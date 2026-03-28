@@ -53,10 +53,8 @@ class FloatingAppsViewModel(
 
             _floatingApps.value += app
 
-            centerFloatingApp(appId = app.id, persist = false)
-            resetFloatingAppSize(appId = app.id, info = info, persist = false)
-
-            persist()
+            centerFloatingApp(appId = app.id)
+            resetFloatingAppSize(appId = app.id, info = info)
         }
     }
 
@@ -64,7 +62,6 @@ class FloatingAppsViewModel(
     fun removeFloatingApp(id: Int, onDeleteId: (Int) -> Unit) {
         viewModelScope.launch {
             _floatingApps.value = _floatingApps.value.filterNot { it.id == id }
-            persist()
             onDeleteId(id)
         }
     }
@@ -118,7 +115,6 @@ class FloatingAppsViewModel(
             add(index - 1, floatingApp)
         }
         _floatingApps.value = moved
-        persist()
     }
 
     fun moveFloatingAppDown(appId: Int) {
@@ -131,13 +127,12 @@ class FloatingAppsViewModel(
             add(index + 1, floatingApp)
         }
         _floatingApps.value = moved
-        persist()
     }
 
 
-    fun centerFloatingApp(appId: Int, persist: Boolean = true) {
+    fun centerFloatingApp(appId: Int) {
 
-        updateApp(appId, persist) { app ->
+        updateApp(appId) { app ->
             val floatingAppWidthPx = app.spanX * cellSizePx
             val floatingAppHeightPx = app.spanY * cellSizePx
 
@@ -152,8 +147,8 @@ class FloatingAppsViewModel(
     }
 
 
-    fun resetFloatingAppSize(appId: Int, info: AppWidgetProviderInfo? = null, persist: Boolean = true) {
-        updateApp(appId, persist) { app ->
+    fun resetFloatingAppSize(appId: Int, info: AppWidgetProviderInfo? = null) {
+        updateApp(appId) { app ->
             app.copy(
                 spanX = calculateSpanX(info?.minWidth?.toFloat() ?: 1.5f),
                 spanY = calculateSpanY(info?.minHeight?.toFloat() ?: 1.5f),
@@ -240,12 +235,16 @@ class FloatingAppsViewModel(
         }
 
         _floatingApps.value = updated
-        persist()
     }
 
 
     enum class ResizeCorner {
         Top, Right, Left, Bottom
+    }
+
+
+    fun restoreFloatingApps(snapshot: List<FloatingAppObject>) {
+        _floatingApps.value = snapshot.map { it.copy() }
     }
 
     fun resetAllFloatingApps() {
@@ -259,15 +258,8 @@ class FloatingAppsViewModel(
 
     /* ───────────────────────────── Internal ───────────────────────────── */
 
-    private fun persist() {
-        viewModelScope.launch {
-            FloatingAppsSettingsStore.jsonSetting.set(ctx, FloatingAppsJson.encodeFloatingApps(_floatingApps.value))
-        }
-    }
-
     private fun updateApp(
         appId: Int,
-        persist: Boolean = true,
         block: (FloatingAppObject) -> FloatingAppObject
     ) {
         val current = _floatingApps.value
@@ -281,8 +273,6 @@ class FloatingAppsViewModel(
         }
 
         _floatingApps.value = updatedList
-
-         if (persist) persist()
     }
 
     private fun loadFloatingApps() {

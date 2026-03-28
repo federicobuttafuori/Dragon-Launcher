@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,23 +26,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.CenterFocusStrong
-import androidx.compose.material.icons.filled.FormatClear
-import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.GridOff
-import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LinearScale
-import androidx.compose.material.icons.filled.MoveDown
-import androidx.compose.material.icons.filled.MoveUp
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -72,30 +65,41 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import org.elnix.dragonlauncher.base.ktx.toDp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
+import org.elnix.dragonlauncher.common.serializables.FloatingAppsJson
+import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.undoredo.UndoRedoManager
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.WIDGET_TAG
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
-import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
+import org.elnix.dragonlauncher.enumsui.UndRedoEditTools
+import org.elnix.dragonlauncher.enumsui.WidgetsToolsAddRemove
+import org.elnix.dragonlauncher.enumsui.WidgetsToolsCenterReset
+import org.elnix.dragonlauncher.enumsui.WidgetsToolsGridScaleNest
+import org.elnix.dragonlauncher.enumsui.WidgetsToolsMoveUpDown
+import org.elnix.dragonlauncher.enumsui.WidgetsToolsUpDown
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
+import org.elnix.dragonlauncher.settings.stores.FloatingAppsSettingsStore
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
+import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonColumn
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
 import org.elnix.dragonlauncher.ui.dialogs.NestManagementDialog
-import org.elnix.dragonlauncher.ui.helpers.CircleIconButton
+import org.elnix.dragonlauncher.ui.dialogs.ShapePickerDialog
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.ui.helpers.UpDownButton
+import org.elnix.dragonlauncher.ui.helpers.SmallShapeRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
@@ -107,38 +111,31 @@ import kotlin.math.sin
 
 @Composable
 fun FloatingAppsTab(
-    widgetHostProvider: WidgetHostProvider,
     onBack: () -> Unit,
     onLaunchSystemWidgetPicker: (nestId: Int) -> Unit,
     onResetWidgetSize: (id: Int, widgetId: Int) -> Unit,
     onRemoveWidget: (FloatingAppObject) -> Unit,
     initialNestId: Int = 0
 ) {
+    val ctx = LocalContext.current
     val showStatusBar = LocalShowStatusBar.current
 
     val floatingAppsViewModel = LocalFloatingAppsViewModel.current
+    val cellSizePx = floatingAppsViewModel.cellSizePx
     val scope = rememberCoroutineScope()
 
     val widgetsDebugInfos by DebugSettingsStore.widgetsDebugInfo.asState()
 
     val floatingApps by floatingAppsViewModel.floatingApps.collectAsState()
 
-    val cellSizePx = floatingAppsViewModel.cellSizePx
-
     var selected by remember { mutableStateOf<FloatingAppObject?>(null) }
-
-    val isSelected = selected != null
+    val aWidgetIsSelected = selected != null
 
     var snapMove by remember { mutableStateOf(true) }
     var snapResize by remember { mutableStateOf(true) }
 
     var showScaleDropdown by remember { mutableStateOf(false) }
     var widgetsScale by remember { mutableFloatStateOf(0.80f) }
-
-    fun removeWidget(floatingApp: FloatingAppObject) {
-        onRemoveWidget(floatingApp)
-        if (selected == floatingApp) selected = null
-    }
 
     var showAddDialog by remember { mutableStateOf(false) }
     var showNestPickerDialog by remember { mutableStateOf(false) }
@@ -155,6 +152,60 @@ fun FloatingAppsTab(
 
 
     /* ───────────────────────────────────────────────────────────────── */
+
+    fun snapshotWidgets(): List<FloatingAppObject> = floatingApps.map { it.copy() }
+
+
+    val undoRedo = remember { UndoRedoManager() }
+
+    LaunchedEffect(Unit) {
+        undoRedo.register(
+            key = "floatingApps",
+            snapshot = { snapshotWidgets() },
+            restore = {
+                floatingAppsViewModel.restoreFloatingApps(it)
+                selected = floatingApps.find { p -> p.id == (selected?.id ?: "") }
+            }
+        )
+    }
+
+    fun save() {
+        scope.launch {
+            FloatingAppsSettingsStore.jsonSetting.set(ctx, FloatingAppsJson.encodeFloatingApps(snapshotWidgets()))
+        }
+    }
+
+    fun applyChange(mutator: () -> Unit) {
+        undoRedo.applyChange(mutator)
+        save()
+    }
+
+    fun undo() {
+        undoRedo.undo()
+        save()
+    }
+
+    fun redo() {
+        undoRedo.redo()
+        save()
+    }
+
+    fun undoAll() {
+        undoRedo.undoAll()
+        save()
+    }
+
+    fun redoAll() {
+        undoRedo.redoAll()
+        save()
+    }
+
+
+    fun removeWidget(floatingApp: FloatingAppObject) {
+        onRemoveWidget(floatingApp)
+        if (selected == floatingApp) selected = null
+    }
+
 
     /**
      * The widgets and the grid, displayed first, to keep access to the buttons
@@ -219,26 +270,36 @@ fun FloatingAppsTab(
                         floatingAppsViewModel = floatingAppsViewModel,
                         app = floatingApp,
                         selected = floatingApp.id == selected?.id,
-                        widgetHostProvider = widgetHostProvider,
                         onSelect = { selected = floatingApp },
                         onPrecisionModeChange = { isPrecisionModeActive = it },
                         onMove = { dx, dy ->
+                            // I don't apply to stack on every movement, and so don't save
                             floatingAppsViewModel.moveFloatingApp(floatingApp.id, dx, dy, false)
                         },
                         onRotateEnd = {
-                            floatingAppsViewModel.rotateFloatingApp(floatingApp.id, it, true)
+                            applyChange {
+                                floatingAppsViewModel.rotateFloatingApp(floatingApp.id, it, true)
+                            }
                         },
                         onMoveEnd = {
-                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, snapMove)
+                            // Only save on move end to avoid I/O overhead
+                            applyChange {
+                                floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, snapMove)
+                            }
                         },
                         onResize = { corner, dx, dy ->
+                            // Same thing here, don't apply change until fully resized
                             floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, dx, dy, false)
                         },
                         onResizeEnd = { corner ->
-                            floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
+                            applyChange {
+                                floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
+                            }
                         },
                         onEdit = {
-                            floatingAppsViewModel.editFloatingApp(it)
+                            applyChange {
+                                floatingAppsViewModel.editFloatingApp(it)
+                            }
                         }
                     )
                 }
@@ -254,7 +315,7 @@ fun FloatingAppsTab(
             exit = fadeOut() + slideOutVertically { -it }
         ) {
             Surface(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
                 contentColor = MaterialTheme.colorScheme.surface,
                 shape = CircleShape
             ) {
@@ -285,7 +346,9 @@ fun FloatingAppsTab(
             helpText = stringResource(R.string.floating_apps_tab_help),
             onReset = {
                 scope.launch {
-                    floatingAppsViewModel.resetAllFloatingApps()
+                    applyChange {
+                        floatingAppsViewModel.resetAllFloatingApps()
+                    }
                 }
             },
             otherIcons = arrayOf(
@@ -295,6 +358,68 @@ fun FloatingAppsTab(
             ),
             bottomContent = {
                 /* ───────────── Bottom controls ───────────── */
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
+                ) {
+                    MultiSelectConnectedButtonRow(
+                        entries = WidgetsToolsGridScaleNest.entries,
+                        showLabel = false,
+                        isChecked = {
+                            when (it) {
+                                WidgetsToolsGridScaleNest.Grid -> snapMove
+                                WidgetsToolsGridScaleNest.Scale -> snapResize
+                                WidgetsToolsGridScaleNest.Nests -> true
+                            }
+                        }
+                    ) { entry ->
+                        scope.launch {
+                            when (entry) {
+                                WidgetsToolsGridScaleNest.Grid -> {
+                                    snapMove = !snapMove
+                                }
+
+                                WidgetsToolsGridScaleNest.Scale -> {
+                                    snapResize = !snapResize
+                                }
+
+                                WidgetsToolsGridScaleNest.Nests -> {
+                                    showNestPickerDialog = true
+                                }
+                            }
+                        }
+                    }
+
+                    // Undo/Redo bar
+                    val undoButtonEnabled = undoRedo.canUndo
+                    val redoButtonEnabled = undoRedo.canRedo
+
+                    MultiSelectConnectedButtonRow(
+                        entries = UndRedoEditTools.entries,
+                        showLabel = false,
+
+                        isEnabled = {
+                            when (it) {
+                                UndRedoEditTools.UndoAll -> undoButtonEnabled
+                                UndRedoEditTools.Undo -> undoButtonEnabled
+                                UndRedoEditTools.Redo -> redoButtonEnabled
+                                UndRedoEditTools.RedoAll -> redoButtonEnabled
+                            }
+                        }
+                    ) { entry ->
+                        scope.launch {
+                            when (entry) {
+                                UndRedoEditTools.UndoAll -> undoAll()
+                                UndRedoEditTools.Undo -> undo()
+                                UndRedoEditTools.Redo -> redo()
+                                UndRedoEditTools.RedoAll -> redoAll()
+                            }
+                        }
+                    }
+                }
+
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -302,107 +427,124 @@ fun FloatingAppsTab(
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    UpDownButton(
-                        upIcon = Icons.Default.Add,
-                        downIcon = Icons.Default.AccountCircle,
-                        color = MaterialTheme.colorScheme.primary,
-                        contentDescriptionUp = stringResource(R.string.add_widget),
-                        contentDescriptionDown = stringResource(R.string.pick_a_nest),
-                        padding = 16.dp,
-                        onClickUp = { showAddDialog = true },
-                        onClickDown = { showNestPickerDialog = true }
-                    )
-
-                    UpDownButton(
-                        upIcon = Icons.Default.CenterFocusStrong,
-                        downIcon = Icons.Default.Restore,
-                        color = MaterialTheme.colorScheme.primary,
-                        contentDescriptionUp = stringResource(R.string.center_selected_widget),
-                        contentDescriptionDown = stringResource(R.string.reset_widget),
-                        upEnabled = isSelected,
-                        downEnabled = isSelected,
-                        padding = 16.dp,
-                        onClickUp = {
-                            selected?.let { floatingAppsViewModel.centerFloatingApp(it.id) }
-
+                    MultiSelectConnectedButtonRow(
+                        entries = WidgetsToolsAddRemove.entries,
+                        showLabel = false,
+                        isChecked = {
+                            when (it) {
+                                WidgetsToolsAddRemove.Add -> true
+                                WidgetsToolsAddRemove.Remove -> aWidgetIsSelected
+                            }
                         },
-                        onClickDown = {
-                            selected?.let {
-                                if (it.action is SwipeActionSerializable.OpenWidget) {
-                                    onResetWidgetSize(it.id, (it.action as SwipeActionSerializable.OpenWidget).widgetId)
-                                } else {
-                                    floatingAppsViewModel.resetFloatingAppSize(it.id)
+                        isEnabled = {
+                            when (it) {
+                                WidgetsToolsAddRemove.Add -> true
+                                WidgetsToolsAddRemove.Remove -> aWidgetIsSelected
+                            }
+                        }
+                    ) { entry ->
+                        scope.launch {
+                            when (entry) {
+                                WidgetsToolsAddRemove.Add -> {
+                                    showAddDialog = true
+                                }
+
+                                WidgetsToolsAddRemove.Remove -> {
+                                    selected?.let {
+                                        applyChange {
+                                            removeWidget(it)
+                                        }
+                                    }
                                 }
                             }
                         }
-                    )
+                    }
 
-                    UpDownButton(
-                        upIcon = Icons.Default.ArrowUpward,
-                        downIcon = Icons.Default.ArrowDownward,
-                        color = MaterialTheme.colorScheme.secondary,
-                        contentDescriptionUp = stringResource(R.string.select_previous_widget),
-                        contentDescriptionDown = stringResource(R.string.select_next_widget),
-                        upEnabled = true,
-                        downEnabled = true,
-                        padding = 16.dp,
-                        onClickUp = {
-                            if (floatingApps.isNotEmpty()) {
-                                val idx = floatingApps.indexOfFirst { it == selected }
-                                val next = if (idx <= 0) floatingApps.last() else floatingApps[idx - 1]
-                                selected = next
-                            }
-                        },
-                        onClickDown = {
-                            if (floatingApps.isNotEmpty()) {
-                                val idx = floatingApps.indexOfFirst { it == selected }
-                                val next = if (idx == -1 || idx == floatingApps.lastIndex) floatingApps.first() else floatingApps[idx + 1]
-                                selected = next
+
+                    MultiSelectConnectedButtonColumn(
+                        entries = WidgetsToolsCenterReset.entries,
+                        showLabel = false,
+                        isChecked = { true },
+                        isEnabled = { aWidgetIsSelected }
+                    ) { entry ->
+                        scope.launch {
+                            when (entry) {
+                                WidgetsToolsCenterReset.Center -> {
+                                    selected?.let {
+                                        applyChange {
+                                            floatingAppsViewModel.centerFloatingApp(it.id)
+                                        }
+                                    }
+                                }
+
+                                WidgetsToolsCenterReset.Reset -> {
+                                    selected?.let {
+                                        applyChange {
+                                            if (it.action is SwipeActionSerializable.OpenWidget) {
+                                                onResetWidgetSize(it.id, (it.action as SwipeActionSerializable.OpenWidget).widgetId)
+                                            } else {
+                                                floatingAppsViewModel.resetFloatingAppSize(it.id)
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    )
+                    }
 
-                    val upDownEnabled = isSelected && floatingApps.size > 1
+                    MultiSelectConnectedButtonColumn(
+                        entries = WidgetsToolsUpDown.entries,
+                        showLabel = false,
+                        isChecked = { true }
+                    ) { entry ->
+                        scope.launch {
+                            when (entry) {
+                                WidgetsToolsUpDown.Up -> {
+                                    if (floatingApps.isNotEmpty()) {
+                                        val idx = floatingApps.indexOfFirst { it == selected }
+                                        val next = if (idx <= 0) floatingApps.last() else floatingApps[idx - 1]
+                                        selected = next
+                                    }
+                                }
 
-                    UpDownButton(
-                        upIcon = Icons.Default.MoveUp,
-                        downIcon = Icons.Default.MoveDown,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        contentDescriptionUp = stringResource(R.string.move_selected_widget_up),
-                        contentDescriptionDown = stringResource(R.string.move_selected_widget_down),
-                        upEnabled = upDownEnabled,
-                        downEnabled = upDownEnabled,
-                        padding = 16.dp,
-                        onClickUp = {
-                            selected?.let { floatingAppsViewModel.moveFloatingAppDown(it.id) }
-                        },
-                        onClickDown = {
-                            selected?.let { floatingAppsViewModel.moveFloatingAppUp(it.id) }
+                                WidgetsToolsUpDown.Down -> {
+                                    if (floatingApps.isNotEmpty()) {
+                                        val idx = floatingApps.indexOfFirst { it == selected }
+                                        val next = if (idx == -1 || idx == floatingApps.lastIndex) floatingApps.first() else floatingApps[idx + 1]
+                                        selected = next
+                                    }
+                                }
+                            }
                         }
-                    )
+                    }
 
-                    UpDownButton(
-                        upIcon = if (snapMove) Icons.Default.GridOn else Icons.Default.GridOff,
-                        downIcon = if (snapResize) Icons.Default.FormatSize else Icons.Default.FormatClear,
-                        color = MaterialTheme.colorScheme.primary,
-                        contentDescriptionUp = stringResource(R.string.enable_grid),
-                        contentDescriptionDown = stringResource(R.string.enable_scale_snap),
-                        upEnabled = true,
-                        downEnabled = true,
-                        padding = 16.dp,
-                        onClickUp = { snapMove = !snapMove },
-                        onClickDown = { snapResize = !snapResize }
-                    )
+                    val upDownEnabled = aWidgetIsSelected && floatingApps.size > 1
 
-                    // Delete selected widget
-                    CircleIconButton(
-                        icon = Icons.Default.Remove,
-                        contentDescription = stringResource(R.string.delete_widget),
-                        tint = MaterialTheme.colorScheme.error,
-                        enabled = isSelected,
-                        padding = 16.dp
-                    ) {
-                        selected?.let { removeWidget(it) }
+                    MultiSelectConnectedButtonColumn(
+                        entries = WidgetsToolsMoveUpDown.entries,
+                        showLabel = false,
+                        isEnabled = { upDownEnabled },
+                        isChecked = { upDownEnabled }
+                    ) { entry ->
+                        scope.launch {
+                            when (entry) {
+                                WidgetsToolsMoveUpDown.MoveUp -> {
+                                    selected?.let {
+                                        applyChange {
+                                            floatingAppsViewModel.moveFloatingAppDown(it.id)
+                                        }
+                                    }
+                                }
+
+                                WidgetsToolsMoveUpDown.MoveDown -> {
+                                    selected?.let {
+                                        applyChange {
+                                            floatingAppsViewModel.moveFloatingAppUp(it.id)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -412,32 +554,14 @@ fun FloatingAppsTab(
                         Column(
                             modifier = Modifier.settingsGroup()
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = buildAnnotatedString {
-                                        withStyle(
-                                            style = MaterialTheme.typography.bodyMedium.toSpanStyle()
-                                        ) {
-                                            append(stringResource(R.string.widget_number))
-                                            append(": ")
-                                        }
 
-                                        withStyle(
-                                            style = MaterialTheme.typography.bodyLarge.toSpanStyle().copy(
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                        ) {
-                                            append(floatingApps.size.toString())
-                                        }
-                                    },
-                                )
-                            }
+                            Text("${stringResource(R.string.widget_number)}: ${floatingApps.size}")
+                            Text("${stringResource(R.string.current_nest)}: $nestId")
+
+                            HorizontalDivider()
 
                             SliderWithLabel(
+                                label = stringResource(R.string.scale),
                                 value = widgetsScale,
                                 valueRange = 0.5f..1f,
                                 onReset = { widgetsScale = 0.85f }
@@ -531,7 +655,6 @@ private fun DraggableFloatingApp(
     floatingAppsViewModel: FloatingAppsViewModel,
     app: FloatingAppObject,
     selected: Boolean,
-    widgetHostProvider: WidgetHostProvider,
     onPrecisionModeChange: (Boolean) -> Unit,
     onSelect: () -> Unit,
     onMove: (Float, Float) -> Unit,
@@ -563,6 +686,8 @@ private fun DraggableFloatingApp(
     var handleCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
     var widgetAngle by remember(app.angle) { mutableFloatStateOf(app.angle) }
     var isPrecisionMode by remember { mutableStateOf(false) }
+    var showEditPopup by remember { mutableStateOf(false) }
+    var showShapeEditor by remember { mutableStateOf(false) }
 
     LaunchedEffect(isPrecisionMode) {
         onPrecisionModeChange(isPrecisionMode)
@@ -603,8 +728,7 @@ private fun DraggableFloatingApp(
         FloatingAppsHostView(
             floatingAppObject = app,
             blockTouches = true,
-            cellSizePx = cellSizePx,
-            widgetHostProvider = widgetHostProvider
+            cellSizePx = cellSizePx
         ) { }
 
 
@@ -618,10 +742,10 @@ private fun DraggableFloatingApp(
                             isPrecisionMode = false
                             onSelect()
                             try {
-                                kotlinx.coroutines.withTimeout(viewConfiguration.longPressTimeoutMillis) {
+                                withTimeout(viewConfiguration.longPressTimeoutMillis) {
                                     tryAwaitRelease()
                                 }
-                            } catch (_: kotlinx.coroutines.TimeoutCancellationException) {
+                            } catch (_: TimeoutCancellationException) {
                                 isPrecisionMode = true
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
@@ -846,29 +970,38 @@ private fun DraggableFloatingApp(
                         .background(MaterialTheme.colorScheme.primary, CircleShape)
                 )
             }
+
+
+            // Edit button
+            DragonIconButton(
+                onClick = { showEditPopup = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .clip(CircleShape)
+                    .background(Color.Transparent)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.edit)
+                )
+            }
         }
-    }
-
-    // ──────────────────────────────────────────
-    // Ghost Toggle, to prevent clicks
-    // ──────────────────────────────────────────
 
 
-    // If close to top
-    val offsetY = if (app.y < 0.05f) y + height.toInt()
-    else y - 200
+        // ──────────────────────────────────────────
+        // Ghost Toggle, to prevent clicks
+        // ──────────────────────────────────────────
 
-    if (selected) {
-        Box(
-            modifier = Modifier
-                .offset {
-                    IntOffset(
-                        x = x,
-                        y = offsetY
-                    )
-                }
+        DropdownMenu(
+            expanded = showEditPopup,
+            onDismissRequest = { showEditPopup = false },
+            containerColor = Color.Transparent,
+            shadowElevation = 0.dp,
+            tonalElevation = 0.dp
         ) {
-            Column {
+            Column(
+                modifier = Modifier.settingsGroup()
+            ) {
 
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -905,7 +1038,25 @@ private fun DraggableFloatingApp(
                         fontSize = 12.sp
                     )
                 }
+
+                SmallShapeRow(
+                    selected = app.shape ?: IconShape.Square,
+                    onReset = {
+                        onEdit(app.copy(shape = null))
+                    }
+                ) { showShapeEditor = true }
             }
         }
     }
+
+    if (showShapeEditor) {
+        ShapePickerDialog(
+            selected = app.shape ?: IconShape.Square,
+            onDismiss = { showShapeEditor = false }
+        ) {
+            showShapeEditor = false
+            onEdit(app.copy(shape = it))
+        }
+    }
+
 }

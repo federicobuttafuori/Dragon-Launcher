@@ -940,4 +940,7 @@
     <string name="charging_animation">Charging animation</string>
     <string name="charging_animation_desc">Play a beatiful charging animation when the phone is charging</string>
     <string name="widget_number">Widgets Number</string>
+    <string name="shape">Shape</string>
+    <string name="scale">Scale</string>
+    <string name="current_nest">Current nest</string>
 </resources>

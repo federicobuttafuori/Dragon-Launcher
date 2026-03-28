@@ -12,6 +12,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChangeCircle
@@ -50,6 +52,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -83,6 +86,7 @@ import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
+import org.elnix.dragonlauncher.common.undoredo.UndoRedoManager
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.NESTS_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.SWIPE_TAG
@@ -213,10 +217,14 @@ fun SettingsScreen(
     // Manual placement mode state (multi-select "Place one by one")
     var manualPlacementQueue by remember { mutableStateOf<List<SwipeActionSerializable>>(emptyList()) }
     val isInManualPlacementMode = manualPlacementQueue.isNotEmpty()
+    var isEditing by remember { mutableStateOf(false) }
 
     var showNestManagementDialog by remember { mutableStateOf(false) }
     var showResetPointsAndNestsDialog by remember { mutableStateOf(false) }
 
+
+    val firstRowScrollState = rememberScrollState()
+    val secondRowScrollState = rememberScrollState()
     /** ──────────────────── NESTS SYSTEM ────────────────────
      * - Collects the nests from the datastore, then initialize the base nest to 0 (always the default)
      * while all the other have a random id
@@ -274,134 +282,61 @@ fun SettingsScreen(
     }
 
 
-    var undoStack by remember { mutableStateOf<List<List<SwipePointSerializable>>>(emptyList()) }
-    var nestsUndoStack by remember { mutableStateOf<List<List<CircleNest>>>(emptyList()) }
+    val undoRedo = remember { UndoRedoManager() }
 
-    var redoStack by remember { mutableStateOf<List<List<SwipePointSerializable>>>(emptyList()) }
-    var nestsRedoStack by remember { mutableStateOf<List<List<CircleNest>>>(emptyList()) }
-
-    fun snapshotPoints(): List<SwipePointSerializable> = points.map { it.copy() }
-    fun snapshotNests(): List<CircleNest> = nests.map { it.copy() }
-
+    LaunchedEffect(Unit) {
+        undoRedo.register(
+            key = "points",
+            snapshot = { points.map { it.copy() } },
+            restore = {
+                points.clear()
+                points.addAll(it.map { p -> p.copy() })
+                selectedPoint = points.find { p -> p.id == (selectedPoint?.id ?: "") }
+            }
+        )
+        undoRedo.register(
+            key = "nests",
+            snapshot = { nests.map { it.copy() } },
+            restore = {
+                nests.clear()
+                nests.addAll(it)
+            }
+        )
+    }
 
     fun save() {
         scope.launch {
-            SwipeSettingsStore.savePoints(ctx, snapshotPoints())
-            SwipeSettingsStore.saveNests(ctx, snapshotNests())
+            SwipeSettingsStore.savePoints(ctx, points.map { it.copy() })
+            SwipeSettingsStore.saveNests(ctx, nests.map { it.copy() })
         }
     }
 
-
     fun applyChange(mutator: () -> Unit) {
-        // Save current state into undo before mutation
-        undoStack = undoStack + listOf(snapshotPoints())
-        nestsUndoStack = nestsUndoStack + listOf(snapshotNests())
-        // Any new user change invalidates redo history
-        redoStack = emptyList()
-        nestsRedoStack = emptyList()
-        // Now apply the change
-        mutator()
+        undoRedo.applyChange(mutator)
         recomposeTrigger++
         save()
     }
 
     fun undo() {
-        if (undoStack.isEmpty() && nestsUndoStack.isEmpty()) return
-
-        // Current state goes to redo
-        redoStack = redoStack + listOf(snapshotPoints())
-        nestsRedoStack = nestsRedoStack + listOf(snapshotNests())
-
-        // Pop last from undo and set it as current
-        val last = undoStack.last()
-        undoStack = undoStack.dropLast(1)
-
-        val lastNests = nestsUndoStack.last()
-        nestsUndoStack = nestsUndoStack.dropLast(1)
-
-        points.clear()
-        points.addAll(last.map { it.copy() })
-
-        nests.clear()
-        nests.addAll(lastNests)
-
-        selectedPoint = points.find { it.id == (selectedPoint?.id ?: "") }
-
-        save()
-    }
-
-    fun undoAll() {
-        if (undoStack.isEmpty() && nestsUndoStack.isEmpty()) return
-
-        // Current state goes to redo
-        redoStack = redoStack + listOf(snapshotPoints())
-        nestsRedoStack = nestsRedoStack + listOf(snapshotNests())
-
-        // Clear undo and take the first one
-        val firstPoints = undoStack.first()
-        undoStack = emptyList()
-
-        val firstNests = nestsUndoStack.first()
-        nestsUndoStack = emptyList()
-
-        points.clear()
-        points.addAll(firstPoints.map { it.copy() })
-
-        nests.clear()
-        nests.addAll(firstNests)
-
-        selectedPoint = points.find { it.id == (selectedPoint?.id ?: "") }
-
+        undoRedo.undo()
         save()
     }
 
     fun redo() {
-        if (redoStack.isEmpty() && nestsRedoStack.isEmpty()) return
+        undoRedo.redo()
+        save()
+    }
 
-        // Current state goes back to undo
-        undoStack = undoStack + listOf(snapshotPoints())
-        nestsUndoStack = nestsUndoStack + listOf(snapshotNests())
-
-        val last = redoStack.last()
-        redoStack = redoStack.dropLast(1)
-
-        val lastNests = nestsRedoStack.last()
-        nestsRedoStack = nestsRedoStack.dropLast(1)
-
-        points.clear()
-        points.addAll(last.map { it.copy() })
-
-        nests.clear()
-        nests.addAll(lastNests)
-
-        selectedPoint = points.find { it.id == (selectedPoint?.id ?: "") }
-
+    fun undoAll() {
+        undoRedo.undoAll()
         save()
     }
 
     fun redoAll() {
-        if (redoStack.isEmpty() && nestsRedoStack.isEmpty()) return
-
-        // Current state goes back to undo
-        undoStack = undoStack + listOf(snapshotPoints())
-        nestsUndoStack = nestsUndoStack + listOf(snapshotNests())
-
-        val firstPoints = redoStack.first()
-        redoStack = emptyList()
-
-        val firstNests = nestsRedoStack.first()
-        nestsRedoStack = emptyList()
-
-        points.clear()
-        points.addAll(firstPoints.map { it.copy() })
-
-        nests.clear()
-        nests.addAll(firstNests)
-
-        selectedPoint = points.find { it.id == (selectedPoint?.id ?: "") }
-
+        undoRedo.redoAll()
         save()
     }
+
 
     /**
      * Adds a new nest to the current list of nests.
@@ -613,6 +548,7 @@ fun SettingsScreen(
         if (isInManualPlacementMode) manualPlacementQueue = emptyList()
         else if (selectedPoint != null) selectedPoint = null
         else if (nestId != 0) nestNavigation.goBack()
+        else if (isEditing) isEditing = false
         else onBack()
     }
 
@@ -877,34 +813,36 @@ fun SettingsScreen(
                  * if the user has hovered a point for more than 500ms, a radial circle overlay spawns and indicates that
                  * it can release to merge the 2 points
                  */
-                Canvas(Modifier.fillMaxSize()) {
-                    circlesSettingsOverlay(
-                        drawParams = drawParams,
-                        center = center,
-                        depth = 1,
-                        circles = circles,
-                        selectedPoint = selectedPoint,
-                        nestId = nestId,
-                        preventBgErasing = true
-                    )
-
-                    if (isDragging && selectedPoint != null) {
-                        actionsInCircle(
+                key(recomposeTrigger) {
+                    Canvas(Modifier.fillMaxSize()) {
+                        circlesSettingsOverlay(
                             drawParams = drawParams,
-                            center = selectedPointTempOffset.value,
+                            center = center,
                             depth = 1,
-                            point = selectedPoint!!,
-                            selected = true,
+                            circles = circles,
+                            selectedPoint = selectedPoint,
+                            nestId = nestId,
                             preventBgErasing = true
                         )
-                    }
 
-                    if (isDragging && closestHoveredTempOffset != null && ableToLaunchHoverAction) {
-                        glowOverlay(
-                            center = closestHoveredTempOffset!!,
-                            color = primaryColor,
-                            radius = hoveredPointRadialGradientProgress.dp.toPx()
-                        )
+                        if (isDragging && selectedPoint != null) {
+                            actionsInCircle(
+                                drawParams = drawParams,
+                                center = selectedPointTempOffset.value,
+                                depth = 1,
+                                point = selectedPoint!!,
+                                selected = true,
+                                preventBgErasing = true
+                            )
+                        }
+
+                        if (isDragging && closestHoveredTempOffset != null && ableToLaunchHoverAction) {
+                            glowOverlay(
+                                center = closestHoveredTempOffset!!,
+                                color = primaryColor,
+                                radius = hoveredPointRadialGradientProgress.dp.toPx()
+                            )
+                        }
                     }
                 }
 
@@ -1251,18 +1189,17 @@ fun SettingsScreen(
             }
 
 
-
             // ──────────────────────────────────────────────────
             // Bottom toolbars
             // ──────────────────────────────────────────────────
 
 
-
-
             // Row with nest toolbar and toggle buttons toolbar
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(firstRowScrollState)
             ) {
 
                 // ──────────────────────────────────────────────────
@@ -1278,7 +1215,6 @@ fun SettingsScreen(
 
                 MultiSelectConnectedButtonRow(
                     entries = NestEditTools.entries,
-                    showLabelOnPress = true,
                     showLabel = false,
 
                     isEnabled = {
@@ -1319,13 +1255,11 @@ fun SettingsScreen(
                 // ──────────────────────────────────────────────────
 
 
-
                 // ──────────────────────────────────────────────────
                 // The 3 points settings tools: Snap points / Auto separate / Lock to circle
                 MultiSelectConnectedButtonRow(
                     entries = PointsEditTools.entries,
                     showLabel = false,
-                    showLabelOnPress = true,
                     isChecked = {
                         when (it) {
                             SnapPoints -> snapPoints
@@ -1347,9 +1281,11 @@ fun SettingsScreen(
 
             // Undo/Redo and move bars
             Row(
-                Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(secondRowScrollState)
             ) {
 
 
@@ -1424,10 +1360,8 @@ fun SettingsScreen(
                             ctx.showToast("Failed to set value: $e")
                             logE(SWIPE_TAG, e) { "Failed to set value for point via text field" }
                         }
+                        isEditing = false
                     }
-
-                    var isEditing by remember { mutableStateOf(false) }
-
 
                     Spacer(Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
                     AnimatedVisibility(aPointIsSelected) {
@@ -1443,7 +1377,7 @@ fun SettingsScreen(
 
                     AnimatedVisibility(isEditing) {
                         DragonIconButton(
-                            onClick = { commitEditTExt() },
+                            onClick = ::commitEditTExt,
                             colors = AppObjectsColors.iconButtonColors(
                                 MaterialTheme.colorScheme.primary,
                                 MaterialTheme.colorScheme.onPrimary
@@ -1486,12 +1420,11 @@ fun SettingsScreen(
                 // ──────────────────────────────────────────────────
 
 
-
                 // ──────────────────────────────────────────────────
                 // Undo/Redo bar
 
-                val undoButtonEnabled = undoStack.isNotEmpty()
-                val redoButtonEnabled = redoStack.isNotEmpty()
+                val undoButtonEnabled = undoRedo.canUndo
+                val redoButtonEnabled = undoRedo.canRedo
 
                 MultiSelectConnectedButtonRow(
                     entries = UndRedoEditTools.entries,
@@ -1545,7 +1478,6 @@ fun SettingsScreen(
 
                 MultiSelectConnectedButtonRow(
                     entries = SelectedPointEditTools.entries,
-                    showLabelOnPress = true,
                     showLabel = false,
                     isChecked = { true },
                     isEnabled = { aPointIsSelected }
@@ -1620,6 +1552,9 @@ fun SettingsScreen(
             )
         }
     }
+
+
+    // ── Dialogs ─────────────────────────────────────────
 
     if (showAddDialog) {
         AddPointDialog(
