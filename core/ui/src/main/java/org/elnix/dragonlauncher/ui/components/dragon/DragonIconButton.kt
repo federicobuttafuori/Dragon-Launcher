@@ -17,11 +17,11 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 
 
 @Composable
-fun DragonIconButton(
+fun DragonIconButtonImpl(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
+    colors: IconButtonColors,
     content: @Composable () -> Unit,
 ) {
 
@@ -37,7 +37,6 @@ fun DragonIconButton(
     )
 
     val shape = RoundedCornerShape(shapeRound)
-
 
     IconButton(
         onClick = onClick,
@@ -55,34 +54,41 @@ fun DragonIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: ImageVector
+    colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
+    content: @Composable () -> Unit,
 ) {
 
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val shapeRound by animateDpAsState(
-        targetValue = if (isPressed)
-            UiConstants.DRAGON_SHAPE_CORNER_DP
-        else
-            UiConstants.CIRCLE_SHAPE_CORNER_DP,
-        label = "shape_anim"
-    )
-
-    val shape = RoundedCornerShape(shapeRound)
-
-    IconButton(
+    DragonIconButtonImpl(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        colors = AppObjectsColors.iconButtonColors(),
-        interactionSource = interactionSource,
-        shape = shape
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null
-        )
+        colors = colors,
+        content = content
+    )
+}
+
+@Composable
+fun DragonIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
+    icon: ImageVector,
+    contentDescription: String
+) {
+
+    DragonTooltip(contentDescription) {
+        DragonIconButtonImpl(
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            colors = colors
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription
+            )
+        }
     }
 }
 

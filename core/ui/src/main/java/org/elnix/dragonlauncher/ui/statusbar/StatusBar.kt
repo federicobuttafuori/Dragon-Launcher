@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -76,6 +73,7 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
+import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.CustomActionSelector
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
@@ -159,9 +157,9 @@ fun StatusBar(
                     )
 
                     if (element.width == -2) { // Special ID for Notch Spacer
-                         Spacer(Modifier.width(with(density) { totalCutoutWidth.toDp() }))
+                        Spacer(Modifier.width(with(density) { totalCutoutWidth.toDp() }))
                     } else {
-                         Spacer(modifier)
+                        Spacer(modifier)
                     }
                 }
             }
@@ -198,7 +196,7 @@ fun EditStatusBar() {
         elements.clear()
 
         val loadedElements = StatusBarJsonSettingsStore.jsonSetting.get(ctx)
-                             
+
         val elementsJson = StatusBarJson.decodeStatusBarElements(loadedElements)
 
         elementsJson.forEach { item ->
@@ -666,40 +664,20 @@ fun EditStatusBar() {
         ) {
             allStatusBarSerializable.forEach { item ->
 
-                var showHelp by remember { mutableStateOf(false) }
                 val itemName = remember(item) { item::class.simpleName.toString() }
 
-                Box(contentAlignment = Alignment.Center) {
+                DragonTooltip(itemName) {
                     Box(
                         modifier = Modifier
                             .border(1.dp, MaterialTheme.colorScheme.primary, DragonShape)
                             .clip(DragonShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .sizeIn(minWidth = 50.dp, minHeight = 50.dp)
-                            .combinedClickable(
-                                onLongClick = { showHelp = true },
-                                onClick = { addElement(item) }
-                            )
+                            .clickable { addElement(item) }
                             .padding(15.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         StatusBarItem(item, previewMode = true)
-                    }
-
-                    DropdownMenu(
-                        expanded = showHelp,
-                        onDismissRequest = { showHelp = false },
-                        containerColor = Color.Transparent,
-                        shadowElevation = 0.dp,
-                        tonalElevation = 0.dp
-                    ) {
-                        Text(
-                            text = itemName,
-                            modifier = Modifier
-                                .clip(DragonShape)
-                                .background(MaterialTheme.colorScheme.background)
-                                .padding(5.dp)
-                        )
                     }
                 }
             }

@@ -117,7 +117,8 @@ fun SmallShapeRow(
 
         DragonIconButton(
             onClick = onReset,
-            icon = Icons.Default.Restore
+            icon = Icons.Default.Restore,
+            contentDescription = stringResource(R.string.reset)
         )
     }
 }

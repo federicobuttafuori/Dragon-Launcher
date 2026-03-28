@@ -124,6 +124,7 @@ import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
+import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
 import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonColumn
 import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
@@ -225,6 +226,7 @@ fun SettingsScreen(
 
     val firstRowScrollState = rememberScrollState()
     val secondRowScrollState = rememberScrollState()
+
     /** ──────────────────── NESTS SYSTEM ────────────────────
      * - Collects the nests from the datastore, then initialize the base nest to 0 (always the default)
      * while all the other have a random id
@@ -1298,32 +1300,34 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ToggleButton(
-                        checked = false, // For the shape to be always the right one, and not a circle
-                        onCheckedChange = {
-                            selectedPoint?.let { point ->
-                                applyChange {
-                                    point.angleDeg = normalizeAngle(point.angleDeg + 1)
-                                    if (snapPoints) point.angleDeg = point.angleDeg
-                                        .toInt()
-                                        .toDouble()
-                                    if (autoSeparatePoints) autoSeparate(
-                                        points,
-                                        nestId,
-                                        circles.find { it.id == point.circleNumber },
-                                        point
-                                    )
+                    DragonTooltip(R.string.move_point_clockwise) {
+                        ToggleButton(
+                            checked = false, // For the shape to be always the right one, and not a circle
+                            onCheckedChange = {
+                                selectedPoint?.let { point ->
+                                    applyChange {
+                                        point.angleDeg = normalizeAngle(point.angleDeg + 1)
+                                        if (snapPoints) point.angleDeg = point.angleDeg
+                                            .toInt()
+                                            .toDouble()
+                                        if (autoSeparatePoints) autoSeparate(
+                                            points,
+                                            nestId,
+                                            circles.find { it.id == point.circleNumber },
+                                            point
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                        enabled = aPointIsSelected,
-                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                        colors = AppObjectsColors.toggleButtonColors(),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ChevronLeft,
-                            contentDescription = stringResource(R.string.move_point_clockwise)
-                        )
+                            },
+                            enabled = aPointIsSelected,
+                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                            colors = AppObjectsColors.toggleButtonColors(),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ChevronLeft,
+                                contentDescription = stringResource(R.string.move_point_clockwise)
+                            )
+                        }
                     }
 
 
@@ -1389,32 +1393,34 @@ fun SettingsScreen(
 
                     Spacer(Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))
 
-                    ToggleButton(
-                        checked = false,
-                        onCheckedChange = {
-                            selectedPoint?.let { point ->
-                                applyChange {
-                                    point.angleDeg = normalizeAngle(point.angleDeg - 1)
-                                    if (snapPoints) point.angleDeg = point.angleDeg
-                                        .toInt()
-                                        .toDouble()
-                                    if (autoSeparatePoints) autoSeparate(
-                                        points,
-                                        nestId,
-                                        circles.find { it.id == point.circleNumber },
-                                        point
-                                    )
+                    DragonTooltip(R.string.move_point_anticlockwise) {
+                        ToggleButton(
+                            checked = false,
+                            onCheckedChange = {
+                                selectedPoint?.let { point ->
+                                    applyChange {
+                                        point.angleDeg = normalizeAngle(point.angleDeg - 1)
+                                        if (snapPoints) point.angleDeg = point.angleDeg
+                                            .toInt()
+                                            .toDouble()
+                                        if (autoSeparatePoints) autoSeparate(
+                                            points,
+                                            nestId,
+                                            circles.find { it.id == point.circleNumber },
+                                            point
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                        enabled = aPointIsSelected,
-                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                        colors = AppObjectsColors.toggleButtonColors(),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = stringResource(R.string.move_point_anticlockwise),
-                        )
+                            },
+                            enabled = aPointIsSelected,
+                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                            colors = AppObjectsColors.toggleButtonColors(),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ChevronRight,
+                                contentDescription = stringResource(R.string.move_point_anticlockwise),
+                            )
+                        }
                     }
                 }
                 // ──────────────────────────────────────────────────

@@ -1,38 +1,23 @@
 package org.elnix.dragonlauncher.ui.components.generic
 
-import android.view.ViewConfiguration
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.enumsui.ToggleButtonOption
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
 import org.elnix.dragonlauncher.ui.components.internals.connectedBottomButtonShapes
 import org.elnix.dragonlauncher.ui.components.internals.connectedTopButtonShapes
-import org.elnix.dragonlauncher.ui.modifiers.buttonGroup
 
 /**
  * A horizontally connected multi-select toggle button group built on Material3 Expressive's
@@ -75,36 +60,18 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonColumn(
     ) {
         entries.forEachIndexed { index, entry ->
 
-            val interactionSource = remember { MutableInteractionSource() }
-            val isPressed by interactionSource.collectIsPressedAsState()
-
-            var showHelp by remember { mutableStateOf(false) }
-            var longPressConsumed by remember { mutableStateOf(false) }
-
-            LaunchedEffect(isPressed) {
-                if (isPressed) {
-                    longPressConsumed = false
-                    delay(ViewConfiguration.getLongPressTimeout().toLong())
-                    showHelp = true
-                    longPressConsumed = true
-                }
-            }
             // No idea why, but using a not here feels more natural for the displayed entries
             val checked = !isChecked(entry)
 
-            Box {
+            DragonTooltip(entry.resId ?: -1) {
                 ToggleButton(
                     checked = checked,
                     enabled = isEnabled(entry),
                     onCheckedChange = {
-                        if (!longPressConsumed) {
-                            onCheck(entry)
-
-                            if (hapticFeedback) {
-                                haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap)
-                            }
+                        onCheck(entry)
+                        if (hapticFeedback) {
+                            haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap)
                         }
-                        longPressConsumed = false
                     },
                     colors = AppObjectsColors.toggleButtonColors(),
                     // Custom shapes
@@ -114,7 +81,6 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonColumn(
                             entries.lastIndex -> connectedBottomButtonShapes()
                             else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                         },
-                    interactionSource = interactionSource
                 ) {
                     Crossfade(!checked) { notChecked ->
                         Icon(
@@ -122,23 +88,6 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonColumn(
                             contentDescription = null
                         )
                     }
-                }
-
-                DropdownMenu(
-                    expanded = showHelp,
-                    onDismissRequest = {
-                        showHelp = false
-                        longPressConsumed = false
-                    },
-                    containerColor = Color.Transparent,
-                    shadowElevation = 0.dp,
-                    tonalElevation = 0.dp
-                ) {
-                    Text(
-                        text = stringResource(entry.resId ?: -1),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.buttonGroup()
-                      )
                 }
             }
         }
