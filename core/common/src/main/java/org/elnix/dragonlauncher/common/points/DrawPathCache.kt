@@ -2,10 +2,7 @@ package org.elnix.dragonlauncher.common.points
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
-import org.elnix.dragonlauncher.common.logging.logD
-import org.elnix.dragonlauncher.common.logging.logW
 import org.elnix.dragonlauncher.common.serializables.IconShape
-import org.elnix.dragonlauncher.common.utils.Constants
 
 /**
  * An LRU (Least Recently Used) cache for [Path] objects derived from [IconShape], used to avoid
@@ -80,18 +77,8 @@ class DrawPathCache(initialMaxSize: Int = 64) {
         shape: IconShape,
         size: Size,
         compute: () -> Path
-    ): Path {
+    ): Path = paths.getOrPut(Pair(shape, size), compute)
 
-        // Debug, remove when release TODO
-        val cached = paths[Pair(shape, size)]
-        if (cached != null) {
-            logD(Constants.Logging.SWIPE_TAG) { "Cache hit for ($shape, $size)" }
-        } else {
-            logW(Constants.Logging.SWIPE_TAG) { "Cache miss — computing path for ($shape, $size)" }
-        }
-
-        return paths.getOrPut(Pair(shape, size), compute)
-    }
 
     /**
      * The current number of entries held in the cache.

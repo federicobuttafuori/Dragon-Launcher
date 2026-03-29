@@ -79,11 +79,11 @@ object AppObjectsColors {
         val colors = MaterialTheme.colorScheme
         return if (LocalUseCustomColorChannels.current) {
             SliderDefaults.colors(
-                thumbColor = activeTrackColor?: colors.primary,
-                activeTrackColor = activeTrackColor?: colors.secondary,
-                activeTickColor = activeTrackColor?: colors.primary,
+                thumbColor = activeTrackColor ?: colors.primary,
+                activeTrackColor = activeTrackColor ?: colors.secondary,
+                activeTickColor = activeTrackColor ?: colors.primary,
                 inactiveTrackColor = backgroundColor ?: colors.surface,
-                inactiveTickColor = activeTrackColor?: colors.primary,
+                inactiveTickColor = activeTrackColor ?: colors.primary,
                 disabledThumbColor = colors.primary,
                 disabledActiveTrackColor = backgroundColor ?: colors.onSurface,
                 disabledActiveTickColor = colors.primary,
@@ -117,7 +117,7 @@ object AppObjectsColors {
             OutlinedTextFieldDefaults.colors(
                 focusedTextColor = onBackgroundColor ?: colors.onBackground,
                 unfocusedTextColor = onBackgroundColor ?: colors.onBackground,
-                disabledTextColor = onBackgroundColor ?: colors.onBackground.adjustBrightness( 0.5f),
+                disabledTextColor = onBackgroundColor ?: colors.onBackground.adjustBrightness(0.5f),
                 errorTextColor = colors.error,
 
                 focusedContainerColor = backgroundColor ?: colors.background,
@@ -201,6 +201,19 @@ object AppObjectsColors {
     }
 
     @Composable
+    fun errorIconButtonColors(): IconButtonColors {
+        val colors = MaterialTheme.colorScheme
+        return if (LocalUseCustomColorChannels.current) {
+            IconButtonDefaults.iconButtonColors(
+                containerColor = colors.errorContainer,
+                contentColor = colors.error,
+                disabledContainerColor = colors.errorContainer.alphaMultiplier(0.5f),
+                disabledContentColor = colors.error.alphaMultiplier(0.5f)
+            )
+        } else IconButtonDefaults.iconButtonColors()
+    }
+
+    @Composable
     fun cardColors(): CardColors {
         val colors = MaterialTheme.colorScheme
         return if (LocalUseCustomColorChannels.current) {
@@ -212,7 +225,7 @@ object AppObjectsColors {
             )
         } else CardDefaults.cardColors()
     }
-    
+
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     fun toggleButtonColors(): ToggleButtonColors {

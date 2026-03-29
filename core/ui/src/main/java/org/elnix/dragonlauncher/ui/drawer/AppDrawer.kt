@@ -575,12 +575,10 @@ fun AppDrawerScreen(
                                         it.isAuthenticating -> LoadingIndicator(color = Color.Yellow)
                                         it.isLocked -> {
                                             DragonIconButton(
-                                                onClick = { appLifecycleViewModel.onUnlockPrivateSpace() }) {
-                                                Icon(
-                                                    Icons.Default.Lock,
-                                                    contentDescription = "Private Space Locked"
-                                                )
-                                            }
+                                                onClick = { appLifecycleViewModel.onUnlockPrivateSpace() },
+                                                imageVector = Icons.Default.Lock,
+                                                contentDescription = "Private Space Locked"
+                                            )
                                         }
                                     }
                                 }

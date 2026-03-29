@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +22,7 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 @Composable
 fun SettingsTitle(
     title: String,
-    vararg otherIcons: Pair<(() -> Unit), ImageVector>,
+    vararg otherIcons: Triple<(() -> Unit), ImageVector, String>,
     resetIcon: (() -> Unit)?,
     helpIcon: () -> Unit,
     onBack: () -> Unit
@@ -35,13 +34,10 @@ fun SettingsTitle(
     ) {
 
         DragonIconButton(
-            onClick = { onBack() }
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.back)
-            )
-        }
+            onClick = onBack,
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = stringResource(R.string.back)
+        )
 
         Text(
             text = title,
@@ -59,33 +55,24 @@ fun SettingsTitle(
             otherIcons.forEach {
                 DragonIconButton(
                     onClick = { it.first() },
-                ) {
-                    Icon(
-                        imageVector = it.second,
-                        contentDescription = null
-                    )
-                }
+                    imageVector = it.second,
+                    contentDescription = it.third
+                )
             }
 
             if (resetIcon != null) {
                 DragonIconButton(
                     onClick = { resetIcon() },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Restore,
-                        contentDescription = stringResource(R.string.reset)
-                    )
-                }
+                    imageVector = Icons.Default.Restore,
+                    contentDescription = stringResource(R.string.reset)
+                )
             }
 
             DragonIconButton(
                 onClick = { helpIcon() },
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Help,
-                    contentDescription = stringResource(R.string.help)
-                )
-            }
+                imageVector = Icons.AutoMirrored.Filled.Help,
+                contentDescription = stringResource(R.string.help)
+            )
         }
     }
 }

@@ -673,12 +673,11 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                DragonIconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = stringResource(R.string.home)
-                    )
-                }
+                DragonIconButton(
+                    onClick = onBack,
+                    imageVector = Icons.Default.Home,
+                    contentDescription = stringResource(R.string.home)
+                )
 
                 Text(
                     text = stringResource(R.string.swipe_points_selection),
@@ -690,12 +689,11 @@ fun SettingsScreen(
                 )
 
                 Row {
-                    DragonIconButton(onClick = { showBurgerMenu = true }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.open_burger_menu)
-                        )
-                    }
+                    DragonIconButton(
+                        onClick = { showBurgerMenu = true },
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.open_burger_menu)
+                    )
 
                     DropdownMenu(
                         expanded = showBurgerMenu,
@@ -772,12 +770,11 @@ fun SettingsScreen(
                         )
                     }
 
-                    DragonIconButton(onClick = onAdvSettings) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = stringResource(R.string.settings)
-                        )
-                    }
+                    DragonIconButton(
+                        onClick = onAdvSettings,
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
                 }
             }
 
@@ -1385,10 +1382,10 @@ fun SettingsScreen(
                             colors = AppObjectsColors.iconButtonColors(
                                 MaterialTheme.colorScheme.primary,
                                 MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Icon(Icons.Default.Check, contentDescription = "Validate")
-                        }
+                            ),
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Validate"
+                        )
                     }
 
                     Spacer(Modifier.width(ButtonGroupDefaults.ConnectedSpaceBetween))

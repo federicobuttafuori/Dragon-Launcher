@@ -48,7 +48,7 @@ fun SettingsScaffold(
     onBack: () -> Unit,
     helpText: String,
     onReset: (() -> Unit)?,
-    vararg otherIcons: Pair<(() -> Unit), ImageVector>,
+    vararg otherIcons: Triple<(() -> Unit), ImageVector, String>,
     modifier: Modifier = Modifier,
     resetTitle: String = stringResource(R.string.reset_default_settings),
     resetText: String? = stringResource(R.string.reset_settings_in_this_tab),

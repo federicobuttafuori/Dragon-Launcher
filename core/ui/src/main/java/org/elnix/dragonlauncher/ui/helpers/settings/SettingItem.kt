@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
-import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
 import org.elnix.dragonlauncher.ui.helpers.IconC
@@ -109,7 +109,7 @@ fun SettingItemWithExternalOpen(
     comingSoon: Boolean = false,
     icon: Any? = null,
     leadIcon: Any? = null,
-    extIcon: Any = Icons.AutoMirrored.Filled.OpenInNew,
+    extIcon: ImageVector = Icons.AutoMirrored.Filled.OpenInNew,
     onLongClick: (() -> Unit)? = null,
     onExtClick: () -> Unit,
     onClick: () -> Unit
@@ -132,15 +132,9 @@ fun SettingItemWithExternalOpen(
 
         DragonIconButton(
             onClick = onExtClick,
-            colors = AppObjectsColors.iconButtonColors(),
-            modifier = Modifier.size(52.dp)
-        ) {
-            IconC(
-                icon = extIcon,
-                contentDescription = title,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.sizeIn(maxHeight = 30.dp)
-            )
-        }
+            modifier = Modifier.size(52.dp),
+            contentDescription = title,
+            imageVector = extIcon
+        )
     }
 }

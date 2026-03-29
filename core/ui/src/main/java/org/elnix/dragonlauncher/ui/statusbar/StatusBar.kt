@@ -661,13 +661,10 @@ fun EditStatusBar() {
                         DragonIconButton(
                             onClick = {
                                 duplicateElement(element)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ContentCopy,
-                                contentDescription = stringResource(R.string.copy)
-                            )
-                        }
+                            },
+                            imageVector = Icons.Default.ContentCopy,
+                            contentDescription = stringResource(R.string.copy)
+                        )
                     }
                 }
             }

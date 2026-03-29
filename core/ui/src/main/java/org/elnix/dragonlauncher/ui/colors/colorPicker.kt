@@ -271,13 +271,10 @@ private fun ColorPicker(
                     onClick = {
                         ctx.copyToClipboard(hexText)
                     },
-                    colors = AppObjectsColors.iconButtonColors(color, textBoxColor)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Copy HEX"
-                    )
-                }
+                    colors = AppObjectsColors.iconButtonColors(color, textBoxColor),
+                    imageVector = Icons.Default.ContentCopy,
+                    contentDescription = "Copy HEX"
+                )
 
                 DragonIconButton(
                     onClick = {
@@ -287,13 +284,10 @@ private fun ColorPicker(
                             onColorSelected(pasted)
                         }
                     },
-                    colors = AppObjectsColors.iconButtonColors(color, textBoxColor)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ContentPaste,
-                        contentDescription = "Paste HEX"
-                    )
-                }
+                    colors = AppObjectsColors.iconButtonColors(color, textBoxColor),
+                    imageVector = Icons.Default.ContentPaste,
+                    contentDescription = "Paste HEX"
+                )
             }
         }
 

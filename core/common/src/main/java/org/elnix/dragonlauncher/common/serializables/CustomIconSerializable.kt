@@ -59,8 +59,6 @@ data class CustomIconSerializable(
     /** Vertical scale multiplier. */
     val scaleY: Float? = null,
 
-    /** Optional blend mode name (renderer-defined, e.g. SRC_IN, MULTIPLY). */
-    val blendMode: String? = null
 )
 
 /**
@@ -79,15 +77,3 @@ enum class IconType {
     TEXT,
     PLAIN_COLOR
 }
-
-/**
- * Custom BlendModes usd in the icon resolution
- * @see org.elnix.dragonlauncher.common.utils.ImageUtils.resolveCustomIconBitmap
- */
-//@Serializable
-//enum class BlendModes {
-//    DEFAULT,
-//    MULTIPLY,
-//    SCREEN,
-//    OVERLAY
-//}

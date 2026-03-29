@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -94,16 +93,16 @@ fun SettingsDebugTab(
 
                 Spacer(Modifier.weight(1f))
                 DragonIconButton(
-                    onClick = { settingsJson?.let { ctx.copyToClipboard(it.toString(2)) } }
-                ) {
-                    Icon(Icons.Default.ContentCopy, null)
-                }
+                    onClick = { settingsJson?.let { ctx.copyToClipboard(it.toString(2)) } },
+                    imageVector = Icons.Default.ContentCopy,
+                    contentDescription = "Copy"
+                )
 
                 DragonIconButton(
-                    onClick = { loadSettings() }
-                ) {
-                    Icon(Icons.Default.Loop, null)
-                }
+                    onClick = { loadSettings() },
+                    imageVector = Icons.Default.Loop,
+                    contentDescription = "Load settings"
+                )
             }
         },
         content = {

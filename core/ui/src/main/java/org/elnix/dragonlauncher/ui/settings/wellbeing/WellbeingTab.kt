@@ -54,7 +54,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -66,13 +65,15 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.serializables.IconShape
+import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.utils.Constants.PackageNameLists.knownSocialMediaApps
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.hasUsageStatsPermission
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
+import org.elnix.dragonlauncher.ui.actions.appIcon
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
@@ -83,12 +84,11 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalIcons
+import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 
 @Composable
 fun WellbeingTab(onBack: () -> Unit) {
     val ctx = LocalContext.current
-    val icons = LocalIcons.current
     val appsViewModel = LocalAppsViewModel.current
 
     val scope = rememberCoroutineScope()
@@ -102,7 +102,6 @@ fun WellbeingTab(onBack: () -> Unit) {
     val gridSize by DrawerSettingsStore.gridSize.asState()
     val showIcons by DrawerSettingsStore.showAppIconsInDrawer.asState()
     val showLabels by DrawerSettingsStore.showAppLabelInDrawer.asState()
-    val iconsShape by DrawerSettingsStore.iconsShape.asState()
     val allApps by appsViewModel.allApps.collectAsState()
 
     var showAppPicker by remember { mutableStateOf(false) }
@@ -411,19 +410,17 @@ fun WellbeingTab(onBack: () -> Unit) {
 
             items(pausedApps.toList()) { packageName ->
                 val app = allApps.find { it.packageName == packageName }
-                val appName = app?.name ?: packageName
 
-                PausedAppItem(
-                    appName = appName,
-                    packageName = packageName,
-                    appIcon = icons[app?.packageName],
-                    iconsShape = iconsShape,
-                    onRemove = {
-                        scope.launch {
-                            WellbeingSettingsStore.removePausedApp(ctx, packageName, pausedApps)
+                app?.let {
+                    PausedAppItem(
+                        app = app,
+                        onRemove = {
+                            scope.launch {
+                                WellbeingSettingsStore.removePausedApp(ctx, packageName, pausedApps)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         } else {
             item {
@@ -718,12 +715,11 @@ private fun ModeChip(
 
 @Composable
 private fun PausedAppItem(
-    appName: String,
-    packageName: String,
-    appIcon: ImageBitmap?,
-    iconsShape: IconShape,
+    app: AppModel,
     onRemove: () -> Unit
 ) {
+    val iconShape = LocalIconShape.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -738,40 +734,24 @@ private fun PausedAppItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.weight(1f)
         ) {
-            if (appIcon != null) {
-                Image(
-                    bitmap = appIcon,
-                    contentDescription = appName,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(iconsShape.resolveShape()),
-                    contentScale = ContentScale.Fit
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(iconsShape.resolveShape())
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Apps,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+
+            Image(
+                painter = appIcon(app),
+                contentDescription = app.name,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(iconShape.resolveShape()),
+                contentScale = ContentScale.Fit
+            )
 
             Column {
                 Text(
-                    text = appName,
+                    text = app.name,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = packageName,
+                    text = app.packageName,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                     fontSize = 10.sp,
@@ -780,13 +760,11 @@ private fun PausedAppItem(
             }
         }
 
-        DragonIconButton(onClick = onRemove) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Remove",
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(18.dp)
-            )
-        }
+        DragonIconButton(
+            onClick = onRemove,
+            imageVector = Icons.Default.Close,
+            contentDescription = stringResource(R.string.remove),
+            colors = AppObjectsColors.errorIconButtonColors()
+        )
     }
 }

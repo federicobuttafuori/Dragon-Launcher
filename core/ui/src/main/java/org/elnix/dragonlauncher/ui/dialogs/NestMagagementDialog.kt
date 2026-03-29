@@ -229,14 +229,11 @@ private fun NestManagementItem(
 
         if (onDelete != null) {
             DragonIconButton(
-                onClick = { onDelete(nest.id) }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.delete_circle_nest),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
+                onClick = { onDelete(nest.id) },
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.delete_circle_nest),
+                colors = AppObjectsColors.errorIconButtonColors()
+            )
         }
     }
 }

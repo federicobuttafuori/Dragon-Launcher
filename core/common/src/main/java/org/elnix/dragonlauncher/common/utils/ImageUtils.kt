@@ -412,29 +412,6 @@ object ImageUtils {
             }
         }
 
-
-        // TODO doesn't work
-        // Step 5: blend mode (best-effort)
-//        icon.blendMode?.let {
-//            paint.xfermode = when (it.uppercase()) {
-//                "MULTIPLY" -> PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
-//                "SCREEN" -> PorterDuffXfermode(PorterDuff.Mode.SCREEN)
-//                "OVERLAY" -> PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
-//                else -> null
-//            }
-//        }
-
-        // TODO unused for now
-        // Step 6: shadow
-//        if (icon.shadowRadius != null) {
-//            paint.setShadowLayer(
-//                icon.shadowRadius,
-//                icon.shadowOffsetX ?: 0f,
-//                icon.shadowOffsetY ?: 0f,
-//                (icon.shadowColor ?: 0x55000000).toInt()
-//            )
-//        }
-
         canvas.withSave {
             // Step 7: transform (scale + rotation)
             val scaleX = icon.scaleX ?: 1f

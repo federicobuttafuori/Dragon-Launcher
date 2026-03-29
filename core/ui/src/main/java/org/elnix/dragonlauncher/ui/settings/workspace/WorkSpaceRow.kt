@@ -100,12 +100,11 @@ fun WorkspaceRow(
                     )
 
                     if (showSamsungSettingsIcon && onSamsungSettingsClick != null) {
-                        DragonIconButton(onClick = onSamsungSettingsClick) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = stringResource(R.string.samsung_secure_folder_settings)
-                            )
-                        }
+                        DragonIconButton(
+                            onClick = onSamsungSettingsClick,
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.samsung_secure_folder_settings)
+                        )
                     }
 
                     Icon(
@@ -156,9 +155,10 @@ fun WorkspaceRow(
                         WorkspaceAction.Rename,
                         WorkspaceAction.Delete
                     ).forEach { action ->
-                        DragonIconButton(onClick = { onAction(action) }) {
-                            Icon(action.icon, action.label)
-                        }
+                        DragonIconButton(
+                            onClick = { onAction(action) }, imageVector = action.icon,
+                            contentDescription = action.label
+                        )
                     }
                 }
 

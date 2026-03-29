@@ -207,7 +207,7 @@ fun AngleLineTab(onBack: () -> Unit) {
                 AngleLineSettingsStore.resetAll(ctx)
             }
         },
-        Pair({ showOrderDialog = true }, Icons.Default.MoreVert),
+        Triple({ showOrderDialog = true }, Icons.Default.MoreVert, stringResource(R.string.more)),
         scrollableContent = true,
         titleContent = {
 

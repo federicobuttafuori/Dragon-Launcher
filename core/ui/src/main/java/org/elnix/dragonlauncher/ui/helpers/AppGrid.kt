@@ -138,13 +138,9 @@ fun AppGrid(
 
                     if (onReload != null) {
                         DragonIconButton(
-                            onClick = onReload
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = stringResource(R.string.reload_apps)
-                            )
-                        }
+                            onClick = onReload, imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.reload_apps)
+                        )
                     }
                 }
             }
@@ -204,7 +200,7 @@ fun AppGrid(
                         onLongClick = {
                             if (!isMultiSelectMode && onEnterMultiSelect != null) {
                                 onEnterMultiSelect(app)
-                            }  else if (isMultiSelectMode && onToggleSelect != null) {
+                            } else if (isMultiSelectMode && onToggleSelect != null) {
                                 onToggleSelect(app)
                             } else {
                                 onLongClick?.invoke(app)
@@ -213,7 +209,7 @@ fun AppGrid(
                         onClick = {
                             if (isMultiSelectMode && onToggleSelect != null) {
                                 onToggleSelect(app)
-                            } else{
+                            } else {
                                 onClick(app)
                             }
                         }
@@ -354,7 +350,7 @@ private fun AppDefinedGrid(
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
-                            ){
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.MoreHoriz,
                                     contentDescription = "More",
@@ -363,7 +359,7 @@ private fun AppDefinedGrid(
                             }
                         }
                     }
-                    appIndex ++
+                    appIndex++
                 }
             }
         }

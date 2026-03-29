@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +57,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.DragonLogManager
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
@@ -121,13 +122,16 @@ fun LogsTab(
                         if (ExtensionManager.isExtensionInstalled(ctx, pkgValue)) {
                             val pkgInfo = try {
                                 ctx.packageManager.getPackageInfo(pkgValue, 0)
-                            } catch (_: Exception) { null }
-                            
+                            } catch (_: Exception) {
+                                null
+                            }
+
                             val versionStr = pkgInfo?.versionName ?: "unknown"
                             lines.add("$nameValue ($versionStr)")
                         }
                     }
-                } catch (_: Exception) {}
+                } catch (_: Exception) {
+                }
             }
         }
 
@@ -169,7 +173,7 @@ fun LogsTab(
                     appendLine("${perm.substringAfterLast(".")}: ${if (granted) "✅" else "❌"}")
                 }
             } catch (e: Exception) {
-                appendLine("Error reading permissions")
+                appendLine("Error reading permissions: $e")
             }
         }
     }
@@ -185,11 +189,14 @@ fun LogsTab(
             refreshTrigger++
         },
         resetText = "Clear all logs",
+
+
         otherIcons = arrayOf(
-            ({
-                refreshTrigger++
-                ctx.showToast("Refreshing...")
-            } to Icons.Default.Refresh)
+            Triple(
+                { refreshTrigger++; ctx.showToast("Refreshing...") },
+                Icons.Default.Refresh,
+                stringResource(R.string.refresh)
+            )
         ),
         content = {
 
@@ -218,10 +225,11 @@ fun LogsTab(
                                 onClick = {
                                     ctx.copyToClipboard(deviceDetails)
                                     ctx.showToast("Device info copied")
-                                }
-                            ) {
-                                Icon(Icons.Default.ContentCopy, "Copy Info", modifier = Modifier.size(20.dp))
-                            }
+                                },
+                                modifier = Modifier.size(20.dp),
+                                imageVector = Icons.Default.ContentCopy,
+                                contentDescription = "Copy Info"
+                            )
                         }
                         Spacer(Modifier.height(8.dp))
                         SelectionContainer {
@@ -304,18 +312,18 @@ fun LogsTab(
                                     DragonIconButton(
                                         onClick = {
                                             showDeleteDialog = file
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.Delete, "Delete")
-                                    }
+                                        },
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Delete"
+                                    )
 
                                     DragonIconButton(
                                         onClick = {
                                             exportLogFile(ctx, file)
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.Share, "Export")
-                                    }
+                                        },
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = "Export"
+                                    )
                                 }
                             }
                         }
@@ -347,19 +355,19 @@ fun LogsTab(
                                                 e.printStackTrace()
                                                 ctx.showToast("Failed to copy to clipboard, probably too long")
                                             }
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.ContentCopy, "Copy All")
-                                    }
+                                        },
+                                        imageVector = Icons.Default.ContentCopy,
+                                        contentDescription = "Copy All"
+                                    )
 
                                     DragonIconButton(
                                         onClick = {
                                             logs = ""
                                             selectedFile = null
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.Close, "Close")
-                                    }
+                                        },
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close"
+                                    )
                                 }
                             }
 
@@ -427,7 +435,7 @@ private fun exportLogFile(ctx: Context, file: File) {
 
 
         ctx.startActivity(Intent.createChooser(shareIntent, "Share ${file.name}"))
-        logD(LOGS_TAG) {" Share opened: ${file.name} (${shareFile.absolutePath})" }
+        logD(LOGS_TAG) { " Share opened: ${file.name} (${shareFile.absolutePath})" }
 
     } catch (e: SecurityException) {
         logE(LOGS_TAG, e) { "FileProvider not configured" }

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -170,19 +169,19 @@ private fun SliderWithLabelInternal(
                     editing -> {
                         DragonIconButton(
                             onClick = { editValue() },
-                            colors = AppObjectsColors.iconButtonColors(backgroundColor)
-                        ) {
-                            Icon(Icons.Default.Check, contentDescription = "Validate")
-                        }
+                            colors = AppObjectsColors.iconButtonColors(backgroundColor),
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Validate"
+                        )
                     }
 
                     onReset != null -> {
                         DragonIconButton(
                             onClick = onReset,
-                            enabled = enabled
-                        ) {
-                            Icon(Icons.Default.Restore, contentDescription = "Reset")
-                        }
+                            enabled = enabled,
+                            imageVector = Icons.Default.Restore,
+                            contentDescription = "Reset"
+                        )
                     }
                 }
             }

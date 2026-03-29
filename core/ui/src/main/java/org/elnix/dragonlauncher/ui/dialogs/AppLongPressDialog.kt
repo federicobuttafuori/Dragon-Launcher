@@ -192,14 +192,10 @@ fun AppLongPressDialog(
                 Spacer(Modifier.weight(1f))
 
                 DragonIconButton(
-                    onClick = { showDetailedAppInfoDialog = true }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = "Details",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+                    onClick = { showDetailedAppInfoDialog = true },
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Details",
+                )
             }
         },
         onDismissRequest = onDismiss,

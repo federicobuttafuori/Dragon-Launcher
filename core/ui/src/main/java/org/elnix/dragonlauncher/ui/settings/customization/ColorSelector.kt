@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -407,7 +406,6 @@ fun ColorSelectorTab(
     var showResetValidation by remember { mutableStateOf(false) }
 
     var showBurgerMenu by remember { mutableStateOf(false) }
-    var showRequestHelpDialog by remember { mutableStateOf(false) }
 
     var selectedCustomView by remember { mutableStateOf(CustomColorModeEditing.NORMAL) }
 
@@ -599,16 +597,10 @@ fun ColorSelectorTab(
                             onClick = { showBurgerMenu = true },
                             colors = AppObjectsColors.iconButtonColors(
                                 backgroundColor = MaterialTheme.colorScheme.primary.copy(0.5f)
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.open_burger_menu),
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .padding(5.dp)
-                            )
-                        }
+                            ),
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.open_burger_menu)
+                        )
 
                         DropdownMenu(
                             expanded = showBurgerMenu,
@@ -640,21 +632,6 @@ fun ColorSelectorTab(
                                 )
                             )
                         }
-                    }
-
-                    DragonIconButton(
-                        onClick = { showRequestHelpDialog = true },
-                        colors = AppObjectsColors.iconButtonColors(
-                            backgroundColor = MaterialTheme.colorScheme.primary.copy(0.5f)
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .padding(5.dp)
-                        )
                     }
                 }
             }
@@ -915,16 +892,6 @@ fun ColorSelectorTab(
             },
             containerColor = MaterialTheme.colorScheme.surface,
             shape = DragonShape
-        )
-    }
-
-
-    if (showRequestHelpDialog) {
-        UserValidation(
-            title = stringResource(R.string.help_wanted),
-            message = stringResource(R.string.help_wanted_on_colors),
-            onDismiss = {},
-            onValidate = { showRequestHelpDialog = false }
         )
     }
 

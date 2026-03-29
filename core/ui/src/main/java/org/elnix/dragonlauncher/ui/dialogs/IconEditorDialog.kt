@@ -171,12 +171,9 @@ fun IconEditorDialog(
                         textValue = ""
                     },
                     colors = AppObjectsColors.iconButtonColors(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Restore,
-                        contentDescription = stringResource(R.string.reset)
-                    )
-                }
+                    imageVector = Icons.Default.Restore,
+                    contentDescription = stringResource(R.string.reset)
+                )
             }
         },
         confirmButton = {
@@ -428,21 +425,6 @@ fun IconEditorDialog(
                             )
                         }
                     ) { showShapePickerDialog = true }
-
-                    // TODO Disabled cause not used and not working yet
-//                    val selectedBlendMode =  selectedIcon?.blendMode?.let {
-//                        BlendModes.valueOf(it)
-//                    } ?: BlendModes.DEFAULT
-//
-//                    ActionColumn(
-//                        actions = BlendModes.entries,
-//                        selectedView = selectedBlendMode,
-//                        backgroundColor = MaterialTheme.colorScheme.surface
-//                    ) {
-//                        selectedIcon = (selectedIcon ?: CustomIconSerializable()).copy(
-//                            blendMode = it.toString()
-//                        )
-//                    }
                 }
             }
         },

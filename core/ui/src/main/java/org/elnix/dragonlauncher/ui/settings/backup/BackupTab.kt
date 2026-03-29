@@ -82,7 +82,7 @@ fun BackupTab(onBack: () -> Unit) {
         ctx.showToast(lastBackupTime)
     }
 
-    val autoBackupUri: Uri? = autoBackupUriString?.takeIf { it.isNotEmpty() }?.toUri()
+    val autoBackupUri: Uri? = autoBackupUriString.takeIf { it.isNotEmpty() }?.toUri()
 
     val backupPath: String? = autoBackupUri?.let { uri ->
         getFilePathFromUri(ctx, uri)

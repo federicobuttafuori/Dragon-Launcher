@@ -49,31 +49,31 @@ fun DragonIconButtonImpl(
     )
 }
 
+//@Composable
+//fun DragonIconButton(
+//    onClick: () -> Unit,
+//    modifier: Modifier = Modifier,
+//    enabled: Boolean = true,
+//    colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
+//    content: @Composable () -> Unit,
+//) {
+//
+//    DragonIconButtonImpl(
+//        onClick = onClick,
+//        modifier = modifier,
+//        enabled = enabled,
+//        colors = colors,
+//        content = content
+//    )
+//}
+
 @Composable
 fun DragonIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
-    content: @Composable () -> Unit,
-) {
-
-    DragonIconButtonImpl(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-        colors = colors,
-        content = content
-    )
-}
-
-@Composable
-fun DragonIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
-    icon: ImageVector,
+    imageVector: ImageVector,
     contentDescription: String
 ) {
 
@@ -85,7 +85,7 @@ fun DragonIconButton(
             colors = colors
         ) {
             Icon(
-                imageVector = icon,
+                imageVector = imageVector,
                 contentDescription = contentDescription
             )
         }

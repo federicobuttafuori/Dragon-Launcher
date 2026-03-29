@@ -111,7 +111,6 @@ fun HapticFeedbackEditor(
     )
 
 
-
     fun currentEditingSnapshot(): CustomHapticFeedbackSerializable? {
         val snapshot = if (entries.isEmpty()) null
         else CustomHapticFeedbackSerializable(
@@ -190,22 +189,16 @@ fun HapticFeedbackEditor(
                     )
 
                     DragonIconButton(
-                        onClick = ::importFromClipboard
-                    ) {
-                        Icon(
-                            Icons.Default.ContentPaste,
-                            contentDescription = null
-                        )
-                    }
+                        onClick = ::importFromClipboard,
+                        imageVector = Icons.Default.ContentPaste,
+                        contentDescription = stringResource(R.string.paste)
+                    )
 
                     DragonIconButton(
-                        onClick = ::copyToClipboard
-                    ) {
-                        Icon(
-                            Icons.Default.ContentCopy,
-                            contentDescription = null
-                        )
-                    }
+                        onClick = ::copyToClipboard,
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = stringResource(R.string.copy)
+                    )
                 }
                 Spacer(Modifier.height(5.dp))
 
@@ -376,19 +369,16 @@ fun HapticFeedbackEditor(
                                                 onClick = {
                                                     entries.add(index + 1, entries[index].copy(id = System.nanoTime()))
                                                 },
-                                                colors = AppObjectsColors.iconButtonColors()
-                                            ) {
-                                                Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.copy))
-                                            }
+                                                colors = AppObjectsColors.iconButtonColors(),
+                                                imageVector = Icons.Default.ContentCopy,
+                                                contentDescription = stringResource(R.string.copy)
+                                            )
 
                                             DragonIconButton(
                                                 onClick = { entries.removeAt(index) },
-                                                colors = AppObjectsColors.iconButtonColors(
-                                                    contentColor = MaterialTheme.colorScheme.error
-                                                )
-                                            ) {
-                                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.remove))
-                                            }
+                                                colors = AppObjectsColors.errorIconButtonColors(),
+                                                imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.remove)
+                                            )
 
                                             Icon(
                                                 imageVector = Icons.Default.DragHandle,
@@ -447,14 +437,11 @@ private fun RotatingPlayIcon(
             }
             onClick()
         },
-        enabled = enabled
-    ) {
-        Icon(
-            imageVector = Icons.Default.PlayArrow,
-            contentDescription = stringResource(R.string.play),
-            Modifier.rotate(playIconRotation.value)
-        )
-    }
+        modifier = Modifier.rotate(playIconRotation.value),
+        enabled = enabled,
+        imageVector = Icons.Default.PlayArrow,
+        contentDescription = stringResource(R.string.play),
+    )
 }
 
 @Composable
@@ -476,7 +463,6 @@ private fun AddStepButton(
         )
     }
 }
-
 
 
 @Composable

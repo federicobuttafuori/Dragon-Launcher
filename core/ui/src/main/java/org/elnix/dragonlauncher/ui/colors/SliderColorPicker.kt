@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.utils.colors.blendWith
 import org.elnix.dragonlauncher.common.utils.colors.randomColor
-import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 
@@ -69,14 +67,10 @@ fun SliderColorPicker(
             DragonIconButton(
                 onClick = { popLastColor() },
                 modifier = Modifier.weight(1f),
-                enabled = canPopLastColor
-            ) {
-                Icon(
-                    Icons.Default.Replay,
-                    contentDescription = "Reset",
-                    tint = MaterialTheme.colorScheme.onSurface.semiTransparentIfDisabled(canPopLastColor)
-                )
-            }
+                enabled = canPopLastColor,
+                imageVector = Icons.Default.Replay,
+                contentDescription = "Reset",
+            )
 
             DragonIconButton(
                 onClick = {
@@ -87,14 +81,10 @@ fun SliderColorPicker(
                     blue = color.blue
                     onColorSelected(color)
                 },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    Icons.Default.Shuffle,
-                    contentDescription = "Random Color",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
+                modifier = Modifier.weight(1f),
+                imageVector =  Icons.Default.Shuffle,
+                contentDescription = "Random Color",
+            )
         }
 
         SliderWithLabel(

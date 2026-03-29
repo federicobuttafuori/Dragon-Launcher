@@ -54,12 +54,11 @@ fun LazyListScope.iconPackListContent(
                 color = MaterialTheme.colorScheme.onBackground
             )
             // Refresh icon
-            DragonIconButton(onReloadPacks) {
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.reload),
-                )
-            }
+            DragonIconButton(
+                onReloadPacks,
+                imageVector = Icons.Default.Refresh,
+                contentDescription = stringResource(R.string.reload)
+            )
         }
     }
 

@@ -94,13 +94,10 @@ fun AppAliasesDialog(
                     horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     DragonIconButton(
-                        onClick = { showAliasEditScreen = "" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.add_alias)
-                        )
-                    }
+                        onClick = { showAliasEditScreen = "" },
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_alias)
+                    )
 
                     aliases[cacheKey]?.forEach { alias ->
 

@@ -191,13 +191,10 @@ fun EditPointDialog(
                                 action = editPoint.action,
                                 id = editPoint.id
                             )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Restore,
-                            contentDescription = stringResource(R.string.reset)
-                        )
-                    }
+                        },
+                        imageVector = Icons.Default.Restore,
+                        contentDescription = stringResource(R.string.reset)
+                    )
                 }
 
                 DragonColumnGroup {
@@ -308,13 +305,10 @@ fun EditPointDialog(
                                         DragonIconButton(
                                             onClick = {
                                                 editPoint = editPoint.copy(customName = null)
-                                            }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Restore,
-                                                contentDescription = stringResource(R.string.reset)
-                                            )
-                                        }
+                                            },
+                                            imageVector = Icons.Default.Restore,
+                                            contentDescription = stringResource(R.string.reset)
+                                        )
                                     }
                                 },
                                 modifier = Modifier

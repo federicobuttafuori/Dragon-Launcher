@@ -182,34 +182,25 @@ fun AppPickerDialog(
                                         isMultiSelectMode = false
                                         selectedApps.clear()
                                     },
-                                    colors = AppObjectsColors.iconButtonColors()
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Deselect,
-                                        contentDescription = stringResource(R.string.deselect_all)
-                                    )
-                                }
+                                    colors = AppObjectsColors.iconButtonColors(),
+                                    imageVector = Icons.Default.Deselect,
+                                    contentDescription = stringResource(R.string.deselect_all)
+                                )
                             }
 
                             DragonIconButton(
                                 onClick = { isSearchBarEnabled = true },
-                                colors = AppObjectsColors.iconButtonColors()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = stringResource(R.string.search_apps)
-                                )
-                            }
+                                colors = AppObjectsColors.iconButtonColors(),
+                                imageVector = Icons.Default.Search,
+                                contentDescription = stringResource(R.string.search_apps)
+                            )
 
                             DragonIconButton(
                                 onClick = { scope.launch { appsViewModel.reloadApps() } },
-                                colors = AppObjectsColors.iconButtonColors()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.RestartAlt,
-                                    contentDescription = stringResource(R.string.reload_apps)
-                                )
-                            }
+                                colors = AppObjectsColors.iconButtonColors(),
+                                imageVector = Icons.Default.RestartAlt,
+                                contentDescription = stringResource(R.string.reload_apps)
+                            )
                         }
                     } else {
                         AppDrawerSearch(
@@ -348,12 +339,10 @@ fun AppPickerDialog(
                                             onClick = {
                                                 logW(PRIVATE_SPACE_TAG) { "Drawer reload button launch!" }
                                                 appLifecycleViewModel.onUnlockPrivateSpace()
-                                            }) {
-                                            Icon(
-                                                Icons.Default.Lock,
-                                                contentDescription = "Private Space Locked"
-                                            )
-                                        }
+                                            },
+                                            imageVector = Icons.Default.Lock,
+                                            contentDescription = "Private Space Locked"
+                                        )
                                     }
                                 }
                             }

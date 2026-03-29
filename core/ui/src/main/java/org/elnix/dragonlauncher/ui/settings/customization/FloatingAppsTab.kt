@@ -26,7 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LinearScale
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -354,9 +354,12 @@ fun FloatingAppsTab(
                 }
             },
             otherIcons = arrayOf(
-                ({
-                    showScaleDropdown = !showScaleDropdown
-                } to Icons.Default.LinearScale)
+                Triple(
+                    {
+                        showScaleDropdown = !showScaleDropdown
+                    }, Icons.Default.MoreHoriz,
+                    stringResource(R.string.more)
+                )
             ),
             bottomContent = {
                 /* ───────────── Bottom controls ───────────── */
@@ -435,13 +438,13 @@ fun FloatingAppsTab(
                         showLabel = false,
                         isChecked = {
                             when (it) {
-                                WidgetsToolsAddNestRemove.Add, WidgetsToolsAddNestRemove.Nests  -> true
+                                WidgetsToolsAddNestRemove.Add, WidgetsToolsAddNestRemove.Nests -> true
                                 WidgetsToolsAddNestRemove.Remove -> aWidgetIsSelected
                             }
                         },
                         isEnabled = {
                             when (it) {
-                                WidgetsToolsAddNestRemove.Add, WidgetsToolsAddNestRemove.Nests  -> true
+                                WidgetsToolsAddNestRemove.Add, WidgetsToolsAddNestRemove.Nests -> true
                                 WidgetsToolsAddNestRemove.Remove -> aWidgetIsSelected
                             }
                         }
@@ -579,7 +582,7 @@ fun FloatingAppsTab(
                                 value = cellSizeDp,
                                 valueRange = 1..100,
                                 onReset = {
-                                   floatingAppsViewModel.updateCellSize(null)
+                                    floatingAppsViewModel.updateCellSize(null)
                                 },
                             ) {
                                 floatingAppsViewModel.updateCellSize(it)
@@ -762,13 +765,16 @@ private fun DraggableFloatingApp(
                 rawWidgetWidth = (rawWidgetWidth - deltaSpanX).coerceAtLeast(minSize)
                 localDeltaX = deltaPosX
             }
+
             ResizeCorner.Right -> {
                 rawWidgetWidth = (rawWidgetWidth + deltaSpanX).coerceAtLeast(minSize)
             }
+
             ResizeCorner.Top -> {
                 rawWidgetHeight = (rawWidgetHeight - deltaSpanY).coerceAtLeast(minSize)
                 localDeltaY = deltaPosY
             }
+
             ResizeCorner.Bottom -> {
                 rawWidgetHeight = (rawWidgetHeight + deltaSpanY).coerceAtLeast(minSize)
             }
@@ -1096,13 +1102,10 @@ private fun DraggableFloatingApp(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .clip(CircleShape)
-                    .background(Color.Transparent)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit)
-                )
-            }
+                    .background(Color.Transparent),
+                imageVector = Icons.Default.Edit,
+                contentDescription = stringResource(R.string.edit)
+            )
         }
 
 
