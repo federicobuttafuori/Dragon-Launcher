@@ -26,7 +26,7 @@ import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.ui.helpers.iconPackListContent
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 @Composable
 fun IconPackTab(
@@ -56,7 +56,7 @@ fun IconPackTab(
         showPreview = true
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.icon_pack),
         onBack = onBack,
         helpText = stringResource(R.string.icon_pack_help),

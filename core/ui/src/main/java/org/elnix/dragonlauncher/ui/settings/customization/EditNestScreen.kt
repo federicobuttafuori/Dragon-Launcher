@@ -58,7 +58,7 @@ import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.nests.circlesSettingsOverlay
 import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -170,7 +170,7 @@ fun NestEditingScreen(
 
 
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.dragging_distance_selection),
         onBack = onBack,
         helpText = stringResource(R.string.edit_nest_help),
@@ -352,7 +352,7 @@ fun NestEditingScreen(
                         // Used to control whether the nest displays its circle individually or not
                         SwitchRow(
                             state = currentNest.showCircle ?: drawParams.showCircle,
-                            text = stringResource(R.string.show_circle)
+                            title = stringResource(R.string.show_circle)
                         ) { showCircle ->
 
                             pendingNestUpdate = nests.map {
@@ -364,7 +364,7 @@ fun NestEditingScreen(
                         // Quick toggle to display the preview of the nest top left
                         SwitchRow(
                             state = showSmallPreview,
-                            text = stringResource(R.string.show_nest_preview)
+                            title = stringResource(R.string.show_nest_preview)
                         ) { showPreview -> showSmallPreview = showPreview }
                     }
                 }

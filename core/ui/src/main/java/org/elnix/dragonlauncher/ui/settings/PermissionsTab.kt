@@ -35,7 +35,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 @Composable
 fun PermissionsTab(onBack: () -> Unit) {
@@ -92,7 +92,7 @@ fun PermissionsTab(onBack: () -> Unit) {
     }
 
     Column {
-        SettingsLazyHeader(
+        SettingsScaffold(
             title = stringResource(R.string.permissions),
             onBack = onBack,
             helpText = stringResource(R.string.permission_tab_help),
@@ -128,8 +128,8 @@ fun PermissionsTab(onBack: () -> Unit) {
                         val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
                         ctx.startActivity(intent)
                     },
-                    text = stringResource(R.string.notification_access),
-                    subText = stringResource(R.string.notification_access_desc)
+                    title = stringResource(R.string.notification_access),
+                    description = stringResource(R.string.notification_access_desc)
                 )
             }
 
@@ -142,8 +142,8 @@ fun PermissionsTab(onBack: () -> Unit) {
                         }
                         ctx.startActivity(intent)
                     },
-                    text = stringResource(R.string.install_from_unknown_source_permission),
-                    subText = stringResource(R.string.install_from_unknown_source_permission_desc)
+                    title = stringResource(R.string.install_from_unknown_source_permission),
+                    description = stringResource(R.string.install_from_unknown_source_permission_desc)
                 )
             }
 
@@ -154,8 +154,8 @@ fun PermissionsTab(onBack: () -> Unit) {
                         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                         ctx.startActivity(intent)
                     },
-                    text = stringResource(R.string.accessibility_service),
-                    subText = stringResource(R.string.accessibility_service_desc)
+                    title = stringResource(R.string.accessibility_service),
+                    description = stringResource(R.string.accessibility_service_desc)
 
                 )
             }
@@ -168,8 +168,8 @@ fun PermissionsTab(onBack: () -> Unit) {
                         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                         ctx.startActivity(intent)
                     },
-                    text = stringResource(R.string.usage_access),
-                    subText = stringResource(R.string.not_implemented)
+                    title = stringResource(R.string.usage_access),
+                    description = stringResource(R.string.not_implemented)
 //                    subText = stringResource(R.string.usage_access_desc)
                 )
             }
@@ -204,8 +204,8 @@ fun PermissionsTab(onBack: () -> Unit) {
                                 }
                             ctx.startActivity(intent)
                         },
-                        text = permission.substringAfterLast("."),
-                        subText = stringResource(R.string.manage_in_system_settings)
+                        title = permission.substringAfterLast("."),
+                        description = stringResource(R.string.manage_in_system_settings)
                     )
                 }
             }

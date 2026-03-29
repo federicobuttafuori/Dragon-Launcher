@@ -66,7 +66,7 @@ import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
@@ -114,7 +114,7 @@ fun BehaviorTab(
     val forceAppLanguageSelector by DebugSettingsStore.forceAppLanguageSelector.asState()
 
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.behavior),
         onBack = onBack,
         helpText = stringResource(R.string.behavior_help),

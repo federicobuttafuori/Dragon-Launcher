@@ -11,7 +11,7 @@ import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.loadChangelogs
 import org.elnix.dragonlauncher.common.utils.openUrl
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 @Composable
 fun ChangelogsScreen(
@@ -26,7 +26,7 @@ fun ChangelogsScreen(
     }
 
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.changelogs),
         onBack = onBack,
         helpText = stringResource(R.string.changelogs_help),

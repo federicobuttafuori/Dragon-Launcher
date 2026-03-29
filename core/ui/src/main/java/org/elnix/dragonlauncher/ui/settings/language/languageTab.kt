@@ -32,7 +32,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 
 @Composable
@@ -59,7 +59,7 @@ fun LanguageTab(onBack: () -> Unit) {
         selectedTag = LanguageSettingsStore.keyLang.get(ctx)
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.settings_language_title),
         onBack = onBack,
         helpText = stringResource(R.string.choose_your_app_language),

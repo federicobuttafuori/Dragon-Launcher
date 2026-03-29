@@ -31,7 +31,7 @@ import org.elnix.dragonlauncher.services.ExtensionManager
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
 @Composable
@@ -48,7 +48,7 @@ fun ExtensionsTab(
         isLoading = false
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.extensions),
         onBack = onBack,
         helpText = stringResource(R.string.extensions_description),

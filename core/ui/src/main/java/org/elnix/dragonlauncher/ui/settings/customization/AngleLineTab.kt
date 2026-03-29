@@ -51,7 +51,7 @@ import org.elnix.dragonlauncher.ui.dialogs.AngleLineObjectsOrderDialog
 import org.elnix.dragonlauncher.ui.dialogs.rememberLineObjectsOrder
 import org.elnix.dragonlauncher.ui.helpers.customobjects.EditCustomObjectBlock
 import org.elnix.dragonlauncher.ui.helpers.customobjects.actionLine
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
@@ -195,7 +195,7 @@ fun AngleLineTab(onBack: () -> Unit) {
         }
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.angle_line),
         onBack = {
             saveAll()

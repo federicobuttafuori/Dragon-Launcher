@@ -98,7 +98,7 @@ import org.elnix.dragonlauncher.ui.dialogs.NestManagementDialog
 import org.elnix.dragonlauncher.ui.dialogs.ShapePickerDialog
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SmallShapeRow
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
@@ -342,7 +342,7 @@ fun FloatingAppsTab(
 
         StatusBar(null)
 
-        SettingsLazyHeader(
+        SettingsScaffold(
             title = stringResource(R.string.widgets),
             onBack = onBack,
             helpText = stringResource(R.string.floating_apps_tab_help),

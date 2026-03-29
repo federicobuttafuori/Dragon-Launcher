@@ -50,7 +50,7 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 @Composable
 fun MainScreeLayersOrderScreen(
@@ -82,7 +82,7 @@ fun MainScreeLayersOrderScreen(
         }
     )
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.main_screen_layers),
         onBack = onBack,
         helpText = stringResource(R.string.main_screen_layers_help),

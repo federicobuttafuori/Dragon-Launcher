@@ -46,7 +46,7 @@ import org.elnix.dragonlauncher.ui.dialogs.AppPickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.dialogs.RenameAppDialog
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
 @Composable
@@ -91,7 +91,7 @@ fun WorkspaceDetailScreen(
     var iconTargetApp by remember { mutableStateOf<AppModel?>(null) }
 
     Box(Modifier.fillMaxSize()) {
-        SettingsLazyHeader(
+        SettingsScaffold(
             title = "${stringResource(R.string.workspace)}: ${workspace.name}",
             onBack = onBack,
             helpText = stringResource(R.string.workspace_detail_help),

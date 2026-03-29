@@ -80,7 +80,7 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AppPickerDialog
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalIcons
@@ -121,7 +121,7 @@ fun WellbeingTab(onBack: () -> Unit) {
         }
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.wellbeing),
         onBack = onBack,
         helpText = stringResource(R.string.wellbeing_help),
@@ -173,8 +173,8 @@ fun WellbeingTab(onBack: () -> Unit) {
                     Column {
                         SwitchRow(
                             state = guiltModeEnabled,
-                            text = stringResource(R.string.guilt_mode),
-                            subText = stringResource(R.string.guilt_mode_description),
+                            title = stringResource(R.string.guilt_mode),
+                            description = stringResource(R.string.guilt_mode_description),
                             enabled = true,
                         ) { newValue ->
                             if (newValue && !hasUsageStatsPermission(ctx)) {
@@ -222,8 +222,8 @@ fun WellbeingTab(onBack: () -> Unit) {
             ) {
                 SwitchRow(
                     state = reminderEnabled,
-                    text = stringResource(R.string.reminder_mode_title),
-                    subText = stringResource(R.string.reminder_mode_description),
+                    title = stringResource(R.string.reminder_mode_title),
+                    description = stringResource(R.string.reminder_mode_description),
                     enabled = socialMediaPauseEnabled,
                 ) { newValue ->
                     if (newValue && reminderMode == "overlay" && !Settings.canDrawOverlays(ctx)) {
@@ -339,8 +339,8 @@ fun WellbeingTab(onBack: () -> Unit) {
         item {
             SwitchRow(
                 state = returnToLauncherEnabled,
-                text = stringResource(R.string.return_to_launcher_title),
-                subText = stringResource(R.string.return_to_launcher_description),
+                title = stringResource(R.string.return_to_launcher_title),
+                description = stringResource(R.string.return_to_launcher_description),
                 enabled = socialMediaPauseEnabled,
             ) { newValue ->
                 scope.launch {

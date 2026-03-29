@@ -43,7 +43,7 @@ import org.elnix.dragonlauncher.ui.modifiers.conditional
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
-fun SettingsLazyHeader(
+fun SettingsScaffold(
     title: String,
     onBack: () -> Unit,
     helpText: String,

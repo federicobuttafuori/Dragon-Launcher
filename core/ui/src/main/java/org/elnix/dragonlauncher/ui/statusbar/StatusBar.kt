@@ -406,8 +406,8 @@ fun EditStatusBar() {
 
                         is StatusBarSerializable.Bandwidth -> {
                             SwitchRow(
-                                text = stringResource(R.string.merge_bandwidth),
-                                subText = "",
+                                title = stringResource(R.string.merge_bandwidth),
+                                description = "",
                                 state = item.merge,
                             ) {
                                 updateElement(item.copy(merge = it))
@@ -417,43 +417,43 @@ fun EditStatusBar() {
                         is StatusBarSerializable.Connectivity -> {
                             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                                 SwitchRow(
-                                    text = stringResource(R.string.show_airplane_mode),
-                                    subText = "",
+                                    title = stringResource(R.string.show_airplane_mode),
+                                    description = "",
                                     state = item.showAirplaneMode,
                                 ) {
                                     updateElement(item.copy(showAirplaneMode = it))
                                 }
                                 SwitchRow(
-                                    text = stringResource(R.string.show_wifi),
-                                    subText = "",
+                                    title = stringResource(R.string.show_wifi),
+                                    description = "",
                                     state = item.showWifi,
                                 ) {
                                     updateElement(item.copy(showWifi = it))
                                 }
                                 SwitchRow(
-                                    text = stringResource(R.string.show_bluetooth),
-                                    subText = "",
+                                    title = stringResource(R.string.show_bluetooth),
+                                    description = "",
                                     state = item.showBluetooth,
                                 ) {
                                     updateElement(item.copy(showBluetooth = it))
                                 }
                                 SwitchRow(
-                                    text = stringResource(R.string.show_vpn),
-                                    subText = "",
+                                    title = stringResource(R.string.show_vpn),
+                                    description = "",
                                     state = item.showVpn,
                                 ) {
                                     updateElement(item.copy(showVpn = it))
                                 }
                                 SwitchRow(
-                                    text = stringResource(R.string.show_mobile_data),
-                                    subText = "",
+                                    title = stringResource(R.string.show_mobile_data),
+                                    description = "",
                                     state = item.showMobileData,
                                 ) {
                                     updateElement(item.copy(showMobileData = it))
                                 }
                                 SwitchRow(
-                                    text = stringResource(R.string.show_hotspot),
-                                    subText = "",
+                                    title = stringResource(R.string.show_hotspot),
+                                    description = "",
                                     state = item.showHotspot,
                                 ) {
                                     updateElement(item.copy(showHotspot = it))
@@ -598,8 +598,8 @@ fun EditStatusBar() {
 
                         is StatusBarSerializable.Battery -> {
                             SwitchRow(
-                                text = stringResource(R.string.show_percentage),
-                                subText = stringResource(R.string.show_percentage_desc),
+                                title = stringResource(R.string.show_percentage),
+                                description = stringResource(R.string.show_percentage_desc),
                                 state = item.showPercentage,
                             ) {
                                 updateElement(item.copy(showPercentage = it))

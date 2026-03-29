@@ -58,7 +58,7 @@ import org.elnix.dragonlauncher.ui.dialogs.ShapePickerDialog
 import org.elnix.dragonlauncher.ui.helpers.GridSizeSlider
 import org.elnix.dragonlauncher.ui.helpers.ShapeRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
 
@@ -112,7 +112,7 @@ fun DrawerTab(
 
     var showShapePickerDialog by remember { mutableStateOf(false) }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.app_drawer),
         onBack = onBack,
         helpText = stringResource(R.string.drawer_tab_text),

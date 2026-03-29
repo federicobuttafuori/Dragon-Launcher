@@ -51,7 +51,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.wellbeing.OverlayReminderService
@@ -87,7 +87,7 @@ fun DebugTab(
         pendingSystemLauncher = detectSystemLauncher(ctx)
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.debug),
         onBack = onBack,
         helpText = "Advanced developer tools and system overrides.",

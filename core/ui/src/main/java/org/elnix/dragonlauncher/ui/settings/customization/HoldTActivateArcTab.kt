@@ -39,7 +39,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.customobjects.EditCustomObjectBlock
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
 
 
@@ -77,7 +77,7 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
         }
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.hold_settings),
         onBack = {
             save()

@@ -47,7 +47,7 @@ import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.CreateOrEditWorkspaceDialog
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
 
@@ -123,7 +123,7 @@ fun WorkspaceListScreen(
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
-        SettingsLazyHeader(
+        SettingsScaffold(
             title = stringResource(R.string.workspaces),
             onBack = onBack,
             helpText = stringResource(R.string.workspace_help),

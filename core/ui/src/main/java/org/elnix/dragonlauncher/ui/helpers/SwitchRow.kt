@@ -20,8 +20,8 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
 @Composable
 fun SwitchRow(
     state: Boolean?,
-    text: String,
-    subText: String? = null,
+    title: String,
+    description: String? = null,
     enabled: Boolean = true,
     defaultValue: Boolean = false,
     onToggle: ((Boolean) -> Unit)? = null,
@@ -37,13 +37,13 @@ fun SwitchRow(
             modifier = Modifier.weight(1f)
         ){
             Text(
-                text = text,
+                text = title,
                 color = MaterialTheme.colorScheme.onSurface.semiTransparentIfDisabled(enabled)
             )
 
-            if (subText != null) {
+            if (description != null) {
                 Text(
-                    text = subText,
+                    text = description,
                     color = MaterialTheme.colorScheme.onSurface.alphaMultiplier(if (enabled) 0.7f else 0.3f),
                     style = MaterialTheme.typography.labelSmall
                 )

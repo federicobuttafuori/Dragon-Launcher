@@ -37,7 +37,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,7 +84,7 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.remembers.ExpandableSectionState
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
@@ -419,7 +418,7 @@ fun ColorSelectorTab(
 
     var showExitTestValidation by remember { mutableStateOf(false) }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.color_selector),
         onBack = onBack,
         helpText = stringResource(R.string.color_selector_text),
@@ -832,8 +831,8 @@ fun ColorSelectorTab(
             item {
                 SwitchRow(
                     state = selectedDefaultTheme == AMOLED,
-                    text = stringResource(R.string.amoled_theme),
-                    subText = stringResource(R.string.use_pure_black_background)
+                    title = stringResource(R.string.amoled_theme),
+                    description = stringResource(R.string.use_pure_black_background)
                 ) {
                     val theme = if (it) {
                         AMOLED

@@ -55,8 +55,8 @@ fun SettingsSwitchRow(
 
     SwitchRow(
         state = tempState,
-        text = title,
-        subText = description,
+        title = title,
+        description = description,
         enabled = enabled
     ) { clicked ->
         when {

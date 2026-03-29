@@ -2,14 +2,11 @@ package org.elnix.dragonlauncher.ui
 
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import android.system.Os.kill
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -80,7 +77,7 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
 
@@ -110,7 +107,7 @@ fun AdvancedSettingsScreen(
 
     val backgroundColor = MaterialTheme.colorScheme.background
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.settings),
         onBack = onBack,
         helpText = stringResource(R.string.settings),

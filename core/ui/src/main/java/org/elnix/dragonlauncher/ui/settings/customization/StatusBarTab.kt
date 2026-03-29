@@ -25,7 +25,7 @@ import org.elnix.dragonlauncher.ui.components.ExpandableSection
 import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.statusbar.EditStatusBar
@@ -47,7 +47,7 @@ fun StatusBarTab(
     Column {
         StatusBar(null)
 
-        SettingsLazyHeader(
+        SettingsScaffold(
             title = stringResource(R.string.status_bar),
             onBack = onBack,
             helpText = stringResource(R.string.status_bar_tab_text),
@@ -60,8 +60,8 @@ fun StatusBarTab(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             content = {
                 SwitchRow(
-                    text = stringResource(R.string.show_status_bar),
-                    subText = stringResource(R.string.show_status_bar_desc),
+                    title = stringResource(R.string.show_status_bar),
+                    description = stringResource(R.string.show_status_bar_desc),
                     state = showStatusBar()
                 ) {
                     scope.launch {

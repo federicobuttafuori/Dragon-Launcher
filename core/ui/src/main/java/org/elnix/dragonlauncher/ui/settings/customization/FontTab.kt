@@ -85,7 +85,7 @@ import org.elnix.dragonlauncher.services.ExtensionManager
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.settings.asState
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import java.io.File
 import java.io.FileOutputStream
 
@@ -322,7 +322,7 @@ fun FontTab(onBack: () -> Unit) {
     }
 
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.font_selector),
         onBack = onBack,
         helpText = stringResource(R.string.font_manage_help),

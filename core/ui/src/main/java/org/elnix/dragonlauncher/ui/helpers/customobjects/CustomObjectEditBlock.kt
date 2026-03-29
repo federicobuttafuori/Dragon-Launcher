@@ -129,7 +129,7 @@ fun EditCustomObjectBlock(
         if (properties.allowGlowCustomization) {
             SwitchRow(
                 state = editObject.glow != null,
-                text = stringResource(R.string.enable_glow)
+                title = stringResource(R.string.enable_glow)
             ) { enabled ->
                 if (enabled) {
                     onEdit(editObject.copy(glow = CustomGlow()))
@@ -185,7 +185,7 @@ fun EditCustomObjectBlock(
             SwitchRow(
                 state = editObject.eraseBackground
                     ?: default.eraseBackground!!,
-                text = stringResource(R.string.erase_background)
+                title = stringResource(R.string.erase_background)
             ) {
                 onEdit(editObject.copy(eraseBackground = it))
             }

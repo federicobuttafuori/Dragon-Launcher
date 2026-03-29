@@ -7,11 +7,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
@@ -50,7 +47,7 @@ import org.elnix.dragonlauncher.ui.components.generic.ActionSelector
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.WallpaperDim
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 
 @SuppressLint("LocalContextResourcesRead", "LocalContextGetResourceValueCall")
@@ -97,7 +94,7 @@ fun WallpaperTab(onBack: () -> Unit) {
     Column {
         StatusBar(null)
 
-        SettingsLazyHeader(
+        SettingsScaffold(
             title = stringResource(R.string.wallpaper),
             onBack = onBack,
             helpText = stringResource(R.string.wallpaper_help),

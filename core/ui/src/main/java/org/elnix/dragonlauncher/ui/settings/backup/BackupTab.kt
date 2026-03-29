@@ -59,7 +59,7 @@ import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsImportLauncher
 import org.json.JSONObject
@@ -200,7 +200,7 @@ fun BackupTab(onBack: () -> Unit) {
 
 
     // ──────── UI ───────────────────────────────────────
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = ctx.getString(R.string.backup_restore),
         onBack = onBack,
         helpText = ctx.getString(R.string.backup_restore_text),

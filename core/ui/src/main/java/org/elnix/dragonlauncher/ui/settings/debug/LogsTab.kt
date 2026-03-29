@@ -74,7 +74,7 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import java.io.File
 
 @Composable
@@ -174,7 +174,7 @@ fun LogsTab(
         }
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = "Logs",
         onBack = onBack,
         helpText = "Logs, need more info?",

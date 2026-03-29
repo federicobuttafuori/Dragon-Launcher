@@ -47,7 +47,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalIcons
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
@@ -81,7 +81,7 @@ fun AppearanceTab(
     }
 
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.appearance),
         onBack = onBack,
         helpText = stringResource(R.string.appearance_tab_text),

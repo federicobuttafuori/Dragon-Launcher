@@ -34,7 +34,7 @@ import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.settings.allStores
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.json.JSONObject
 
 @Composable
@@ -73,7 +73,7 @@ fun SettingsDebugTab(
 
     val listState = rememberLazyListState()
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = "Settings debug json",
         onBack = onBack,
         helpText = "settings json",

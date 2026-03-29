@@ -12,7 +12,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.ThemeObject
 import org.elnix.dragonlauncher.common.utils.loadThemes
 import org.elnix.dragonlauncher.ui.helpers.ThemesList
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsLazyHeader
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 @Composable
 fun ThemesTab(
@@ -26,7 +26,7 @@ fun ThemesTab(
         themes = loadThemes(ctx)
     }
 
-    SettingsLazyHeader(
+    SettingsScaffold(
         title = stringResource(R.string.theme_selector),
         onBack = onBack,
         helpText = stringResource(R.string.theme_selector_help),
