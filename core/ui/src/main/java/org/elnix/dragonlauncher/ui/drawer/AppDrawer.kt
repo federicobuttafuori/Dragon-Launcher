@@ -741,16 +741,18 @@ fun AppDrawerScreen(
                     onClose()
                 }
             } else null,
-            onRemoveFromWorkspace = {
-                workspaceId?.let { wsId ->
-                    scope.launch {
-                        appsViewModel.removeAppFromWorkspace(
-                            workspaceId = wsId,
-                            cacheKey = cacheKey
-                        )
+            onRemoveFromWorkspace = if (!app.isPrivateProfile) {
+                {
+                    workspaceId?.let { wsId ->
+                        scope.launch {
+                            appsViewModel.removeAppFromWorkspace(
+                                workspaceId = wsId,
+                                cacheKey = cacheKey
+                            )
+                        }
                     }
                 }
-            },
+            } else null,
             onRenameApp = {
                 renameText = app.name
                 renameTarget = app
