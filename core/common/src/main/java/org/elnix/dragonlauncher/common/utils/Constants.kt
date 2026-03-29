@@ -225,7 +225,70 @@ object Constants {
         const val SNAP_STEP_DEG = 15.0
         const val HOME_REENTER_WINDOW_MS = 80L
 
-        const val STATUS_BAR_TEMPLATE = "[{\"type\":\"Time\",\"action\":\"null\",\"formatter\":\"HH:mm:ss\"},{\"type\":\"Date\",\"action\":\"null\",\"formatter\":\" | MMM dd\"},{\"type\":\"Spacer\",\"width\":-1},{\"type\":\"Notifications\",\"maxIcons\":8},{\"type\":\"Spacer\",\"width\":6},{\"type\":\"Connectivity\"},{\"type\":\"Spacer\",\"width\":9},{\"type\":\"Bandwidth\"},{\"type\":\"Spacer\",\"width\":11},{\"type\":\"Battery\",\"showIcon\":false,\"showPercentage\":true}]"
+        const val STATUS_BAR_TEMPLATE = "[\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Time\",\n" +
+                "      \"formatter\": \"HH:mm:ss | \",\n" +
+                "      \"action\": null,\n" +
+                "      \"fontSize\": 16,\n" +
+                "      \"isBold\": false,\n" +
+                "      \"colorHex\": null\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Date\",\n" +
+                "      \"formatter\": \"MMM dd\",\n" +
+                "      \"action\": null,\n" +
+                "      \"fontSize\": 14,\n" +
+                "      \"isBold\": false,\n" +
+                "      \"colorHex\": null\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Spacer\",\n" +
+                "      \"width\": -1\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Notifications\",\n" +
+                "      \"maxIcons\": 8,\n" +
+                "      \"iconSize\": 18\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Spacer\",\n" +
+                "      \"width\": 6\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Bandwidth\",\n" +
+                "      \"merge\": false,\n" +
+                "      \"fontSize\": 12,\n" +
+                "      \"colorHex\": null\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Spacer\",\n" +
+                "      \"width\": 7\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Connectivity\",\n" +
+                "      \"showAirplaneMode\": true,\n" +
+                "      \"showWifi\": true,\n" +
+                "      \"showBluetooth\": true,\n" +
+                "      \"showVpn\": true,\n" +
+                "      \"showMobileData\": true,\n" +
+                "      \"showHotspot\": true,\n" +
+                "      \"showUsb\": true,\n" +
+                "      \"updateFrequency\": 5,\n" +
+                "      \"iconSize\": 18\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Spacer\",\n" +
+                "      \"width\": 10\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"org.elnix.dragonlauncher.common.serializables.StatusBarSerializable.Battery\",\n" +
+                "      \"showIcon\": false,\n" +
+                "      \"showPercentage\": true,\n" +
+                "      \"fontSize\": 14,\n" +
+                "      \"colorHex\": null\n" +
+                "    }\n" +
+                "  ]"
     }
 
     object Drawer {
@@ -240,5 +303,4 @@ object Constants {
     }
 
     const val MY_PACKAGE_NAME = "org.elnix.dragonlauncher"
-
 }
