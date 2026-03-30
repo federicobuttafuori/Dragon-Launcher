@@ -54,9 +54,11 @@ fun AddPointDialog(
     actions: List<SwipeActionSerializable> = defaultChoosableActions,
     onNewNest: (() -> Unit)? = null,
     onDismiss: () -> Unit,
-    onActionSelected: (SwipeActionSerializable) -> Unit,
+    onActionSelected: ((SwipeActionSerializable) -> Unit)? = null,
     onMultipleActionsSelected: ((List<SwipeActionSerializable>, Boolean) -> Unit)? = null
 ) {
+    require((onActionSelected != null).xor(onMultipleActionsSelected != null))
+
     val ctx = LocalContext.current
 
     val appsViewModel = LocalAppsViewModel.current
@@ -84,6 +86,14 @@ fun AddPointDialog(
     var shortcutDialogVisible by remember { mutableStateOf(false) }
     var shortcuts by remember { mutableStateOf<List<ShortcutInfo>>(emptyList()) }
 
+
+    fun onActionPicked(action: SwipeActionSerializable) {
+        if (onMultipleActionsSelected != null) {
+            onMultipleActionsSelected(listOf(action), false)
+        } else {
+            onActionSelected!!(action)
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -172,7 +182,7 @@ fun AddPointDialog(
                         else -> {
                             AddPointColumn(
                                 action = action,
-                                onSelected = { onActionSelected(action) }
+                                onSelected = { onActionPicked(action) }
                             )
                             Spacer(Modifier.height(8.dp))
                         }
@@ -217,7 +227,7 @@ fun AddPointDialog(
                     shortcuts = list
                     shortcutDialogVisible = true
                 } else {
-                    onActionSelected(
+                    onActionPicked(
                         SwipeActionSerializable.LaunchApp(
                             app.packageName,
                             app.isPrivateProfile,
@@ -226,11 +236,13 @@ fun AddPointDialog(
                     )
                 }
             },
-            onMultipleAppsSelected = if (onMultipleActionsSelected != null) { { apps, autoPlace ->
-                val actions = apps.map { SwipeActionSerializable.LaunchApp(it.packageName, it.isPrivateProfile, it.userId ?: 0) }
-                onMultipleActionsSelected(actions, autoPlace)
-                showAppPicker = false
-            } } else null
+            onMultipleAppsSelected = if (onMultipleActionsSelected != null) {
+                { apps, autoPlace ->
+                    val actions = apps.map { SwipeActionSerializable.LaunchApp(it.packageName, it.isPrivateProfile, it.userId ?: 0) }
+                    onMultipleActionsSelected(actions, autoPlace)
+                    showAppPicker = false
+                }
+            } else null
         )
     }
 
@@ -238,7 +250,7 @@ fun AddPointDialog(
         UrlInputDialog(
             onDismiss = { showUrlInput = false },
             onUrlSelected = {
-                onActionSelected(it)
+                onActionPicked(it)
                 showUrlInput = false
             }
         )
@@ -248,7 +260,7 @@ fun AddPointDialog(
         FilePickerDialog(
             onDismiss = { showFilePicker = false },
             onFileSelected = {
-                onActionSelected(it)
+                onActionPicked(it)
                 showFilePicker = false
             }
         )
@@ -259,12 +271,18 @@ fun AddPointDialog(
             app = selectedApp!!,
             shortcuts = shortcuts,
             onDismiss = { shortcutDialogVisible = false },
-            onShortcutSelected = {pkg, id ->
-                onActionSelected(SwipeActionSerializable.LaunchShortcut(pkg, id))
+            onShortcutSelected = { pkg, id ->
+                onActionPicked(SwipeActionSerializable.LaunchShortcut(pkg, id))
                 shortcutDialogVisible = false
             },
             onOpenApp = {
-                onActionSelected(SwipeActionSerializable.LaunchApp(selectedApp!!.packageName, selectedApp!!.isPrivateProfile, selectedApp!!.userId ?: 0))
+                onActionPicked(
+                    SwipeActionSerializable.LaunchApp(
+                        selectedApp!!.packageName,
+                        selectedApp!!.isPrivateProfile,
+                        selectedApp!!.userId ?: 0
+                    )
+                )
                 onDismiss()
             }
         )
@@ -278,7 +296,7 @@ fun AddPointDialog(
             onNameChange = null,
             onDelete = null,
             onSelect = {
-                onActionSelected(SwipeActionSerializable.OpenCircleNest(it.id))
+                onActionPicked(SwipeActionSerializable.OpenCircleNest(it.id))
                 showNestPicker = false
             }
         )
@@ -288,7 +306,7 @@ fun AddPointDialog(
         SettingsPagePicker(
             onDismissRequest = { showSettingsPagePicker = false }
         ) {
-            onActionSelected(SwipeActionSerializable.OpenDragonLauncherSettings(it))
+            onActionPicked(SwipeActionSerializable.OpenDragonLauncherSettings(it))
             showSettingsPagePicker = false
         }
     }
@@ -317,7 +335,7 @@ fun AddPointDialog(
                             .clip(DragonShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable {
-                                onActionSelected(SwipeActionSerializable.OpenAppDrawer())
+                                onActionPicked(SwipeActionSerializable.OpenAppDrawer())
                                 showWorkspacePicker = false
                             }
                             .padding(12.dp),
@@ -338,7 +356,7 @@ fun AddPointDialog(
                                 .clip(DragonShape)
                                 .background(MaterialTheme.colorScheme.surface)
                                 .clickable {
-                                    onActionSelected(
+                                    onActionPicked(
                                         SwipeActionSerializable.OpenAppDrawer(workspace.id)
                                     )
                                     showWorkspacePicker = false
@@ -364,7 +382,7 @@ fun AddPointDialog(
         PinnedShortcutsPickerDialog(
             onDismiss = { showPinnedShortcutsPicker = false },
             onShortcutSelected = { shortcutAction ->
-                onActionSelected(shortcutAction)
+                onActionPicked(shortcutAction)
                 showPinnedShortcutsPicker = false
             }
         )
@@ -379,12 +397,13 @@ fun AddPointColumn(
 ) {
     val extraColors = LocalExtraColors.current
 
-    val name = when(action) {
+    val name = when (action) {
         is SwipeActionSerializable.LaunchApp -> stringResource(R.string.open_app)
         is SwipeActionSerializable.LaunchShortcut -> {
             if (action.packageName.isEmpty()) stringResource(R.string.pinned_shortcuts)
             else actionLabel(action)
         }
+
         is SwipeActionSerializable.OpenUrl -> stringResource(R.string.open_url)
         is SwipeActionSerializable.OpenFile -> stringResource(R.string.open_file)
         is SwipeActionSerializable.OpenCircleNest -> stringResource(R.string.open_nest_circle)

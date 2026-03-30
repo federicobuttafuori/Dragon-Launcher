@@ -1565,40 +1565,6 @@ fun SettingsScreen(
             onDismiss = {
                 showAddDialog = false
             },
-            onActionSelected = { action ->
-                val circleNumber = lastSelectedCircle.coerceAtMost(circleNumber - 1)
-                val newAngle =
-                    randomFreeAngle(circles.find { it.id == circleNumber }, points) ?: run {
-                        ctx.showToast("Error: no circle belonging to this point found")
-                        return@AddPointDialog
-                    }
-
-
-                // Create a new swipe point, ids are still random, I think I'll keep it that way
-                // unless I really have to manage them correctly
-                val newPoint = SwipePointSerializable(
-                    id = UUID.randomUUID().toString(),
-                    angleDeg = newAngle,
-                    action = action,
-                    circleNumber = circleNumber,
-                    nestId = nestId
-                )
-
-                appsViewModel.reloadPointIcon(newPoint)
-
-                applyChange {
-                    points.add(newPoint)
-                    autoSeparate(
-                        points,
-                        nestId,
-                        circles.find { it.id == newPoint.circleNumber },
-                        newPoint
-                    )
-                }
-
-                selectedPoint = newPoint
-                showAddDialog = false
-            },
             onMultipleActionsSelected = { actions, autoPlace ->
                 val targetCircle = lastSelectedCircle.coerceAtMost(circleNumber - 1)
                 val circle = circles.find { it.id == targetCircle }
@@ -1609,7 +1575,7 @@ fun SettingsScreen(
                         for (action in actions) {
                             val newAngle = randomFreeAngle(circle, points) ?: continue
 
-                            val point = SwipePointSerializable(
+                            val newPoint = SwipePointSerializable(
                                 id = UUID.randomUUID().toString(),
                                 angleDeg = newAngle,
                                 action = action,
@@ -1617,10 +1583,11 @@ fun SettingsScreen(
                                 nestId = nestId
                             )
 
-                            appsViewModel.reloadPointIcon(point)
+                            appsViewModel.reloadPointIcon(newPoint)
 
-                            points.add(point)
-                            autoSeparate(points, nestId, circle, point)
+                            points.add(newPoint)
+                            selectedPoint = newPoint
+                            autoSeparate(points, nestId, circle, newPoint)
                         }
                     }
                     ctx.showToast(ctx.getString(R.string.apps_added_successfully, actions.size))
