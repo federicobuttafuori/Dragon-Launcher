@@ -1590,11 +1590,9 @@ fun SettingsScreen(
                             autoSeparate(points, nestId, circle, newPoint)
                         }
                     }
-                    ctx.showToast(ctx.getString(R.string.apps_added_successfully, actions.size))
                 } else {
                     // Manual placement: queue actions and let user tap to place each one
                     manualPlacementQueue = actions
-                    ctx.showToast(ctx.getString(R.string.tap_circle_to_place))
                 }
                 showAddDialog = false
             }

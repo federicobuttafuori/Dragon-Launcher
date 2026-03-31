@@ -3,22 +3,24 @@ package org.elnix.dragonlauncher.ui.dialogs
 import android.content.pm.ShortcutInfo
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,17 +38,20 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.utils.BluetoothADBCommands
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Actions.defaultChoosableActions
+import org.elnix.dragonlauncher.common.utils.DataADBCommands
 import org.elnix.dragonlauncher.common.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.common.utils.WifiADBCommands
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.actions.ActionIcon
 import org.elnix.dragonlauncher.ui.actions.actionColor
 import org.elnix.dragonlauncher.ui.actions.actionLabel
+import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
 import org.elnix.dragonlauncher.ui.components.settings.asState
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
@@ -60,21 +65,21 @@ fun AddPointDialog(
     require((onActionSelected != null).xor(onMultipleActionsSelected != null))
 
     val ctx = LocalContext.current
-
-    val appsViewModel = LocalAppsViewModel.current
-
     val pm = ctx.packageManager
     val packageManagerCompat = PackageManagerCompat(pm, ctx)
 
     var showAppPicker by remember { mutableStateOf(false) }
     var showUrlInput by remember { mutableStateOf(false) }
+    var showAdbCommandInput by remember { mutableStateOf(false) }
+    var showWifiCommandInput by remember { mutableStateOf(false) }
+    var showBluetoothCommandInput by remember { mutableStateOf(false) }
+    var showDataCommandInput by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
     var showNestPicker by remember { mutableStateOf(false) }
     var showWorkspacePicker by remember { mutableStateOf(false) }
     var showPinnedShortcutsPicker by remember { mutableStateOf(false) }
     var showSettingsPagePicker by remember { mutableStateOf(false) }
 
-    val workspaces by appsViewModel.enabledState.collectAsState()
 
     val gridSize by DrawerSettingsStore.gridSize.asState()
     val showIcons by DrawerSettingsStore.showAppIconsInDrawer.asState()
@@ -95,103 +100,119 @@ fun AddPointDialog(
         }
     }
 
-    AlertDialog(
+    CustomAlertDialog(
+        scroll = false,
+        alignment = Alignment.Center,
+        modifier = Modifier.padding(16.dp),
         onDismissRequest = onDismiss,
         confirmButton = {},
         title = { Text(stringResource(R.string.choose_action)) },
         text = {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .height(320.dp)
-                    .clip(DragonShape),
-                columns = GridCells.Fixed(2),
+            Column(
                 verticalArrangement = Arrangement.spacedBy(5.dp),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Loop through all actions
-                items(actions) { action ->
-                    when (action) {
 
-                        // Open App → requires AppPicker
-                        is SwipeActionSerializable.LaunchApp -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { showAppPicker = true }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
+                Text(
+                    text = stringResource(R.string.long_click_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
 
-                        // Open URL → requires URL dialog
-                        is SwipeActionSerializable.OpenUrl -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { showUrlInput = true }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
+                if (actions.any { it is SwipeActionSerializable.LaunchApp }) {
 
-                        // Open File picker to choose a file
-                        is SwipeActionSerializable.OpenFile -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { showFilePicker = true }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
+                    val dummyLaunchAppAction = SwipeActionSerializable.LaunchApp("", false, 0)
+                    val color = actionColor(dummyLaunchAppAction, LocalExtraColors.current)
 
-                        // Open Circle Nest → requires nest picker
-                        is SwipeActionSerializable.OpenCircleNest -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { showNestPicker = true }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
 
-                        // Open App Drawer → workspace picker
-                        is SwipeActionSerializable.OpenAppDrawer -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { showWorkspacePicker = true }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(DragonShape)
+                            .background(color.copy(0.5f))
+                            .border(1.dp, color, DragonShape)
+                            .clickable { onActionPicked(dummyLaunchAppAction) }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        ActionIcon(
+                            action = dummyLaunchAppAction,
+                            modifier = Modifier.size(30.dp),
+                            showLaunchAppVectorGrid = true
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = stringResource(R.string.open_app),
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
 
-                        // Open App Drawer → workspace picker
-                        is SwipeActionSerializable.OpenDragonLauncherSettings -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { showSettingsPagePicker = true }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
 
-                        // Pinned Shortcuts → browse all pinned shortcuts
-                        is SwipeActionSerializable.LaunchShortcut -> {
-                            if (action.packageName.isEmpty()) {
-                                // Sentinel entry: open pinned shortcuts picker
-                                AddPointColumn(
-                                    action = action,
-                                    onSelected = { showPinnedShortcutsPicker = true }
-                                )
-                                Spacer(Modifier.height(8.dp))
+                LazyVerticalGrid(
+                    modifier = Modifier.clip(DragonShape),
+                    columns = GridCells.Fixed(3),
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    // Loop through all actions
+                    items(actions.filterNot { it is SwipeActionSerializable.LaunchApp }) { action ->
+                        AddPointColumn(
+                            action = action,
+                            onSelected = {
+                                when (action) {
+                                    is SwipeActionSerializable.LaunchShortcut -> {
+                                        showPinnedShortcutsPicker = true
+                                    }
+
+                                    is SwipeActionSerializable.OpenAppDrawer -> {
+                                        showWorkspacePicker = true
+                                    }
+
+                                    is SwipeActionSerializable.OpenCircleNest -> {
+                                        showNestPicker = true
+                                    }
+
+                                    is SwipeActionSerializable.OpenDragonLauncherSettings -> {
+                                        showSettingsPagePicker = true
+                                    }
+
+                                    is SwipeActionSerializable.OpenFile -> {
+                                        showFilePicker = true
+                                    }
+
+                                    is SwipeActionSerializable.OpenUrl -> {
+                                        showUrlInput = true
+                                    }
+
+                                    is SwipeActionSerializable.RunAdbCommand -> {
+                                        showAdbCommandInput = true
+                                    }
+
+                                    is SwipeActionSerializable.ToggleData -> {
+                                        showDataCommandInput = true
+                                    }
+
+                                    is SwipeActionSerializable.ToggleWifi -> {
+                                        showWifiCommandInput = true
+                                    }
+
+                                    is SwipeActionSerializable.ToggleBluetooth -> {
+                                        showBluetoothCommandInput = true
+                                    }
+
+                                    else -> onActionPicked(action)
+                                }
                             }
-                        }
-
-                        // Direct actions
-                        else -> {
-                            AddPointColumn(
-                                action = action,
-                                onSelected = { onActionPicked(action) }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
+                        )
+                        Spacer(Modifier.height(8.dp))
                     }
                 }
             }
-        },
-        containerColor = MaterialTheme.colorScheme.surface,
-        shape = DragonShape
+        }
     )
 
     if (showAppPicker) {
@@ -256,6 +277,54 @@ fun AddPointDialog(
         )
     }
 
+    if (showAdbCommandInput) {
+        AdbCommandInputDialog(
+            onDismiss = { showAdbCommandInput = false },
+            onUrlSelected = {
+                onActionPicked(it)
+                showAdbCommandInput = false
+            }
+        )
+    }
+
+    if (showWifiCommandInput) {
+        AdbCommandPickerDialog(
+            label = "${stringResource(R.string.pick_a)} WIFI ${stringResource(R.string.command)}",
+            options = WifiADBCommands.entries,
+            selected = { WifiADBCommands.Svc },
+            onDismiss = { showWifiCommandInput = false },
+        ) { command, toast ->
+            onActionPicked(SwipeActionSerializable.ToggleWifi(command, toast))
+            showWifiCommandInput = false
+        }
+    }
+
+
+    if (showBluetoothCommandInput) {
+        AdbCommandPickerDialog(
+            label = "${stringResource(R.string.pick_a)} BLUETOOTH ${stringResource(R.string.command)}",
+            options = BluetoothADBCommands.entries,
+            selected = { BluetoothADBCommands.Cmd },
+            onDismiss = { showBluetoothCommandInput = false },
+        ) { command, toast ->
+            onActionPicked(SwipeActionSerializable.ToggleBluetooth(command, toast))
+            showBluetoothCommandInput = false
+        }
+    }
+
+
+    if (showDataCommandInput) {
+        AdbCommandPickerDialog(
+            label = "${stringResource(R.string.pick_a)} DATA ${stringResource(R.string.command)}",
+            options = DataADBCommands.entries,
+            selected = { DataADBCommands.Svc },
+            onDismiss = { showDataCommandInput = false },
+        ) { command, toast ->
+            onActionPicked(SwipeActionSerializable.ToggleData(command, toast))
+            showDataCommandInput = false
+        }
+    }
+
     if (showFilePicker) {
         FilePickerDialog(
             onDismiss = { showFilePicker = false },
@@ -312,69 +381,9 @@ fun AddPointDialog(
     }
 
     if (showWorkspacePicker) {
-        val availableWorkspaces = workspaces.workspaces
-        AlertDialog(
-            onDismissRequest = { showWorkspacePicker = false },
-            confirmButton = {},
-            title = { Text(stringResource(R.string.select_default_workspace)) },
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.select_workspace_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(0.7f)
-                    )
-                    Spacer(Modifier.height(8.dp))
-
-                    // "Default" option (no specific workspace)
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(DragonShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clickable {
-                                onActionPicked(SwipeActionSerializable.OpenAppDrawer())
-                                showWorkspacePicker = false
-                            }
-                            .padding(12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = stringResource(R.string.workspace_default),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                    // Specific workspaces
-                    availableWorkspaces.forEach { workspace ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(DragonShape)
-                                .background(MaterialTheme.colorScheme.surface)
-                                .clickable {
-                                    onActionPicked(
-                                        SwipeActionSerializable.OpenAppDrawer(workspace.id)
-                                    )
-                                    showWorkspacePicker = false
-                                }
-                                .padding(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = workspace.name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.surface,
-            shape = DragonShape
+        WorkspacePickerDialog(
+            onDismiss = { showWorkspacePicker = false },
+            onActionPicked = { onActionPicked(it) }
         )
     }
 
@@ -391,14 +400,16 @@ fun AddPointDialog(
 
 
 @Composable
-fun AddPointColumn(
+private fun AddPointColumn(
     action: SwipeActionSerializable,
     onSelected: () -> Unit
 ) {
     val extraColors = LocalExtraColors.current
 
     val name = when (action) {
-        is SwipeActionSerializable.LaunchApp -> stringResource(R.string.open_app)
+        /** Not verifying for open app, because it is filtered by the filter above in [AddPointColumn] */
+
+
         is SwipeActionSerializable.LaunchShortcut -> {
             if (action.packageName.isEmpty()) stringResource(R.string.pinned_shortcuts)
             else actionLabel(action)
@@ -410,26 +421,24 @@ fun AddPointColumn(
         else -> actionLabel(action)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(DragonShape)
-            .background(actionColor(action, extraColors).copy(0.5f))
-            .clickable { onSelected() }
-            .padding(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = name,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
+    val color = actionColor(action, extraColors)
 
-        ActionIcon(
-            action = action,
-            modifier = Modifier.size(30.dp),
-            showLaunchAppVectorGrid = true
-        )
+    DragonTooltip(name) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(DragonShape)
+                .background(color.copy(0.5f))
+                .border(1.dp, color, DragonShape)
+                .clickable { onSelected() }
+                .padding(12.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            ActionIcon(
+                action = action,
+                modifier = Modifier.size(30.dp),
+                showLaunchAppVectorGrid = true
+            )
+        }
     }
 }

@@ -38,7 +38,7 @@ fun GoogleLockingWarning(
                 validateText = stringResource(R.string.solution),
                 cancelText = stringResource(R.string.dismiss),
                 onCancel = onDismiss,
-                onValidate = onSolution
+                onConfirm = onSolution
             )
         },
         containerColor = MaterialTheme.colorScheme.surface,

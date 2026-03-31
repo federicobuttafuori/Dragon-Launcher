@@ -71,7 +71,7 @@ fun AngleLineObjectsOrderDialog(
         confirmButton = {
             ValidateCancelButtons(
                 onCancel = onDismiss,
-                onValidate = {
+                onConfirm = {
                     scope.launch {
                         AngleLineSettingsStore.angleLineObjectsOrder.set(
                             ctx,

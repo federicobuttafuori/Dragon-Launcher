@@ -120,7 +120,7 @@ fun AppAliasesDialog(
         confirmButton = {
             ValidateCancelButtons(
                 validateText = stringResource(R.string.ok),
-                onValidate = onDismiss
+                onConfirm = onDismiss
             )
         },
         dismissButton = {},

@@ -49,7 +49,7 @@ fun ActionIcon(
 
     val bitmap: ImageBitmap? = when {
         action is SwipeActionSerializable.LaunchApp && showLaunchAppVectorGrid ->
-            loadDrawableResAsBitmap(ctx, R.drawable.ic_app_grid, size, size)
+            ctx.loadDrawableResAsBitmap(R.drawable.ic_app_grid, size, size)
         else -> {
             createUntintedBitmap(
                 icons = icons,

@@ -149,7 +149,7 @@ object ImageUtils {
 
             bitmapToBase64(bmp)
         } catch (e: Exception) {
-           logE(IMAGE_TAG, e) { e.toString() }
+            logE(IMAGE_TAG, e) { e.toString() }
             null
         }
     }
@@ -160,7 +160,7 @@ object ImageUtils {
             val androidBitmap = imageBitmap.asAndroidBitmap()
             bitmapToBase64(androidBitmap)
         } catch (e: Exception) {
-           logE(IMAGE_TAG, e) { e.toString() }
+            logE(IMAGE_TAG, e) { e.toString() }
             null
         }
     }
@@ -250,13 +250,12 @@ object ImageUtils {
         return bitmap.asImageBitmap()
     }
 
-    fun loadDrawableResAsBitmap(
-        ctx: Context,
+    fun Context.loadDrawableResAsBitmap(
         resId: Int,
         width: Int,
         height: Int
     ): ImageBitmap {
-        val drawable = ContextCompat.getDrawable(ctx, resId)
+        val drawable = ContextCompat.getDrawable(this, resId)
             ?: return createDefaultBitmap(width, height)
 
         return loadDrawableAsBitmap(drawable, width, height)
@@ -272,87 +271,62 @@ object ImageUtils {
         val pm = ctx.packageManager
         val pmCompat = PackageManagerCompat(pm, ctx)
 
-        return when (action) {
-            is SwipeActionSerializable.LaunchApp -> {
-                val dummyAppModel = action.toAppModel()
+        return with(ctx) {
+            when (action) {
+                is SwipeActionSerializable.LaunchApp -> {
+                    val dummyAppModel = action.toAppModel()
 
-                val drawable = pmCompat.getAppIcon(
-                    packageName = action.packageName,
-                    userId = action.userId ?: 0,
-                    isPrivateProfile = action.isPrivateSpace
-                )
-                icons[dummyAppModel.iconCacheKey.cacheKey] ?: loadDrawableAsBitmap(drawable, width, height)
-            }
+                    val drawable = pmCompat.getAppIcon(
+                        packageName = action.packageName,
+                        userId = action.userId ?: 0,
+                        isPrivateProfile = action.isPrivateSpace
+                    )
+                    icons[dummyAppModel.iconCacheKey.cacheKey] ?: loadDrawableAsBitmap(drawable, width, height)
+                }
 
-            is SwipeActionSerializable.LaunchShortcut -> {
-                loadShortcutIcon(ctx, action.packageName, action.shortcutId) ?: loadDrawableResAsBitmap(
-                    ctx,
-                    R.drawable.ic_action_pinned_shortcut,
-                    width,
-                    height
-                )
-            }
+                is SwipeActionSerializable.LaunchShortcut -> {
+                    loadShortcutIcon(ctx, action.packageName, action.shortcutId) ?: loadDrawableResAsBitmap(
+                        R.drawable.ic_action_pinned_shortcut,
+                        width,
+                        height
+                    )
+                }
 
-            is SwipeActionSerializable.OpenUrl ->
-                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_web, width, height)
+                is SwipeActionSerializable.OpenUrl -> loadDrawableResAsBitmap(R.drawable.ic_action_web, width, height)
 
-            SwipeActionSerializable.NotificationShade ->
-                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_notification, width, height)
+                SwipeActionSerializable.NotificationShade -> loadDrawableResAsBitmap(R.drawable.ic_action_notification, width, height)
 
-            SwipeActionSerializable.ControlPanel ->
-                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_grid, width, height)
+                SwipeActionSerializable.ControlPanel -> loadDrawableResAsBitmap(R.drawable.ic_action_grid, width, height)
 
-            is SwipeActionSerializable.OpenAppDrawer ->
-                loadDrawableResAsBitmap(ctx, R.drawable.ic_action_drawer, width, height)
+                is SwipeActionSerializable.OpenAppDrawer -> loadDrawableResAsBitmap(R.drawable.ic_action_drawer, width, height)
 
-            is SwipeActionSerializable.OpenDragonLauncherSettings ->
-                loadDrawableResAsBitmap(ctx, R.drawable.dragon_launcher_foreground, width, height)
+                is SwipeActionSerializable.OpenDragonLauncherSettings -> loadDrawableResAsBitmap(R.drawable.dragon_launcher_foreground, width, height)
 
-            SwipeActionSerializable.Lock -> loadDrawableResAsBitmap(ctx, R.drawable.ic_action_lock, width, height)
-            is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(
-                ctx,
-                R.drawable.ic_action_open_file,
-                width,
-                height
-            )
+                SwipeActionSerializable.Lock -> loadDrawableResAsBitmap(R.drawable.ic_action_lock, width, height)
+                is SwipeActionSerializable.OpenFile -> loadDrawableResAsBitmap(R.drawable.ic_action_open_file, width, height)
 
-            SwipeActionSerializable.ReloadApps -> loadDrawableResAsBitmap(
-                ctx,
-                R.drawable.ic_action_reload,
-                width,
-                height
-            )
+                SwipeActionSerializable.ReloadApps -> loadDrawableResAsBitmap(R.drawable.ic_action_reload, width, height)
 
-            SwipeActionSerializable.OpenRecentApps -> loadDrawableResAsBitmap(
-                ctx,
-                R.drawable.ic_action_recent,
-                width,
-                height
-            )
+                SwipeActionSerializable.OpenRecentApps -> loadDrawableResAsBitmap(R.drawable.ic_action_recent, width, height)
 
-            is SwipeActionSerializable.OpenCircleNest -> loadDrawableResAsBitmap(
-                ctx,
-                R.drawable.ic_action_target,
-                width,
-                height
-            )
+                is SwipeActionSerializable.OpenCircleNest -> loadDrawableResAsBitmap(R.drawable.ic_action_target, width, height)
 
-            SwipeActionSerializable.GoParentNest -> loadDrawableResAsBitmap(
-                ctx,
-                R.drawable.ic_icon_go_parent_nest,
-                width,
-                height
-            )
+                SwipeActionSerializable.GoParentNest -> loadDrawableResAsBitmap(R.drawable.ic_icon_go_parent_nest, width, height)
 
-            is SwipeActionSerializable.OpenWidget -> loadDrawableResAsBitmap(
-                ctx,
-                R.drawable.ic_action_widgets,
-                width,
-                height
-            )
+                is SwipeActionSerializable.OpenWidget -> loadDrawableResAsBitmap(R.drawable.ic_action_widgets, width, height)
 
-            SwipeActionSerializable.None -> null
-        } ?: loadDrawableResAsBitmap(ctx, R.drawable.ic_app_default, width, height)
+                is SwipeActionSerializable.RunAdbCommand -> loadDrawableResAsBitmap(R.drawable.adb_icon, width, height)
+
+                is SwipeActionSerializable.ToggleBluetooth -> loadDrawableResAsBitmap(R.drawable.bluetooth_icon, width, height)
+
+                is SwipeActionSerializable.ToggleData -> loadDrawableResAsBitmap(R.drawable.cellular_icon, width, height)
+
+                is SwipeActionSerializable.ToggleWifi -> loadDrawableResAsBitmap(R.drawable.wifi_icon, width, height)
+
+                SwipeActionSerializable.None -> null
+
+            } ?: loadDrawableResAsBitmap(R.drawable.ic_app_default, width, height)
+        }
     }
 
     fun resolveCustomIconBitmap(

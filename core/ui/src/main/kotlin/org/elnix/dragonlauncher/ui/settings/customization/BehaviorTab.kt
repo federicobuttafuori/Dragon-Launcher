@@ -68,17 +68,16 @@ import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
+import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
 
 @Suppress("VariableNeverRead")
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun BehaviorTab(
-    navController: NavController,
-    onBack: () -> Unit
-) {
+fun BehaviorTab(onBack: () -> Unit) {
     val ctx = LocalContext.current
+    val navController = LocalNavController.current
     val appLifecycleViewModel = LocalAppLifecycleViewModel.current
 
     val scope = rememberCoroutineScope()

@@ -59,7 +59,7 @@ fun UserValidation(
             ValidateCancelButtons(
                 validateText = validateText,
                 onCancel = onDismiss,
-                onValidate = onValidate
+                onConfirm = onValidate
             )
         },
         properties = properties,

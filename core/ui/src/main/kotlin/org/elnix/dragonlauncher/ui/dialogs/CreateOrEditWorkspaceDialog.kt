@@ -42,7 +42,7 @@ fun CreateOrEditWorkspaceDialog(
         confirmButton = {
             ValidateCancelButtons(
                 onCancel = onDismiss,
-                onValidate = {
+                onConfirm = {
                     onConfirm(selectedType)
                 }
             )

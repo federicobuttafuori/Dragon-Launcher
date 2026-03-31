@@ -17,7 +17,11 @@ data class ExtraColors(
     val reload: Color,
     val openRecentApps: Color,
     val openCircleNest: Color,
-    val goParentNest: Color
+    val goParentNest: Color,
+    val toggleWifi: Color,
+    val toggleBluetooth: Color,
+    val toggleData: Color,
+    val runAdbCommand: Color
 )
 
 
@@ -35,6 +39,10 @@ val DefaultExtraColors = ExtraColors(
     reload = Color(0xFF886300),
     openRecentApps = Color(0xFF880081),
     openCircleNest = Color(0xFF1BEE14),
-    goParentNest = Color(0xFF1BEE14)
+    goParentNest = Color(0xFF1BEE14),
+    toggleWifi = Color(0xFF0FFFFF),
+    toggleData = Color(0xFF806E00),
+    toggleBluetooth = Color(0xFF2196F3),
+    runAdbCommand = Color(0xFF1BEE14)
 )
 val LocalExtraColors = staticCompositionLocalOf { DefaultExtraColors }

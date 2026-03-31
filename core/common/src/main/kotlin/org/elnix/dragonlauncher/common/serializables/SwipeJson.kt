@@ -1,11 +1,13 @@
 package org.elnix.dragonlauncher.common.serializables
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.utils.BluetoothADBCommands
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.SWIPE_TAG
+import org.elnix.dragonlauncher.common.utils.DataADBCommands
 import org.elnix.dragonlauncher.common.utils.SETTINGS
+import org.elnix.dragonlauncher.common.utils.WifiADBCommands
 import java.util.UUID
 
 
@@ -85,6 +87,30 @@ sealed class SwipeActionSerializable {
         val widgetId: Int,
         val providerPackage: String,
         val providerClass: String
+    ) : SwipeActionSerializable()
+
+    @Serializable
+    data class ToggleWifi(
+        val command: WifiADBCommands = WifiADBCommands.Svc,
+        val toast: Boolean? = false
+    ) : SwipeActionSerializable()
+
+    @Serializable
+    data class ToggleBluetooth(
+        val command: BluetoothADBCommands = BluetoothADBCommands.Cmd,
+        val toast: Boolean? = false
+    ): SwipeActionSerializable()
+
+    @Serializable
+    data class ToggleData(
+        val command: DataADBCommands = DataADBCommands.Svc,
+        val toast: Boolean? = false
+    ) : SwipeActionSerializable()
+
+    @Serializable
+    data class RunAdbCommand(
+        val command: String,
+        val toast: Boolean? = false
     ) : SwipeActionSerializable()
 
     @Serializable

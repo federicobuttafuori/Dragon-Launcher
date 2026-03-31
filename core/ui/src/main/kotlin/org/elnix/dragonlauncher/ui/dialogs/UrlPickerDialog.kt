@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 
 @Composable
@@ -40,7 +39,10 @@ fun UrlInputDialog(
                     },
                     singleLine = true,
                     label = { Text("https://example.com") },
-                    colors = AppObjectsColors.outlinedTextFieldColors(removeBorder = true, backgroundColor = MaterialTheme.colorScheme.surface.adjustBrightness(0.7f))
+                    colors = AppObjectsColors.outlinedTextFieldColors(
+                        removeBorder = true,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 )
                 if (error) {
                     Text(stringResource(R.string.invalid_url), color = Color.Red)

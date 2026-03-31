@@ -15,7 +15,10 @@ import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.APP_LAUNCH_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.common.utils.expandQuickActionsDrawer
+import org.elnix.dragonlauncher.common.utils.getMobileDataStatus
 import org.elnix.dragonlauncher.common.utils.hasUriReadPermission
+import org.elnix.dragonlauncher.common.utils.isBluetoothEnabled
+import org.elnix.dragonlauncher.common.utils.isWifiEnabled
 import org.elnix.dragonlauncher.common.utils.launchShortcut
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.models.AppsViewModel
@@ -44,11 +47,12 @@ fun launchSwipeAction(
     returnToLauncherEnabled: Boolean = false,
     appName: String = "",
     onOpenPrivateSpaceApp: (SwipeActionSerializable) -> Unit,
-    digitalPauseLauncher: ActivityResultLauncher<Intent>? = null,
-    onReloadApps: (() -> Unit)? = null,
-    onReselectFile: (() -> Unit)? = null,
-    onAppSettings: ((String) -> Unit)? = null,
-    onAppDrawer: ((workspaceId: String?) -> Unit)? = null
+    digitalPauseLauncher: ActivityResultLauncher<Intent>,
+    onReloadApps: () -> Unit,
+    onReselectFile: () -> Unit,
+    onAppSettings: (String) -> Unit,
+    onAppDrawer: (workspaceId: String?) -> Unit,
+    onShizukuCommand: (command: String, showToast: Boolean) -> Unit
 ) {
     if (action == null) return
 
@@ -67,7 +71,7 @@ fun launchSwipeAction(
                 }
 
                 /*  ─────────────  2. Wellbeing Pause Check  ─────────────  */
-                if (socialMediaPauseEnabled && action.packageName in pausedApps && digitalPauseLauncher != null) {
+                if (socialMediaPauseEnabled && action.packageName in pausedApps) {
                     val intent = Intent(ctx, DigitalPauseActivity::class.java).apply {
                         putExtra(DigitalPauseActivity.EXTRA_PACKAGE_NAME, action.packageName)
                         putExtra(DigitalPauseActivity.EXTRA_APP_NAME, appName)
@@ -130,11 +134,11 @@ fun launchSwipeAction(
         }
 
         is SwipeActionSerializable.OpenAppDrawer -> {
-            onAppDrawer?.invoke(action.workspaceId)
+            onAppDrawer(action.workspaceId)
         }
 
         is SwipeActionSerializable.OpenDragonLauncherSettings -> {
-            onAppSettings?.invoke(action.route)
+            onAppSettings(action.route)
         }
 
         SwipeActionSerializable.Lock -> {
@@ -156,7 +160,7 @@ fun launchSwipeAction(
 
                 if (!ctx.hasUriReadPermission(uri)) {
                     ctx.showToast("Please reselect the file to allow access")
-                    onReselectFile?.invoke()
+                    onReselectFile()
                     return
                 }
 
@@ -173,12 +177,12 @@ fun launchSwipeAction(
                 }
 
             } catch (e: Exception) {
-                ctx.showToast("Unable to open file" )
-                logE(TAG, e) { "Unable to open file"}
+                ctx.showToast("Unable to open file")
+                logE(TAG, e) { "Unable to open file" }
             }
         }
 
-        SwipeActionSerializable.ReloadApps -> onReloadApps?.invoke()
+        SwipeActionSerializable.ReloadApps -> onReloadApps()
         SwipeActionSerializable.OpenRecentApps -> {
             if (!SystemControl.isServiceEnabled(ctx)) {
                 ctx.showToast("Please enable accessibility settings to use that feature")
@@ -188,12 +192,53 @@ fun launchSwipeAction(
             SystemControl.openRecentApps(ctx)
         }
 
+
+        is SwipeActionSerializable.RunAdbCommand -> {
+            onShizukuCommand(
+                action.command,
+                action.toast == true
+            )
+        }
+
+        is SwipeActionSerializable.ToggleBluetooth -> {
+            onShizukuCommand(
+                if (ctx.isBluetoothEnabled()) {
+                    action.command.commandDisable
+                } else {
+                    action.command.commandEnable
+                },
+                action.toast == true
+            )
+        }
+
+        is SwipeActionSerializable.ToggleData -> {
+            onShizukuCommand(
+                if (ctx.getMobileDataStatus().first) {
+                    action.command.commandDisable
+                } else {
+                    action.command.commandEnable
+                },
+                action.toast == true
+            )
+        }
+
+        is SwipeActionSerializable.ToggleWifi -> {
+            onShizukuCommand(
+                if (ctx.isWifiEnabled()) {
+                    action.command.commandDisable
+                } else {
+                    action.command.commandEnable
+                },
+                action.toast == true
+            )
+        }
+
         is SwipeActionSerializable.OpenCircleNest, SwipeActionSerializable.GoParentNest -> {} // Handled by the main screen / settings
         is SwipeActionSerializable.OpenWidget -> {} // The widget action isn't mean to be part of the choosable actions, so nothing on launch
+
         SwipeActionSerializable.None -> {}
     }
 }
-
 
 /**
  * Launch an app directly without any pause check.

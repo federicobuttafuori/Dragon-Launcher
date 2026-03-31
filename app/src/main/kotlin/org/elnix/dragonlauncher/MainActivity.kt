@@ -66,12 +66,15 @@ import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.models.BackupViewModel
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
+import org.elnix.dragonlauncher.models.ShizukuViewModel
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.shizuku.ShellCommandExecutor
+import org.elnix.dragonlauncher.shizuku.ShizukuPermissionHandler
 import org.elnix.dragonlauncher.ui.MainAppUi
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
@@ -80,6 +83,8 @@ import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
+import org.elnix.dragonlauncher.ui.remembers.LocalNavController
+import org.elnix.dragonlauncher.ui.remembers.LocalShizukuViewModel
 import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 import java.io.File
@@ -420,6 +425,14 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                 (ctx.applicationContext as DragonLauncherApplication).appsViewModel
             }
 
+            val shizukuViewModel = remember(ctx) {
+                ShizukuViewModel(
+                    shellCommandExecutor = ShellCommandExecutor(),
+                    shizukuPermissionHandler = ShizukuPermissionHandler(),
+                    coroutineScope = scope
+                )
+            }
+
             // May be used in the future for some quit action / operation
             // DoubleBackToExit()
 
@@ -560,10 +573,12 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                         LocalBackupViewModel provides backupViewModel,
                         LocalAppsViewModel provides appsViewModel,
                         LocalAppLifecycleViewModel provides appLifecycleViewModel,
-                        LocalFloatingAppsViewModel provides floatingAppsViewModel
+                        LocalFloatingAppsViewModel provides floatingAppsViewModel,
+                        LocalShizukuViewModel provides shizukuViewModel,
+
+                        LocalNavController provides navController,
                     ) {
                         MainAppUi(
-                            navController = navController,
                             onBindCustomWidget = { widgetId, provider, nestId ->
                                 pendingAddNestId = nestId
                                 (ctx as MainActivity).bindWidgetFromCustomPicker(widgetId, provider)

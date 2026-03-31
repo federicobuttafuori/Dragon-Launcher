@@ -49,16 +49,17 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalIcons
+import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
 
 @Composable
 fun AppearanceTab(
-    navController: NavController,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
     val icons = LocalIcons.current
+    val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
 
     // Top overlay things

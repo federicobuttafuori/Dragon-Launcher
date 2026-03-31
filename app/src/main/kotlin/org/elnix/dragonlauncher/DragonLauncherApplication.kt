@@ -24,8 +24,6 @@ class DragonLauncherApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->

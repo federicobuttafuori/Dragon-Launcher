@@ -122,6 +122,11 @@ object Constants {
         )
     }
 
+    object PackageNames {
+        const val MY_PACKAGE_NAME = "org.elnix.dragonlauncher"
+        const val SHIZUKU_PACKAGE_NAME = "moe.shizuku.privileged.api"
+    }
+
     object Navigation {
         /** List of routes that the routes killer ignores when the user leave the app for too long, usually files pickers */
         val ignoredReturnRoutes = listOf(
@@ -147,7 +152,7 @@ object Constants {
     }
 
     object Actions {
-        val defaultChoosableActions = listOf(
+        val defaultChoosableActions: List<SwipeActionSerializable> = listOf(
             SwipeActionSerializable.OpenCircleNest(0),
             SwipeActionSerializable.GoParentNest,
             SwipeActionSerializable.LaunchApp("", false,0),
@@ -160,7 +165,11 @@ object Constants {
             SwipeActionSerializable.Lock,
             SwipeActionSerializable.ReloadApps,
             SwipeActionSerializable.OpenRecentApps,
-            SwipeActionSerializable.OpenDragonLauncherSettings()
+            SwipeActionSerializable.OpenDragonLauncherSettings(),
+            SwipeActionSerializable.RunAdbCommand(""),
+            SwipeActionSerializable.ToggleBluetooth(),
+            SwipeActionSerializable.ToggleWifi(),
+            SwipeActionSerializable.ToggleData(),
         )
     }
 
@@ -204,16 +213,23 @@ object Constants {
         val HAPTIC_TAG = LogTag("HapticDebug")
         val WELCOME_TAG = LogTag("WelcomeDebug")
         val MAIN_SCREEN_LAYERS_TAG = LogTag("MainScreenLayersTag")
-        val CRASH_TAG = LogTag("CrashDebug")
+        val SHIZUKU_TAG = LogTag("ShizukuDebug")
     }
 
     /*  ─────────────  Links  ─────────────  */
-    object Links {
+    object URLs {
 
+        const val ELNIX90_GITHUB_PROFILE_LINK = "https://github.com/Elnix90"
+        const val GITHUB_REPO_LINK = "https://github.com/Elnix90/Dragon-Launcher"
+        const val GITHUB_REPO_RELEASES_LINK = "$GITHUB_REPO_LINK/releases/latest"
+        const val GITHUB_REPO_ISSUES_LINK = "$GITHUB_REPO_LINK/issues/new"
+        const val EXTENSIONS_GITHUB_REPO_LINK = "https://github.com/Elnix90/Dragon-Launcher-Extensions"
         const val DISCORD_INVITE_LINK = "https://discord.gg/6UyuP8EBWS"
         const val REDDIT_LINK = "https://www.reddit.com/r/dragonlauncher/"
         const val MAILTO_LINK = "mailto:elnix91@proton.me"
         const val DRAGON_WEBSITE = "https://dragonlauncher.lthb.fr/"
+        const val URL_SHIZUKU_SITE = "https://shizuku.rikka.app"
+
     }
 
     object Settings {
@@ -302,6 +318,4 @@ object Constants {
         const val AUTO_UPDATE_EXTENSION_PKG = "org.elnix.dragonlauncher.autoupdate"
         const val FONT_EXTENSION_PKG = "org.elnix.dragonlauncher.fonts"
     }
-
-    const val MY_PACKAGE_NAME = "org.elnix.dragonlauncher"
 }

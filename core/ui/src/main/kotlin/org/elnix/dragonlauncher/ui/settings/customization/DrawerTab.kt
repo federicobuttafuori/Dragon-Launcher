@@ -59,15 +59,16 @@ import org.elnix.dragonlauncher.ui.helpers.GridSizeSlider
 import org.elnix.dragonlauncher.ui.helpers.ShapeRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
+import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
 
 @Composable
 fun DrawerTab(
-    appsViewModel: AppsViewModel,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
+    val appsViewModel = LocalAppsViewModel.current
     val scope = rememberCoroutineScope()
 
     val apps by appsViewModel.userApps.collectAsState(initial = emptyList())

@@ -105,7 +105,8 @@ private class SwipeActionAdapter : JsonSerializer<SwipeActionSerializable>, Json
                 obj.addProperty("type", "GoParentNest")
             }
 
-            SwipeActionSerializable.None -> {}
+            // Don't handle new actions in this legacy type adapter
+            else -> {}
         }
         return obj
     }

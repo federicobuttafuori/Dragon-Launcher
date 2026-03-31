@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,7 +45,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -74,14 +74,18 @@ import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.ANGLE_LINE_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.APP_LAUNCH_TAG
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.SHIZUKU_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Navigation.transparentScreens
+import org.elnix.dragonlauncher.common.utils.Constants.PackageNames.SHIZUKU_PACKAGE_NAME
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.URL_SHIZUKU_SITE
 import org.elnix.dragonlauncher.common.utils.ROUTES
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.UiConstants
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
+import org.elnix.dragonlauncher.common.utils.isAppInstalled
 import org.elnix.dragonlauncher.common.utils.isDefaultLauncher
 import org.elnix.dragonlauncher.common.utils.loadChangelogs
 import org.elnix.dragonlauncher.common.utils.openUrl
@@ -108,6 +112,7 @@ import org.elnix.dragonlauncher.ui.dialogs.FilePickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.GoogleLockingWarning
 import org.elnix.dragonlauncher.ui.dialogs.MainScreeLayersOrderScreen
 import org.elnix.dragonlauncher.ui.dialogs.PinUnlockDialog
+import org.elnix.dragonlauncher.ui.dialogs.ShizukuUnavailableDialog
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.rememberMainScreenLayerOrder
@@ -116,10 +121,10 @@ import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
 import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
 import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
 import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
-import org.elnix.dragonlauncher.ui.helpers.collapseDownAnimation
 import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
-import org.elnix.dragonlauncher.ui.helpers.noAnimComposable
-import org.elnix.dragonlauncher.ui.helpers.raiseUpAnimation
+import org.elnix.dragonlauncher.ui.navigation.collapseDownAnimation
+import org.elnix.dragonlauncher.ui.navigation.raiseUpAnimation
+import org.elnix.dragonlauncher.ui.navigation.settingComposable
 import org.elnix.dragonlauncher.ui.remembers.LocalAngleLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
@@ -131,8 +136,10 @@ import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 import org.elnix.dragonlauncher.ui.remembers.LocalIcons
 import org.elnix.dragonlauncher.ui.remembers.LocalLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
+import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 import org.elnix.dragonlauncher.ui.remembers.LocalPoints
+import org.elnix.dragonlauncher.ui.remembers.LocalShizukuViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
@@ -163,13 +170,13 @@ import org.elnix.dragonlauncher.ui.wellbeing.AppTimerService
 import org.elnix.dragonlauncher.ui.wellbeing.DigitalPauseActivity
 import org.elnix.dragonlauncher.ui.whatsnew.ChangelogsScreen
 import org.elnix.dragonlauncher.ui.whatsnew.WhatsNewBottomSheet
+import rikka.shizuku.Shizuku
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun MainAppUi(
-    navController: NavHostController,
     onBindCustomWidget: (Int, ComponentName, nestId: Int) -> Unit,
     onResetWidgetSize: (id: Int, widgetId: Int) -> Unit,
     onRemoveFloatingApp: (FloatingAppObject) -> Unit
@@ -177,6 +184,7 @@ fun MainAppUi(
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val appsViewModel = LocalAppsViewModel.current
+    val shizukuViewModel = LocalShizukuViewModel.current
     val appLifecycleViewModel = LocalAppLifecycleViewModel.current
     val backupViewModel = LocalBackupViewModel.current
 
@@ -198,7 +206,7 @@ fun MainAppUi(
 
     val privateSpaceState = appsViewModel.privateSpaceState
 
-    // Changelogs system
+    /* ───────────── Changelogs system ───────────── */
     val lastSeenVersionCodeWhatsNew by PrivateSettingsStore.lastSeenVersionCodeWhatsNew.asState()
     val lastSeenVersionCodeGoogleLockdownWarning by PrivateSettingsStore.lastSeenVersionCodeGoogleLockdownWarning.asState()
 
@@ -212,12 +220,23 @@ fun MainAppUi(
         value = loadChangelogs(ctx, versionCode)
     }
 
+
+    var showShizukuUnavailableDialog by rememberSaveable { mutableStateOf(false) }
+    val hasShizukuPermission by shizukuViewModel.shizukuPermissionState().collectAsState()
+    var isShizukuInstalled by rememberSaveable {
+        mutableStateOf(
+            ctx.isAppInstalled(
+                SHIZUKU_PACKAGE_NAME
+            )
+        )
+    }
+
+
     val showAppIconsInDrawer by DrawerSettingsStore.showAppIconsInDrawer.asState()
     val showAppLabelsInDrawer by DrawerSettingsStore.showAppLabelInDrawer.asState()
     val autoShowKeyboardOnDrawer by DrawerSettingsStore.autoShowKeyboardOnDrawer.asState()
     val gridSize by DrawerSettingsStore.gridSize.asState()
 
-//    val searchBarBottom by DrawerSettingsStore.searchBarBottom.asState()
     val selectedToolbarItemsStringSet by DrawerSettingsStore.toolbarsOrder.asState()
     val selectedToolbarItems by remember {
         derivedStateOf {
@@ -231,7 +250,6 @@ fun MainAppUi(
             }
         }
     }
-
 
 
     val drawerEnterExitAnimations by DrawerSettingsStore.drawerEnterExitAnimations.asState()
@@ -256,6 +274,8 @@ fun MainAppUi(
     val lifecycleOwner = LocalLifecycleOwner.current
     var isDefaultLauncher by remember { mutableStateOf(ctx.isDefaultLauncher) }
 
+
+    val navController = LocalNavController.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var lastRoute by remember { mutableStateOf(ROUTES.MAIN) }
@@ -273,7 +293,7 @@ fun MainAppUi(
     var startDestination by remember { mutableStateOf(SETTINGS.ROOT) }
 
 
-    // ───────────── Lock gate state ─────────────
+    /* ───────────── Lock gate state ───────────── */
     val lockMethod by PrivateSettingsStore.lockMethod.asState()
     val pinHash by PrivateSettingsStore.lockPinHash.asState()
 
@@ -298,7 +318,7 @@ fun MainAppUi(
     val reminderMode by WellbeingSettingsStore.reminderMode.asState()
     val returnToLauncherEnabled by WellbeingSettingsStore.returnToLauncherEnabled.asState()
 
-    // Store pending package to launch after pause
+    /* ───────────── Store pending package to launch after pause ───────────── */
     var pendingPackageToLaunch by remember { mutableStateOf<String?>(null) }
     var pendingUserIdToLaunch by remember { mutableStateOf<Int?>(null) }
     var pendingAppName by remember { mutableStateOf<String?>(null) }
@@ -400,7 +420,7 @@ fun MainAppUi(
     }
 
 
-    /* navigation functions, all settings are nested under the lock state */
+    /* ───────────── navigation functions, all settings are nested under the lock state ───────────── */
 
     fun goMainScreen() {
         isUnlocked = false
@@ -539,6 +559,28 @@ fun MainAppUi(
                         appsViewModel.selectWorkspace(workspaceId)
                     }
                     goDrawer()
+                },
+                onShizukuCommand = { command, showToast ->
+                    logD(SHIZUKU_TAG) { "Got shizuku command: $command" }
+
+                    if (!Shizuku.pingBinder()) {
+                        logD(SHIZUKU_TAG) { "Shizuku is not running, opening it..." }
+
+                        showShizukuUnavailableDialog = true
+                        return@launchSwipeAction
+                    }
+
+                    if (!hasShizukuPermission) {
+                        logD(SHIZUKU_TAG) { "Shizuku his not allowed" }
+
+                        shizukuViewModel.requestShizukuPermission()
+                    } else {
+                        logD(SHIZUKU_TAG) { "Shizuku tries to run the command: $command" }
+                        if (showToast) {
+                            ctx.showToast("Running: $command")
+                        }
+                        shizukuViewModel.executeShizukuCommand(command)
+                    }
                 }
             )
         } catch (e: AppLaunchException) {
@@ -770,7 +812,7 @@ fun MainAppUi(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 // Main App (LauncherScreen)
-                noAnimComposable(ROUTES.MAIN) {
+                settingComposable(ROUTES.MAIN) {
                     MainScreen(::launchAction)
                 }
 
@@ -799,7 +841,7 @@ fun MainAppUi(
                 }
 
                 // Welcome screen
-                noAnimComposable(ROUTES.WELCOME) {
+                settingComposable(ROUTES.WELCOME) {
                     WelcomeScreen(
                         onEnterSettings = ::goSettingsRoot,
                         onEnterApp = ::goMainScreen
@@ -812,72 +854,46 @@ fun MainAppUi(
                     startDestination = startDestination,
                     route = "settings_graph"
                 ) {
-                    noAnimComposable(SETTINGS.ROOT) {
+                    settingComposable(SETTINGS.ROOT) {
                         SettingsScreen(
                             onAdvSettings = ::goAdvSettingsRoot,
                             onNestEdit = ::goNestEdit,
                             onBack = ::goMainScreen
                         )
                     }
-                    noAnimComposable(SETTINGS.ADVANCED_ROOT) {
-                        AdvancedSettingsScreen(
-                            navController = navController,
-                            onLaunchAction = ::launchApp,
-                        ) { goSettingsRoot() }
-                    }
-
-                    noAnimComposable(SETTINGS.APPEARANCE) {
-                        AppearanceTab(
-                            navController = navController,
-                            onBack = ::goAdvSettingsRoot
-                        )
-                    }
-                    noAnimComposable(SETTINGS.WALLPAPER) { WallpaperTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.ICON_PACK) {
-                        IconPackTab(
-                            appsViewModel,
-                            ::goAppearance
-                        )
-                    }
-                    noAnimComposable(SETTINGS.STATUS_BAR) { StatusBarTab(::goAppearance) }
+                    settingComposable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(::launchApp) { goSettingsRoot() } }
+                    settingComposable(SETTINGS.APPEARANCE) { AppearanceTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.WALLPAPER) { WallpaperTab(::goAppearance) }
+                    settingComposable(SETTINGS.ICON_PACK) { IconPackTab(::goAppearance) }
+                    settingComposable(SETTINGS.STATUS_BAR) { StatusBarTab(::goAppearance) }
 //                    noAnimComposable(SETTINGS.THEME) { ThemesTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.PERMISSIONS) { PermissionsTab { goAdvSettingsRoot() } }
+                    settingComposable(SETTINGS.PERMISSIONS) { PermissionsTab { goAdvSettingsRoot() } }
 
-                    noAnimComposable(SETTINGS.BEHAVIOR) {
-                        BehaviorTab(
-                            navController,
-                            ::goAdvSettingsRoot
-                        )
-                    }
-                    noAnimComposable(SETTINGS.DRAWER) {
-                        DrawerTab(
-                            appsViewModel,
-                            ::goAdvSettingsRoot
-                        )
-                    }
-                    noAnimComposable(SETTINGS.COLORS) { ColorSelectorTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.DEBUG) { DebugTab(navController, ::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.LOGS) { LogsTab(::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::goDebug) }
-                    noAnimComposable(SETTINGS.LANGUAGE) { LanguageTab(::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.ANGLE_LINE_EDIT) { AngleLineTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.BACKUP) { BackupTab(::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
-                    noAnimComposable(SETTINGS.FONTS) { FontTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::goAppearance) }
-                    noAnimComposable(SETTINGS.MAINS_SCREEN_LAYERS) { MainScreeLayersOrderScreen(::goAppearance) }
+                    settingComposable(SETTINGS.BEHAVIOR) { BehaviorTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.DRAWER) { DrawerTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.COLORS) { ColorSelectorTab(::goAppearance) }
+                    settingComposable(SETTINGS.DEBUG) { DebugTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.LOGS) { LogsTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::goDebug) }
+                    settingComposable(SETTINGS.LANGUAGE) { LanguageTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.ANGLE_LINE_EDIT) { AngleLineTab(::goAppearance) }
+                    settingComposable(SETTINGS.BACKUP) { BackupTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.FONTS) { FontTab(::goAppearance) }
+                    settingComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::goAppearance) }
+                    settingComposable(SETTINGS.MAINS_SCREEN_LAYERS) { MainScreeLayersOrderScreen(::goAppearance) }
 
-                    noAnimComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
+                    settingComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
 
-                    noAnimComposable(SETTINGS.NESTS_EDIT) {
+                    settingComposable(SETTINGS.NESTS_EDIT) {
                         NestEditingScreen(
                             nestId = pendingNestToEdit,
                             onBack = ::goSettingsRoot
                         )
                     }
 
-                    noAnimComposable(
+                    settingComposable(
                         route = "${SETTINGS.WIDGETS_FLOATING_APPS}?nestId={nestId}",
                         arguments = listOf(navArgument("nestId") { type = NavType.IntType; defaultValue = 0 })
                     ) { backStack ->
@@ -890,7 +906,7 @@ fun MainAppUi(
                         )
                     }
 
-                    noAnimComposable(SETTINGS.WORKSPACE) {
+                    settingComposable(SETTINGS.WORKSPACE) {
                         WorkspaceListScreen(
                             onOpenWorkspace = { id ->
                                 navController.navigate(
@@ -901,7 +917,7 @@ fun MainAppUi(
                         )
                     }
 
-                    noAnimComposable(
+                    settingComposable(
                         route = SETTINGS.WORKSPACE_DETAIL,
                         arguments = listOf(navArgument("id") { type = NavType.StringType }),
                     ) { backStack ->
@@ -964,6 +980,18 @@ fun MainAppUi(
                     onBindCustomWidget(id, info, nestToBind)
                 }
             ) { showWidgetPicker = null }
+        }
+
+        if (showShizukuUnavailableDialog) {
+            ShizukuUnavailableDialog(
+                onDismiss = { showShizukuUnavailableDialog = false },
+                onConfirm = {
+                    if (isShizukuInstalled) launchApp(SwipeActionSerializable.LaunchApp(SHIZUKU_PACKAGE_NAME, false, 0))
+                    else ctx.openUrl(
+                        url = URL_SHIZUKU_SITE
+                    )
+                }
+            )
         }
 
         /* ───────────── RESULT DIALOG ( IMPORT / EXPORT ) ───────────── */

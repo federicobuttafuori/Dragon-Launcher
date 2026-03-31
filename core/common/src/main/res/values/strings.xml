@@ -965,4 +965,24 @@
     <string name="crash">App Crashed!</string>
     <string name="crash_message">Crash message:</string>
     <string name="access_app">Access app (you may experience crash again)</string>
+    <string name="shizuku_unavailable">Shizuku is unavailable</string>
+    <string name="shizuku_unavailable_message">Shizuku is not installed or properly configured on your device</string>
+    <string name="shizuku">Shizuku</string>
+    <string name="run_adb_command">Run ADB command</string>
+    <string name="toggle_bluetooth">Toggle Bluetooth</string>
+    <string name="toggle_mobile_data">Toggle Mobile Data</string>
+    <string name="toggle_wifi">Toggle wifi</string>
+    <string name="long_click_hint">💡 Long press to display tooltip!</string>
+    <string name="adb_command_without_adb">Adb command without \"adb\"</string>
+    <string name="shizuku_bt_cmd_method">Method</string>
+    <string name="shizuku_bt_cmd_cmd">Works on some Android 11+, not guaranteed across all OEMs</string>
+    <string name="shizuku_bt_service_call">Old method, works on some Android versions and vendors, unreliable</string>
+    <string name="shizuku_bt_root">Requires root access</string>
+    <string name="shizuku_bt_intent">Opens a user-facing confirmation dialog, not silent</string>
+    <string name="shizuku_wifi_svc">Works on most devices, reliable across Android versions</string>
+    <string name="shizuku_data_svc">Works on many devices, some OEMs (Samsung, Xiaomi) may block it</string>
+    <string name="shizuku_data_settings">Often does not apply immediately, may require reboot</string>
+    <string name="pick_a">Pick a</string>
+    <string name="command">command</string>
+    <string name="show_toast">Show toast</string>
 </resources>

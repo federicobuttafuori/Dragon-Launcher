@@ -391,6 +391,30 @@ object ColorSettingsStore : MapSettingsStore() {
         default = Color.Unspecified
     )
 
+    val toggleWifi = Settings.color(
+        key = "toggleWifi",
+        dataStoreName = dataStoreName,
+        default = Color.Unspecified
+    )
+
+    val toggleBluetooth = Settings.color(
+        key = "toggleBluetooth",
+        dataStoreName = dataStoreName,
+        default = Color.Unspecified
+    )
+    val toggleData = Settings.color(
+        key = "toggleData",
+        dataStoreName = dataStoreName,
+        default = Color.Unspecified
+    )
+
+    val runAdbCommand = Settings.color(
+        key = "runAdbCommand",
+        dataStoreName = dataStoreName,
+        default = Color.Unspecified
+    )
+
+
     /* ───────────── Registry ───────────── */
 
     override val ALL: List<BaseSettingObject<Color, String>>
@@ -456,7 +480,11 @@ object ColorSettingsStore : MapSettingsStore() {
             this.reloadColor,
             this.openRecentAppsColor,
             this.openCircleNestColor,
-            this.goParentNestColor
+            this.goParentNestColor,
+            this.toggleWifi,
+            this.toggleData,
+            this.toggleBluetooth,
+            this.runAdbCommand
         )
 
     suspend fun setAllRandomColors(ctx: Context) {

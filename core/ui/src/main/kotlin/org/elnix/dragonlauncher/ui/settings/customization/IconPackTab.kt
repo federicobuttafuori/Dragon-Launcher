@@ -27,14 +27,14 @@ import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.ui.helpers.iconPackListContent
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
+import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 
 @Composable
 fun IconPackTab(
-    appsViewModel: AppsViewModel,
     onBack: () -> Unit
 ) {
-    val ctx = LocalContext.current
 
+    val appsViewModel = LocalAppsViewModel.current
     val scope = rememberCoroutineScope()
 
     val apps by appsViewModel.userApps.collectAsState(initial = emptyList())

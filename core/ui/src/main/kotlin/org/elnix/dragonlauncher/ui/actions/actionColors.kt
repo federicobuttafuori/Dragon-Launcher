@@ -1,8 +1,8 @@
 package org.elnix.dragonlauncher.ui.actions
 
 import androidx.compose.ui.graphics.Color
-import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.base.theme.ExtraColors
+import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 
 fun actionColor(
     action: SwipeActionSerializable?,
@@ -23,6 +23,10 @@ fun actionColor(
             SwipeActionSerializable.OpenRecentApps -> extra.openRecentApps
             is SwipeActionSerializable.OpenCircleNest -> extra.openCircleNest
             SwipeActionSerializable.GoParentNest -> extra.goParentNest
-            null -> Color.Unspecified
-            else -> Color.Unspecified
+            is SwipeActionSerializable.RunAdbCommand -> extra.runAdbCommand
+            is SwipeActionSerializable.ToggleBluetooth -> extra.toggleBluetooth
+            is SwipeActionSerializable.ToggleData -> extra.toggleData
+            is SwipeActionSerializable.ToggleWifi -> extra.toggleWifi
+
+            SwipeActionSerializable.None, null -> Color.Unspecified
         }

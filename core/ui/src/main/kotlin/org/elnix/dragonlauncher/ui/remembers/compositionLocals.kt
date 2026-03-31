@@ -1,7 +1,9 @@
 package org.elnix.dragonlauncher.ui.remembers
 
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.navigation.NavHostController
 import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
 import org.elnix.dragonlauncher.common.serializables.IconShape
@@ -12,6 +14,7 @@ import org.elnix.dragonlauncher.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.models.AppsViewModel
 import org.elnix.dragonlauncher.models.BackupViewModel
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
+import org.elnix.dragonlauncher.models.ShizukuViewModel
 
 val LocalIcons = compositionLocalOf<Map<String, ImageBitmap>> { error("No icons provided") }
 val LocalIconShape = compositionLocalOf<IconShape> { error("No iconShape Provided") }
@@ -36,6 +39,9 @@ val LocalBackupViewModel = compositionLocalOf<BackupViewModel> {
 }
 val LocalFloatingAppsViewModel = compositionLocalOf<FloatingAppsViewModel> {
     error("No FloatingAppsViewModel bar provided")
+}
+val LocalShizukuViewModel = compositionLocalOf<ShizukuViewModel> {
+    error("No LocalShizukuViewModel bar provided")
 }
 
 
@@ -67,3 +73,6 @@ val LocalHoldCustomObject = compositionLocalOf<CustomObjectSerializable> {
 val LocalMainScreenLayers = compositionLocalOf<List<MainScreenLayer>> {
     error("No LocalMainScreenLayers provided")
 }
+
+val LocalNavController =
+    staticCompositionLocalOf<NavHostController> { error("No LocalNavController provided") }

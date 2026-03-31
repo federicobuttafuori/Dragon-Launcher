@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.base.theme.LocalExtraColors
 import org.elnix.dragonlauncher.common.logging.logI
+import org.elnix.dragonlauncher.common.logging.logV
 import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.CustomHapticFeedbackSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
@@ -457,7 +458,7 @@ fun MainScreenOverlay(
                         canvas.saveLayer(bounds, Paint())
 
                         if (showAllActionsOnCurrentCircle || showAllActionsOnCurrentNest) {
-                            logI(NESTS_TAG) { "Got circle settings\ncircles: $circles\nfiltered: $filteredCircles" }
+                            logV(NESTS_TAG) { "Got circle settings\ncircles: $circles\nfiltered: $filteredCircles" }
                             // If you selected to draw the selected circle / nest
                             circlesSettingsOverlay(
                                 drawParams = drawParams,
@@ -468,7 +469,7 @@ fun MainScreenOverlay(
                                 nestId = nestId
                             )
                         } else if (showAppLaunchPreview) {
-                            logI(NESTS_TAG) { "Got action in settings" }
+                            logV(NESTS_TAG) { "Got action in settings" }
 
 
                             // Main circle (the selected) drawn before any apps to be behind

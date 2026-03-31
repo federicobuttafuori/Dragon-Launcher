@@ -20,7 +20,8 @@ biometric = "1.1.0"
 timber = "5.0.1"
 runtime = "1.10.5"
 kotlinx-serialization = "1.10.0"
-
+shizuku = "13.1.0"
+shapeindicators = "2.1.0"
 
 [libraries]
 android-image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref = "androidImageCropper" }
@@ -51,6 +52,9 @@ androidx-biometric = { group = "androidx.biometric", name = "biometric", version
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
+shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
+shapeindicators = { group = "io.github.dp-hridayan", name = "shapeindicators", version.ref = "shapeindicators" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

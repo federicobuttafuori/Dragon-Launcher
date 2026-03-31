@@ -214,7 +214,7 @@ fun DrawScope.actionsInCircle(
                     preventBgErasing = preventBgErasing
                 )
             } ?: drawImage( // <- if this is drawn there a big bug
-                image = loadDrawableResAsBitmap(ctx, R.drawable.ic_action_target, 48, 48),
+                image = ctx.loadDrawableResAsBitmap(R.drawable.ic_action_target, 48, 48),
                 dstOffset = dstOffset,
                 dstSize = intSize
             )

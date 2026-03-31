@@ -52,15 +52,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.common.utils.Constants.Links.DISCORD_INVITE_LINK
-import org.elnix.dragonlauncher.common.utils.Constants.Links.DRAGON_WEBSITE
-import org.elnix.dragonlauncher.common.utils.Constants.Links.MAILTO_LINK
-import org.elnix.dragonlauncher.common.utils.Constants.Links.REDDIT_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.DISCORD_INVITE_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.DRAGON_WEBSITE
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.ELNIX90_GITHUB_PROFILE_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.EXTENSIONS_GITHUB_REPO_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_ISSUES_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_RELEASES_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.MAILTO_LINK
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.REDDIT_LINK
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.alphaMultiplier
@@ -79,17 +83,18 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun AdvancedSettingsScreen(
-    navController: NavController,
     onLaunchAction: (SwipeActionSerializable) -> Unit,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
     val appsViewModel = LocalAppsViewModel.current
+    val navController = LocalNavController.current
 
     val scope = rememberCoroutineScope()
 
@@ -200,7 +205,7 @@ fun AdvancedSettingsScreen(
             SettingItemWithExternalOpen(
                 title = stringResource(R.string.extensions),
                 icon = Icons.Default.Extension,
-                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher-Extensions") }
+                onExtClick = { ctx.openUrl(EXTENSIONS_GITHUB_REPO_LINK) }
             ) { navController.navigate(SETTINGS.EXTENSIONS) }
         }
 
@@ -267,7 +272,7 @@ fun AdvancedSettingsScreen(
                     modifier = Modifier
                         .weight(1f)
                         .clip(DragonShape)
-                        .clickable { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") }
+                        .clickable { ctx.openUrl(GITHUB_REPO_LINK) }
                 )
 
 
@@ -318,9 +323,8 @@ fun AdvancedSettingsScreen(
             SettingItemWithExternalOpen(
                 title = stringResource(R.string.changelogs),
                 icon = Icons.AutoMirrored.Filled.Notes,
-                onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") }
+                onExtClick = { ctx.openUrl("$GITHUB_REPO_LINK/blob/main/fastlane/metadata/android/en-US/changelogs/${versionCode}.txt") }
             ) { navController.navigate(SETTINGS.CHANGELOGS) }
-
         }
 
         item {
@@ -328,8 +332,8 @@ fun AdvancedSettingsScreen(
                 title = stringResource(R.string.source_code),
                 icon = Icons.Default.Code,
                 leadIcon = Icons.AutoMirrored.Filled.Launch,
-                onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher") }
-            ) { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher") }
+                onLongClick = { ctx.copyToClipboard(GITHUB_REPO_LINK) }
+            ) { ctx.openUrl(GITHUB_REPO_LINK) }
         }
 
         item {
@@ -339,8 +343,8 @@ fun AdvancedSettingsScreen(
                     description = stringResource(R.string.check_for_updates_obtainium),
                     icon = Icons.Default.Update,
                     leadIcon = painterResource(R.drawable.obtainium),
-                    onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest") },
-                    onExtClick = { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
+                    onLongClick = { ctx.copyToClipboard(GITHUB_REPO_RELEASES_LINK) },
+                    onExtClick = { ctx.openUrl(GITHUB_REPO_RELEASES_LINK) }
                 ) {
                     onLaunchAction(
                         SwipeActionSerializable.LaunchApp(
@@ -356,9 +360,9 @@ fun AdvancedSettingsScreen(
                     description = stringResource(R.string.check_for_updates_github),
                     icon = Icons.Default.Update,
                     leadIcon = Icons.AutoMirrored.Filled.Launch,
-                    onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/releases/latest") }
+                    onLongClick = { ctx.copyToClipboard(GITHUB_REPO_RELEASES_LINK) }
                 ) {
-                    ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/releases/latest")
+                    ctx.openUrl(GITHUB_REPO_RELEASES_LINK)
                 }
             }
         }
@@ -369,8 +373,8 @@ fun AdvancedSettingsScreen(
                 description = stringResource(R.string.open_an_issue_on_github),
                 icon = Icons.Default.ReportProblem,
                 leadIcon = Icons.AutoMirrored.Filled.Launch,
-                onLongClick = { ctx.copyToClipboard("https://github.com/Elnix90/Dragon-Launcher/issues/new") }
-            ) { ctx.openUrl("https://github.com/Elnix90/Dragon-Launcher/issues/new") }
+                onLongClick = { ctx.copyToClipboard(GITHUB_REPO_ISSUES_LINK) }
+            ) { ctx.openUrl(GITHUB_REPO_ISSUES_LINK) }
         }
 
 
@@ -388,7 +392,7 @@ fun AdvancedSettingsScreen(
                 name = "Elnix90",
                 imageRes = R.drawable.elnix90,
                 description = stringResource(R.string.app_developer),
-                githubUrl = "https://github.com/Elnix90"
+                githubUrl = ELNIX90_GITHUB_PROFILE_LINK
             )
         }
 

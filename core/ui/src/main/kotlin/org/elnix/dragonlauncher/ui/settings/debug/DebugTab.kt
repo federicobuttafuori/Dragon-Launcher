@@ -53,15 +53,16 @@ import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.wellbeing.OverlayReminderService
 
 @Composable
 fun DebugTab(
-    navController: NavController,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
+    val navController = LocalNavController.current
     val appsViewModel = LocalAppsViewModel.current
 
     val scope = rememberCoroutineScope()
@@ -166,7 +167,7 @@ fun DebugTab(
                 DragonButton(
                     onClick = {
                         @Suppress("DIVISION_BY_ZERO")
-                        val a = 5 / 0
+                        5 / 0
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -236,7 +237,7 @@ fun DebugTab(
                                     appendLine("Data Dir: ${info.applicationInfo?.dataDir ?: "unknown"}")
                                 }
                             } catch (e: Exception) {
-                                "Not found or error"
+                                "Not found or error: $e"
                             }
                         }
                     ) {

@@ -13,6 +13,10 @@ data class LogTag(
 )
 
 
+inline fun logV(tag: LogTag, throwable: Throwable? = null, message: () -> String) {
+    Timber.tag(tag.tag).v(throwable, message())
+}
+
 inline fun logD(tag: LogTag, throwable: Throwable? = null, message: () -> String) {
     Timber.tag(tag.tag).d(throwable, message())
 }

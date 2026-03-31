@@ -85,10 +85,4 @@ class DrawPathCache(initialMaxSize: Int = 64) {
      * Useful for debugging or logging cache pressure.
      */
     val size: Int get() = paths.size
-
-
-    /**
-     * Reusable path instance used to avoid lots of [Path] instances allocations
-     */
-    val scratchPath = Path()
 }

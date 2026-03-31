@@ -76,6 +76,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.material3)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.shapeindicators)
+    implementation(libs.shizuku.api)
+
 
 
     implementation(project(":core:base"))

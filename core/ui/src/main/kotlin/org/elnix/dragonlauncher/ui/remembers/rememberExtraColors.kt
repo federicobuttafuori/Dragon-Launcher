@@ -11,8 +11,6 @@ import org.elnix.dragonlauncher.base.theme.ExtraColors
 @Composable
 fun rememberExtraColors(): ExtraColors {
 
-    /*  ─────────────  CUSTOM COLORS ─────────────  */
-
     val angleLineColor by ColorSettingsStore.angleLineColor.asStateNull()
     val circleColor by ColorSettingsStore.circleColor.asStateNull()
 
@@ -28,6 +26,10 @@ fun rememberExtraColors(): ExtraColors {
     val openRecentAppsColor by ColorSettingsStore.openRecentAppsColor.asStateNull()
     val openCircleNestColor by ColorSettingsStore.openCircleNestColor.asStateNull()
     val goParentNestColor by ColorSettingsStore.goParentNestColor.asStateNull()
+    val toggleBluetooth by ColorSettingsStore.toggleBluetooth.asStateNull()
+    val toggleData by ColorSettingsStore.toggleData.asStateNull()
+    val toggleWifi by ColorSettingsStore.toggleWifi.asStateNull()
+    val runAdbCommand by ColorSettingsStore.runAdbCommand.asStateNull()
 
     return ExtraColors(
         angleLine = angleLineColor.definedOrNull() ?: DefaultExtraColors.angleLine,
@@ -44,6 +46,10 @@ fun rememberExtraColors(): ExtraColors {
         reload = reloadAppsColor.definedOrNull() ?: DefaultExtraColors.reload,
         openRecentApps = openRecentAppsColor.definedOrNull() ?: DefaultExtraColors.openRecentApps,
         openCircleNest = openCircleNestColor.definedOrNull() ?: DefaultExtraColors.openCircleNest,
-        goParentNest = goParentNestColor.definedOrNull() ?: DefaultExtraColors.goParentNest
+        goParentNest = goParentNestColor.definedOrNull() ?: DefaultExtraColors.goParentNest,
+        toggleBluetooth = toggleBluetooth.definedOrNull() ?: DefaultExtraColors.toggleBluetooth,
+        toggleData = toggleData.definedOrNull() ?: DefaultExtraColors.toggleData,
+        toggleWifi = toggleWifi.definedOrNull() ?: DefaultExtraColors.toggleWifi,
+        runAdbCommand = runAdbCommand.definedOrNull() ?: DefaultExtraColors.runAdbCommand,
     )
 }
