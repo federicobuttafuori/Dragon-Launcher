@@ -9,16 +9,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.areStatusBarsVisible
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -68,11 +68,11 @@ import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.allStatusBarSerializable
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.isValidDateFormat
 import org.elnix.dragonlauncher.common.utils.isValidTimeFormat
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
@@ -106,6 +106,7 @@ enum class TimeFormat(val pattern: String, val displayName: String) {
     CUSTOM("", "Custom")
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StatusBar(
     launchAction: ((SwipeActionSerializable) -> Unit)?,
@@ -117,8 +118,7 @@ fun StatusBar(
      * Don't show the status bar if not in full screen.
      * For instance, when the system status bar is displayed
      */
-    val systemInsets = WindowInsets.systemBars.asPaddingValues()
-    if (systemInsets.calculateTopPadding() != 0.dp) return
+    if (WindowInsets.areStatusBarsVisible) return
 
     val showStatusBar = showStatusBar()
 

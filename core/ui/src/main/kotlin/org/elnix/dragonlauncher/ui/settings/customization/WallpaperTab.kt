@@ -38,7 +38,6 @@ import org.elnix.dragonlauncher.enumsui.WallpaperTarget
 import org.elnix.dragonlauncher.enumsui.wallpaperEditModeIcon
 import org.elnix.dragonlauncher.enumsui.wallpaperEditModeLabel
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
-import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
@@ -112,8 +111,7 @@ fun WallpaperTab(onBack: () -> Unit) {
                                 ctx.getString(R.string.select_image)
                             )
                         )
-                    },
-                    colors = AppObjectsColors.buttonColors()
+                    }
                 ) {
 
                     Icon(
@@ -144,8 +142,7 @@ fun WallpaperTab(onBack: () -> Unit) {
                             originalBitmap =
                                 wallpaperHelper.createPlainWallpaperBitmap(ctx, plainColor)
                             showTargetDialog = true
-                        },
-                        colors = AppObjectsColors.buttonColors()
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Circle,

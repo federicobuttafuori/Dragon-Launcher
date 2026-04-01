@@ -2,8 +2,10 @@
 
 package org.elnix.dragonlauncher.ui.helpers
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -32,17 +34,17 @@ import org.elnix.dragonlauncher.ui.actions.ActionIcon
 import org.elnix.dragonlauncher.ui.actions.actionColor
 import org.elnix.dragonlauncher.ui.actions.actionLabel
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.dialogs.AddPointDialog
 
 
 @Composable
 fun CustomActionSelector(
+    label: String,
     currentAction: SwipeActionSerializable?,
     nullText: String? = null,
     enabled: Boolean = true,
     switchEnabled: Boolean = true,
-    label: String? = null,
     onToggle: (Boolean) -> Unit,
     onSelected: (SwipeActionSerializable) -> Unit
 ) {
@@ -55,50 +57,50 @@ fun CustomActionSelector(
     val toggled = currentAction != null && currentAction != SwipeActionSerializable.None
     val actionColor = actionColor(currentAction, extraColors).semiTransparentIfDisabled(enabled)
 
-    DragonSurfaceRow(
+    DragonRow(
         onClick = { showDialog = true },
         enabled = enabled
     ) {
-        if (label != null) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier
+                .weight(1f)
+        ) {
             Text(
                 text = label,
                 color = textColor,
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1
             )
-        }
 
-        Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 12.dp)
-        ) {
-            if (toggled) {
+            AnimatedVisibility(toggled || nullText != null){
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (toggled) {
 
-                ActionIcon(
-                    action = currentAction,
-                    modifier = Modifier.size(30.dp)
-                )
-                Spacer(Modifier.width(5.dp))
+                        ActionIcon(
+                            action = currentAction,
+                            modifier = Modifier.size(30.dp)
+                        )
+                        Spacer(Modifier.width(5.dp))
 
-                Text(
-                    text = actionLabel(currentAction),
-                    color = actionColor,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            } else if (nullText != null) {
-                Text(
-                    text = nullText,
-                    color = textColor.copy(0.7f),
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 12.dp)
-                )
+                        Text(
+                            text = actionLabel(currentAction),
+                            color = actionColor,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else if (nullText != null) {
+                        Text(
+                            text = nullText,
+                            color = textColor.copy(0.7f),
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Right
+                        )
+                    }
+                }
             }
         }
 

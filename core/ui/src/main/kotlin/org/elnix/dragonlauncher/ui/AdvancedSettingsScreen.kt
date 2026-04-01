@@ -66,7 +66,7 @@ import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_RELEASES
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.MAILTO_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.REDDIT_LINK
 import org.elnix.dragonlauncher.common.utils.SETTINGS
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.getVersionCode

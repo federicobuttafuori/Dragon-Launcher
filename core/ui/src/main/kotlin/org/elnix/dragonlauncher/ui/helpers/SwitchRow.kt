@@ -1,21 +1,21 @@
 package org.elnix.dragonlauncher.ui.helpers
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.common.utils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
+import org.elnix.dragonlauncher.ui.helpers.text.TextWithDescription
 
 @Composable
 fun SwitchRow(
@@ -29,25 +29,19 @@ fun SwitchRow(
 ) {
     val checked = state ?: defaultValue
 
-    DragonSurfaceRow (
+    DragonRow (
         enabled = enabled,
         onClick = { onCheck(!checked) }
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
-        ){
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.onSurface.semiTransparentIfDisabled(enabled)
-            )
 
-            if (description != null) {
-                Text(
-                    text = description,
-                    color = MaterialTheme.colorScheme.onSurface.alphaMultiplier(if (enabled) 0.7f else 0.3f),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
+        CompositionLocalProvider(
+            LocalContentColor provides MaterialTheme.colorScheme.onSurface.semiTransparentIfDisabled(enabled)
+        ) {
+            TextWithDescription(
+                text = title,
+                description = description,
+                modifier = Modifier.weight(1f)
+            )
         }
 
         if (onToggle != null) {

@@ -1,22 +1,33 @@
 package org.elnix.dragonlauncher.ui.components.generic
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.enumsui.ToggleButtonOption
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
+import org.elnix.dragonlauncher.ui.helpers.withHapticParam
+
+
+enum class ShowLabels {
+    Always,
+    Selected,
+    Never
+}
 
 /**
  * A horizontally connected multi-select toggle button group built on Material3 Expressive's
@@ -34,26 +45,19 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
  * @param entries The ordered list of options to display as toggle buttons.
  * @param isChecked Predicate returning the current checked state for a given entry.
  * @param onCheck Called when the user taps a button, both on check and uncheck.
- * @param showLabel Whether to show the text label alongside the icon. Defaults to `true`.
- * @param hapticFeedback Whether to emit a [HapticFeedbackType.KeyboardTap] on every tap,
+ * @param showLabels Whether to show the text label alongside the icon. Defaults to `true`.
  *   regardless of the resulting checked state. Defaults to `true`.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun <T : ToggleButtonOption> MultiSelectConnectedButtonRow(
     entries: List<T>,
-
     modifier: Modifier = Modifier,
-
-    // Optional parameters
-    showLabel: Boolean = true,
-    hapticFeedback: Boolean = true,
-
+    showLabels: ShowLabels = ShowLabels.Never,
     isEnabled: (T) -> Boolean = { true },
     isChecked: (T) -> Boolean = { true },
     onCheck: (T) -> Unit
 ) {
-    val haptic = LocalHapticFeedback.current
 
     Row(
         modifier = modifier.padding(horizontal = 8.dp),
@@ -61,20 +65,20 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonRow(
     ) {
         entries.forEachIndexed { index, entry ->
 
-
             // No idea why, but using a `not` here feels more natural for the displayed entries
             val checked = !isChecked(entry)
 
+            val showLabel = (showLabels == ShowLabels.Always) || (showLabels == ShowLabels.Selected && !checked)
+
             @OptIn(ExperimentalMaterial3Api::class)
-            DragonTooltip(entry.resId ?: -1) {
+            DragonTooltip(
+                resId = entry.resId ?: -1,
+                enabled = !showLabel
+            ) {
                 ToggleButton(
                     checked = checked,
-                    onCheckedChange = {
+                    onCheckedChange = withHapticParam {
                         onCheck(entry)
-
-                        if (hapticFeedback) {
-                            haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap)
-                        }
                     },
                     enabled = isEnabled(entry),
                     colors = AppObjectsColors.toggleButtonColors(),
@@ -90,6 +94,18 @@ fun <T : ToggleButtonOption> MultiSelectConnectedButtonRow(
                             entry.iconDisabled.takeIf { notChecked && it != null } ?: entry.iconEnabled,
                             contentDescription = null
                         )
+                    }
+
+
+                    AnimatedVisibility(showLabel) {
+                        entry.resId?.let{
+                            Spacer(Modifier.width(5.dp))
+                            Text(
+                                stringResource(it),
+                                maxLines = 1,
+                                softWrap = false
+                            )
+                        }
                     }
                 }
             }

@@ -3,6 +3,7 @@ package org.elnix.dragonlauncher.ui.colors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,7 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.colors.blendWith
 import org.elnix.dragonlauncher.common.utils.colors.randomColor
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
@@ -55,7 +58,9 @@ fun SliderColorPicker(
     }
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(5.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(5.dp)
     ) {
 
         Row(
@@ -69,7 +74,7 @@ fun SliderColorPicker(
                 modifier = Modifier.weight(1f),
                 enabled = canPopLastColor,
                 imageVector = Icons.Default.Replay,
-                contentDescription = "Reset",
+                contentDescription = stringResource(R.string.undo),
             )
 
             DragonIconButton(

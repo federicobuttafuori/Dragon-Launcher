@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -27,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.common.utils.UiConstants
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 
 @Composable
@@ -68,7 +67,7 @@ fun EditValueTextField(
 
     val shapeRound = remember {
         Animatable(
-            initialValue = UiConstants.CIRCLE_SHAPE_CORNER_DP.value,
+            initialValue = UiConstants.DRAGON_SHAPE_CORNER_DP.value,
         )
     }
 
@@ -79,7 +78,7 @@ fun EditValueTextField(
 
             shapeRound.animateTo(
                 if (isEditing) {
-                    UiConstants.CIRCLE_SHAPE_CORNER_DP.value
+                    UiConstants.PRESSED_DRAGON_SHAPE_CORNER_DP.value
                 } else {
                     UiConstants.DRAGON_SHAPE_CORNER_DP.value
                 }
@@ -112,9 +111,9 @@ fun EditValueTextField(
         keyboardActions = KeyboardActions(
             onDone = { onDone() }
         ),
+        shape = shape,
         modifier = Modifier
             .width(80.dp)
             .height(50.dp)
-            .clip(shape)
     )
 }

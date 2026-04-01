@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +33,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import android.graphics.Color as AndroidColor
 
 
@@ -56,6 +58,9 @@ fun GradientColorPicker(
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(5.dp)
     ) {
         // ── Gradient + Hue selectors ─────────────────────────────────────────
         Row(
@@ -67,7 +72,6 @@ fun GradientColorPicker(
         ) {
             var pickerSize by remember { mutableFloatStateOf(0f) }
 
-            // === Color Gradient Square ===
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -113,7 +117,6 @@ fun GradientColorPicker(
                     }
             )
 
-            // === Hue Bar ===
             Box(
                 modifier = Modifier
                     .width(25.dp)

@@ -20,6 +20,7 @@ import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 @Composable
 fun DragonTooltipInternal(
     text: String,
+    enabled: Boolean,
     content: @Composable (() -> Unit)
 ) {
     val tooltipState = rememberTooltipState(isPersistent = true)
@@ -47,6 +48,7 @@ fun DragonTooltipInternal(
                 Text(text)
             }
         },
+        enableUserInput = enabled,
         state = tooltipState,
         content = content
     )
@@ -54,10 +56,12 @@ fun DragonTooltipInternal(
 @Composable
 fun DragonTooltip(
     resId: Int,
+    enabled: Boolean = true,
     content: @Composable (() -> Unit)
 ) {
     DragonTooltipInternal(
         text = stringResource(resId),
+        enabled = enabled,
         content = content
     )
 }
@@ -66,10 +70,12 @@ fun DragonTooltip(
 @Composable
 fun DragonTooltip(
     description: String,
+    enabled: Boolean = true,
     content: @Composable (() -> Unit)
 ) {
     DragonTooltipInternal(
         text = description,
+        enabled = enabled,
         content = content
     )
 }

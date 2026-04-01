@@ -65,10 +65,14 @@ object AppObjectsColors {
     @Composable
     fun cancelButtonColors(): ButtonColors {
         return if (LocalUseCustomColorChannels.current) {
-            ButtonDefaults.outlinedButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.error
-            )
+            with(MaterialTheme.colorScheme) {
+                ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = error,
+                    disabledContainerColor = Color.Transparent,
+                    disabledContentColor = error.alphaMultiplier(0.5f)
+                )
+            }
         } else ButtonDefaults.outlinedButtonColors()
     }
 
@@ -212,10 +216,8 @@ object AppObjectsColors {
     fun errorIconButtonColors(): IconButtonColors {
         return if (LocalUseCustomColorChannels.current) {
             with(MaterialTheme.colorScheme) {
-                IconButtonDefaults.iconButtonColors(
-                    containerColor = errorContainer,
+                iconButtonColors().copy(
                     contentColor = error,
-                    disabledContainerColor = errorContainer.alphaMultiplier(0.5f),
                     disabledContentColor = error.alphaMultiplier(0.5f)
                 )
             }

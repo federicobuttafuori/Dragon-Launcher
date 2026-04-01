@@ -2,27 +2,16 @@ package org.elnix.dragonlauncher.ui.settings.language
 
 
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,8 +19,9 @@ import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.settings.stores.LanguageSettingsStore
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
+import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 
@@ -52,12 +42,7 @@ fun LanguageTab(onBack: () -> Unit) {
         null to stringResource(R.string.system_default)
     )
 
-    var selectedTag by remember { mutableStateOf<String?>(null) }
-
-    // Load current language tag
-    LaunchedEffect(Unit) {
-        selectedTag = LanguageSettingsStore.keyLang.get(ctx)
-    }
+    val selectedTag by LanguageSettingsStore.keyLang.asState()
 
     SettingsScaffold(
         title = stringResource(R.string.settings_language_title),
@@ -71,20 +56,13 @@ fun LanguageTab(onBack: () -> Unit) {
     ) {
 
         items(availableLanguages) { (tag, name) ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(DragonShape)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(5.dp)
-                    .clickable {
-                        scope.launch {
-                            LanguageSettingsStore.keyLang.set(ctx, tag)
-                            applyLocale(tag)
-                            selectedTag = tag
-                        }
-                    },
-                verticalAlignment = Alignment.CenterVertically
+            DragonRow(
+                onClick = {
+                    scope.launch {
+                        LanguageSettingsStore.keyLang.set(ctx, tag)
+                        applyLocale(tag)
+                    }
+                }
             ) {
                 RadioButton(
                     selected = tag == selectedTag,
@@ -92,7 +70,6 @@ fun LanguageTab(onBack: () -> Unit) {
                         scope.launch {
                             LanguageSettingsStore.keyLang.set(ctx, tag)
                             applyLocale(tag)
-                            selectedTag = tag
                         }
                     },
                     colors = AppObjectsColors.radioButtonColors()
@@ -106,7 +83,6 @@ fun LanguageTab(onBack: () -> Unit) {
         }
     }
 }
-
 
 
 private fun applyLocale(tag: String?) {

@@ -129,7 +129,8 @@ fun AppGrid(
                 contentAlignment = Alignment.Center
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(15.dp)
+                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = stringResource(R.string.no_apps),

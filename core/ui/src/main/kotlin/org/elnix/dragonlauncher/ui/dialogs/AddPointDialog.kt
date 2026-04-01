@@ -46,19 +46,20 @@ import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Actions.defaultChoosableActions
 import org.elnix.dragonlauncher.common.utils.DataADBCommands
 import org.elnix.dragonlauncher.common.utils.PackageManagerCompat
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.WifiADBCommands
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.ActionIcon
 import org.elnix.dragonlauncher.ui.actions.actionColor
 import org.elnix.dragonlauncher.ui.actions.actionLabel
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.text.AutoResizeableText
+import org.elnix.dragonlauncher.ui.remembers.LocalShowLabelsInAddPointDialog
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable
@@ -93,7 +94,7 @@ fun AddPointDialog(
     val showIcons by DrawerSettingsStore.showAppIconsInDrawer.asState()
     val showLabels by DrawerSettingsStore.showAppLabelInDrawer.asState()
     val promptForShortcuts by BehaviorSettingsStore.promptForShortcutsWhenAddingApp.asState()
-    val showTooltipsOnAddPointDialog by UiSettingsStore.showTooltipsOnAddPointDialog.asState(false)
+    val showTooltipsOnAddPointDialog = LocalShowLabelsInAddPointDialog.current
 
 
     var selectedApp by remember { mutableStateOf<AppModel?>(null) }
@@ -116,7 +117,7 @@ fun AddPointDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
         title = {
-            DragonSurfaceRow(
+            DragonRow(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.choose_action))
@@ -149,7 +150,7 @@ fun AddPointDialog(
                             .clip(DragonShape)
                             .background(color.copy(0.5f))
                             .border(1.dp, color, DragonShape)
-                            .clickable { onActionPicked(dummyLaunchAppAction) }
+                            .clickable { showAppPicker = true }
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center

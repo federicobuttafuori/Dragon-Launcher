@@ -4,13 +4,9 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,8 +43,6 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.enumsui.DrawerToolbar
-import org.elnix.dragonlauncher.enumsui.icon
-import org.elnix.dragonlauncher.enumsui.resId
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.TextDivider
@@ -80,8 +74,6 @@ fun DrawerToolbarsOrderDialog(
             }
         }
     }
-
-
 
 
     var toolbarItems by remember { mutableStateOf(selectedToolbarItems.toMutableList()) }
@@ -148,23 +140,13 @@ fun DrawerToolbarsOrderDialog(
                                     .padding(horizontal = 12.dp, vertical = 8.dp)
                             ) {
 
-
                                 if (item == DrawerToolbar.Spacer) {
-                                    Box(
-                                        contentAlignment = Alignment.Center,
-                                        modifier = Modifier
-                                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                                            .width(150.dp)
-                                    ) {
-                                        TextDivider(
-                                            text = stringResource(item.resId),
-                                            thickness = 5.dp,
-                                            modifier = Modifier.wrapContentWidth()
-                                        )
-                                    }
+                                    TextDivider(
+                                        text = stringResource(item.resId),
+                                        thickness = 5.dp,
+                                        modifier = Modifier.weight(1f)
+                                    )
                                 } else {
-
-
                                     val checked = if (item == DrawerToolbar.RecentlyUsed) {
                                         showRecentlyUsedApps
                                     } else {
@@ -195,7 +177,6 @@ fun DrawerToolbarsOrderDialog(
                                     )
                                 }
 
-                                Spacer(Modifier.weight(1f))
                                 Icon(
                                     imageVector = Icons.Default.DragHandle,
                                     contentDescription = "Drag handle",

@@ -62,12 +62,12 @@ import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.CustomHapticFeedbackSerializable
 import org.elnix.dragonlauncher.common.serializables.hapticFeedbackSerializablePresets
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.HAPTIC_TAG
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.pasteClipboard
 import org.elnix.dragonlauncher.common.utils.performCustomHaptic
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
@@ -485,6 +485,7 @@ fun HapticFeedBackEditorButtonWithPlayTest(
                 imageVector = Icons.Default.Vibration,
                 contentDescription = stringResource(R.string.haptic_feedback_editor)
             )
+            Spacer(Modifier.width(5.dp))
             Text("${stringResource(R.string.haptic_feedback_editor)}$titleExt")
         }
 

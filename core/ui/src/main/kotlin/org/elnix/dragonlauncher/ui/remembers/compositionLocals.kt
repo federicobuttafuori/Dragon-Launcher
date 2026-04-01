@@ -26,7 +26,6 @@ val LocalStatusBarElements = compositionLocalOf<List<StatusBarSerializable>> {
 }
 
 
-
 // ViewModels
 val LocalAppsViewModel = compositionLocalOf<AppsViewModel> {
     error("No AppsViewModel bar provided")
@@ -43,7 +42,6 @@ val LocalFloatingAppsViewModel = compositionLocalOf<FloatingAppsViewModel> {
 val LocalShizukuViewModel = compositionLocalOf<ShizukuViewModel> {
     error("No LocalShizukuViewModel bar provided")
 }
-
 
 
 val LocalLineObject = compositionLocalOf<CustomObjectSerializable> {
@@ -74,5 +72,11 @@ val LocalMainScreenLayers = compositionLocalOf<List<MainScreenLayer>> {
     error("No LocalMainScreenLayers provided")
 }
 
-val LocalNavController =
-    staticCompositionLocalOf<NavHostController> { error("No LocalNavController provided") }
+val LocalNavController = staticCompositionLocalOf<NavHostController> {
+    error("No LocalNavController provided")
+}
+
+
+val LocalShowLabelsInAddPointDialog = compositionLocalOf<Boolean> {
+    error("No LocalShowLabelsInAddPointDialog provided")
+}

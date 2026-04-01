@@ -138,6 +138,7 @@ import org.elnix.dragonlauncher.ui.helpers.nests.actionsInCircle
 import org.elnix.dragonlauncher.ui.helpers.nests.circlesSettingsOverlay
 import org.elnix.dragonlauncher.ui.helpers.nests.glowOverlay
 import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
+import org.elnix.dragonlauncher.ui.helpers.settings.fullScreenStatusBarsPaddings
 import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalDefaultPoint
@@ -661,9 +662,7 @@ fun SettingsScreen(
     }
 
     Box(
-        Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeDrawing)
+        Modifier.fullScreenStatusBarsPaddings()
     ) {
         Column {
             Row(
@@ -1214,8 +1213,6 @@ fun SettingsScreen(
 
                 MultiSelectConnectedButtonRow(
                     entries = NestEditTools.entries,
-                    showLabel = false,
-
                     isEnabled = {
                         when (it) {
                             NestManagement -> true
@@ -1258,7 +1255,6 @@ fun SettingsScreen(
                 // The 3 points settings tools: Snap points / Auto separate / Lock to circle
                 MultiSelectConnectedButtonRow(
                     entries = PointsEditTools.entries,
-                    showLabel = false,
                     isChecked = {
                         when (it) {
                             SnapPoints -> snapPoints
@@ -1431,8 +1427,6 @@ fun SettingsScreen(
 
                 MultiSelectConnectedButtonRow(
                     entries = UndRedoEditTools.entries,
-                    showLabel = false,
-
                     isEnabled = {
                         when (it) {
                             UndRedoEditTools.UndoAll -> undoButtonEnabled
@@ -1481,7 +1475,6 @@ fun SettingsScreen(
 
                 MultiSelectConnectedButtonRow(
                     entries = SelectedPointEditTools.entries,
-                    showLabel = false,
                     isChecked = { true },
                     isEnabled = { aPointIsSelected }
                 ) { option ->

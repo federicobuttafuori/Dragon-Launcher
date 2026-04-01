@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
@@ -71,7 +70,7 @@ fun AppearanceTab(
     val showAllActionsOnCurrentCircle by UiSettingsStore.showAllActionsOnCurrentCircle.asState()
 
     val topOverlaySettingsState = rememberExpandableSection(stringResource(R.string.app_preview_settings))
-
+    val draggingDisplayState = rememberExpandableSection(stringResource(R.string.dragging_display))
 
     var isDraggingAppPreviewOverlays by remember { mutableStateOf(false) }
     var demoIcon by remember { mutableStateOf(icons.keys.random()) }
@@ -239,7 +238,7 @@ fun AppearanceTab(
 
 
         item {
-            DragonColumnGroup {
+            ExpandableSection(draggingDisplayState) {
                 SettingsSwitchRow(
                     setting = UiSettingsStore.showAppLaunchingPreview,
                     title = stringResource(R.string.show_app_launch_preview),
@@ -270,23 +269,18 @@ fun AppearanceTab(
                     title = stringResource(R.string.show_all_actions_on_current_nest),
                     description = stringResource(R.string.show_all_actions_on_current_nest_desc)
                 )
-            }
-        }
 
-        item {
-            DragonColumnGroup {
+                SettingsSwitchRow(
+                    setting = UiSettingsStore.showAppPreviewIconCenterStartPosition,
+                    title = stringResource(R.string.show_app_icon_start_drag_position),
+                    description = stringResource(R.string.show_app_icon_start_drag_position_description)
+                )
 
                 /* If the line is rgb (computed via the angle) or uses the line color from settings */
                 SettingsSwitchRow(
                     setting = UiSettingsStore.rgbLine,
                     title = stringResource(R.string.rgb_line_selector),
                     description = stringResource(R.string.rgb_line_selector_description)
-                )
-
-                SettingsSwitchRow(
-                    setting = UiSettingsStore.showAppPreviewIconCenterStartPosition,
-                    title = stringResource(R.string.show_app_icon_start_drag_position),
-                    description = stringResource(R.string.show_app_icon_start_drag_position_description)
                 )
 
                 SettingsSwitchRow(
@@ -298,12 +292,14 @@ fun AppearanceTab(
         }
 
         item {
-            SettingsSlider(
-                setting = UiSettingsStore.maxNestsDepth,
-                title = stringResource(R.string.depth),
-                description = stringResource(R.string.depth_desc),
-                valueRange = 1..10
-            )
+            DragonColumnGroup {
+                SettingsSlider(
+                    setting = UiSettingsStore.maxNestsDepth,
+                    title = stringResource(R.string.depth),
+                    description = stringResource(R.string.depth_desc),
+                    valueRange = 1..10
+                )
+            }
         }
     }
 

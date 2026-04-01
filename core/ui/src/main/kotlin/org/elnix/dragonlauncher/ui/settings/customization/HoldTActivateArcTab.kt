@@ -30,7 +30,7 @@ import kotlinx.serialization.modules.SerializersModule
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.ColorSerializer
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.common.utils.UiConstants
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup

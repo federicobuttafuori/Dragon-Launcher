@@ -32,7 +32,6 @@ import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.COPY
-import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.NONE
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.PASTE
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.RANDOM
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.RESET
@@ -45,7 +44,6 @@ import org.elnix.dragonlauncher.ui.components.settings.asState
 private fun ColorPickerButton(
     button: ColorPickerButtonAction,
     currentColor: Color,
-//    defaultColor: Color,
     onReset: () -> Unit,
     backgroundColor: Color,
     onModeChanged: (ColorPickerButtonAction) -> Unit,
@@ -53,7 +51,6 @@ private fun ColorPickerButton(
 ) {
     val ctx = LocalContext.current
 
-    val enabled = button != NONE
 
     var showSelector by remember { mutableStateOf(false) }
 
@@ -66,22 +63,18 @@ private fun ColorPickerButton(
                 .clip(CircleShape)
                 .background(backgroundColor.adjustBrightness(0.8f))
                 .combinedClickable(
-                    enabled = enabled,
                     onLongClick = { showSelector = true }
                 ) {
                     when (button) {
                         RANDOM -> onColorPicked(randomColor(minLuminance = 0.2f))
                         RESET -> { onReset() }
                         COPY -> ctx.copyToClipboard(currentColor.toHexWithAlpha())
-
                         PASTE -> {
                             val newColor = pasteColorHexFromClipboard(ctx)
                             newColor?.let { pasted ->
                                 onColorPicked(pasted)
                             }
                         }
-
-                        NONE -> null
                     }
                 }
                 .padding(5.dp)
@@ -99,7 +92,7 @@ private fun ColorPickerButton(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ColorPickerButtonAction.entries.filter { it != NONE }.forEach {
+                ColorPickerButtonAction.entries.forEach {
                     Icon(
                         imageVector = colorPickerButtonIcon(it),
                         contentDescription = null,
@@ -123,7 +116,6 @@ private fun ColorPickerButton(
 @Composable
 fun ColorPickerButtonOne(
     currentColor: Color,
-//    defaultColor: Color,
     onReset: () -> Unit,
 
     backgroundColor: Color,
@@ -137,7 +129,6 @@ fun ColorPickerButtonOne(
     ColorPickerButton(
         button = button,
         currentColor = currentColor,
-//        defaultColor = defaultColor,
         backgroundColor = backgroundColor,
         onReset = onReset,
         onModeChanged = {
@@ -153,7 +144,6 @@ fun ColorPickerButtonOne(
 @Composable
 fun ColorPickerButtonTwo(
     currentColor: Color,
-//    defaultColor: Color,
     onReset: () -> Unit,
     backgroundColor: Color,
     onColorPicked: (Color) -> Unit
@@ -166,7 +156,6 @@ fun ColorPickerButtonTwo(
     ColorPickerButton(
         button = button,
         currentColor = currentColor,
-//        defaultColor = defaultColor,
         backgroundColor = backgroundColor,
         onReset = onReset,
         onModeChanged = {

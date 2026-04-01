@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.ui.dialogs
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -124,17 +125,14 @@ fun MainScreeLayersOrderScreen(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(5.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 12.dp,
+                                vertical = 10.dp
+                            )
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    horizontal = 12.dp,
-                                    vertical = 10.dp
-                                )
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
 
                             Checkbox(
                                 onCheckedChange = {
@@ -159,67 +157,68 @@ fun MainScreeLayersOrderScreen(
                                 modifier = Modifier.detectReorder(reorderState)
                             )
                         }
-                    }
 
-                    @Suppress("UnusedExpression")
-                    when (item) {
-                        is MainScreenLayer.CustomDim -> {
+                        // WTF it should animate but it doesn't in my phone, why, only Android knows, TODO
+                        @Suppress("UnusedExpression")
+                        AnimatedVisibility(item.enabled) {
+                            when (item) {
+                                is MainScreenLayer.CustomDim -> {
 
-                            var tempShowAfter by remember { mutableIntStateOf(item.showAfter) }
-                            var tempDimAmount by remember { mutableFloatStateOf(item.dimAmount) }
+                                    var tempShowAfter by remember { mutableIntStateOf(item.showAfter) }
+                                    var tempDimAmount by remember { mutableFloatStateOf(item.dimAmount) }
 
-                            DragonColumnGroup {
-                                SliderWithLabel(
-                                    value = tempShowAfter,
-                                    valueRange = 0..5000,
-                                    label = stringResource(R.string.show_after),
-                                    description = stringResource(R.string.show_after_help),
-                                    onReset = {
-                                        objects = objects.map {
-                                            if (it is MainScreenLayer.CustomDim) it.copy(showAfter = 1000) else it
-                                        }
-                                        save()
-                                    },
-                                    onDragStateChange = { isDragging ->
-                                        if (!isDragging) {
-                                            objects = objects.map {
-                                                if (it is MainScreenLayer.CustomDim) it.copy(showAfter = tempShowAfter) else it
+                                    DragonColumnGroup {
+                                        SliderWithLabel(
+                                            value = tempShowAfter,
+                                            valueRange = 0..5000,
+                                            label = stringResource(R.string.show_after),
+                                            description = stringResource(R.string.show_after_help),
+                                            onReset = {
+                                                objects = objects.map {
+                                                    if (it is MainScreenLayer.CustomDim) it.copy(showAfter = 1000) else it
+                                                }
+                                                save()
+                                            },
+                                            onDragStateChange = { isDragging ->
+                                                if (!isDragging) {
+                                                    objects = objects.map {
+                                                        if (it is MainScreenLayer.CustomDim) it.copy(showAfter = tempShowAfter) else it
+                                                    }
+                                                    save()
+                                                }
                                             }
-                                            save()
+                                        ) { newValue ->
+                                            tempShowAfter = newValue
+                                        }
+
+                                        SliderWithLabel(
+                                            value = tempDimAmount,
+                                            valueRange = 0f..1f,
+                                            label = stringResource(R.string.dim_amount),
+                                            description = stringResource(R.string.dim_amount_help),
+                                            onReset = {
+                                                objects = objects.map {
+                                                    if (it is MainScreenLayer.CustomDim) it.copy(dimAmount = 0.5f) else it
+                                                }
+                                                save()
+                                            },
+                                            onDragStateChange = { isDragging ->
+                                                if (!isDragging) {
+                                                    objects = objects.map {
+                                                        if (it is MainScreenLayer.CustomDim) it.copy(dimAmount = tempDimAmount) else it
+                                                    }
+                                                    save()
+                                                }
+                                            }
+                                        ) { newValue ->
+                                            tempDimAmount = newValue
                                         }
                                     }
-                                ) { newValue ->
-                                    tempShowAfter = newValue
                                 }
-
-                                SliderWithLabel(
-                                    value = tempDimAmount,
-                                    valueRange = 0f..1f,
-                                    label = stringResource(R.string.dim_amount),
-                                    description = stringResource(R.string.dim_amount_help),
-                                    onReset = {
-                                        objects = objects.map {
-                                            if (it is MainScreenLayer.CustomDim) it.copy(dimAmount = 0.5f) else it
-                                        }
-                                        save()
-                                    },
-                                    onDragStateChange = { isDragging ->
-                                        if (!isDragging) {
-                                            objects = objects.map {
-                                                if (it is MainScreenLayer.CustomDim) it.copy(dimAmount = tempDimAmount) else it
-                                            }
-                                            save()
-                                        }
-                                    }
-                                ) { newValue ->
-                                    tempDimAmount = newValue
-                                }
+                                else -> null
                             }
                         }
-
-                        else -> null
                     }
-
                 }
             }
         }

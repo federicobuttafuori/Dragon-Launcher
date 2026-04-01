@@ -82,7 +82,6 @@ import org.elnix.dragonlauncher.common.utils.Constants.PackageNames.SHIZUKU_PACK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.URL_SHIZUKU_SITE
 import org.elnix.dragonlauncher.common.utils.ROUTES
 import org.elnix.dragonlauncher.common.utils.SETTINGS
-import org.elnix.dragonlauncher.common.utils.UiConstants
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.common.utils.isAppInstalled
@@ -102,6 +101,7 @@ import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
+import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
 import org.elnix.dragonlauncher.ui.actions.AppLaunchException
 import org.elnix.dragonlauncher.ui.actions.launchAppDirectly
@@ -140,6 +140,7 @@ import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 import org.elnix.dragonlauncher.ui.remembers.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.LocalShizukuViewModel
+import org.elnix.dragonlauncher.ui.remembers.LocalShowLabelsInAddPointDialog
 import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
@@ -422,11 +423,9 @@ fun MainAppUi(
 
     /* ───────────── navigation functions, all settings are nested under the lock state ───────────── */
 
-    fun goMainScreen() {
+    fun popBackMainScreen() {
         isUnlocked = false
-        navController.navigate(ROUTES.MAIN) {
-            popUpTo(0) { inclusive = true }
-        }
+        navController.popBackStack(ROUTES.MAIN, inclusive = false)
     }
 
     fun goDrawer() = navController.navigate(ROUTES.DRAWER)
@@ -438,9 +437,18 @@ fun MainAppUi(
 
 
     @SuppressLint("LocalContextGetResourceValueCall")
-    fun goSettings(route: String) {
+    fun goSettings(route: String, popBackStack: Boolean = true) {
+
+        fun go() {
+            if (popBackStack) {
+                navController.popBackStack(route, inclusive = false)
+            } else {
+                navController.navigate(route)
+            }
+        }
+
         if (isUnlocked || lockMethod == LockMethod.NONE) {
-            navController.navigate(route)
+            go()
             return
         }
         @Suppress("KotlinConstantConditions")
@@ -456,7 +464,7 @@ fun MainAppUi(
                         activity = activity,
                         onSuccess = {
                             isUnlocked = true
-                            navController.navigate(route)
+                            go()
                         },
                         onError = { msg ->
                             ctx.showToast(ctx.getString(R.string.authentication_error, msg))
@@ -470,22 +478,14 @@ fun MainAppUi(
                 }
             }
 
-            LockMethod.NONE -> navController.navigate(route)
+            LockMethod.NONE -> go()
         }
     }
 
-    fun goSettingsRoot() = goSettings(SETTINGS.ROOT)
-    fun goAdvSettingsRoot() = goSettings(SETTINGS.ADVANCED_ROOT)
-
-
-    var pendingNestToEdit by remember { mutableStateOf<Int?>(null) }
-
-    fun goAppearance() = goSettings(SETTINGS.APPEARANCE)
-    fun goDebug() = goSettings(SETTINGS.DEBUG)
-    fun goNestEdit(nest: Int) {
-        pendingNestToEdit = nest
-        goSettings(SETTINGS.NESTS_EDIT)
-    }
+    fun popBackToSettingsRoot() = goSettings(SETTINGS.ROOT)
+    fun popBackToAdvSettingsRoot() = goSettings(SETTINGS.ADVANCED_ROOT)
+    fun popBackToAppearance() = goSettings(SETTINGS.APPEARANCE)
+    fun popBackToDebug() = goSettings(SETTINGS.DEBUG)
 
 
     fun launchWidgetsPicker(nestId: Int) {
@@ -553,7 +553,9 @@ fun MainAppUi(
                 },
                 onReloadApps = { scope.launch { appsViewModel.reloadApps() } },
                 onReselectFile = { showFilePicker = point },
-                onAppSettings = ::goSettings,
+                onAppSettings = {
+                    goSettings(it, false)
+                },
                 onAppDrawer = { workspaceId ->
                     if (workspaceId != null) {
                         appsViewModel.selectWorkspace(workspaceId)
@@ -615,7 +617,7 @@ fun MainAppUi(
 
                 else -> {
                     isUnlocked = false
-                    goMainScreen()
+                    popBackMainScreen()
                 }
             }
         }
@@ -756,6 +758,9 @@ fun MainAppUi(
 
     val layersOrder by rememberMainScreenLayerOrder()
 
+    val showTooltipsOnAddPointDialog by UiSettingsStore.showTooltipsOnAddPointDialog.asState()
+
+
     /**
      * Main Composition local provider, I just for everything I can here to avoid having to import them everywhere
      * I know that I should carefully review what global locals I add, but until now it worked to I'll keep it that way until I notice lag
@@ -775,7 +780,8 @@ fun MainAppUi(
         LocalEndLineObject provides endLineObject,
         LocalHoldCustomObject provides holdCustomObject,
 
-        LocalMainScreenLayers provides layersOrder
+        LocalMainScreenLayers provides layersOrder,
+        LocalShowLabelsInAddPointDialog provides showTooltipsOnAddPointDialog
     ) {
         Scaffold(
             topBar = {
@@ -812,7 +818,13 @@ fun MainAppUi(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 // Main App (LauncherScreen)
-                settingComposable(ROUTES.MAIN) {
+                composable(
+                    route = ROUTES.MAIN,
+                    enterTransition = { if (drawerEnterExitAnimations) raiseUpAnimation() else EnterTransition.None },
+                    exitTransition = { if (drawerEnterExitAnimations) collapseDownAnimation() else ExitTransition.None },
+                    popEnterTransition = { if (drawerEnterExitAnimations) raiseUpAnimation() else EnterTransition.None },
+                    popExitTransition = { if (drawerEnterExitAnimations) collapseDownAnimation() else ExitTransition.None },
+                ) {
                     MainScreen(::launchAction)
                 }
 
@@ -836,15 +848,16 @@ fun MainAppUi(
                         leftWeight = leftDrawerWidth,
                         rightAction = rightDrawerAction,
                         rightWeight = rightDrawerWidth,
-                        onLaunchAction = ::launchApp
-                    ) { goMainScreen() }
+                        onLaunchAction = ::launchApp,
+                        onClose = ::popBackMainScreen
+                    )
                 }
 
                 // Welcome screen
                 settingComposable(ROUTES.WELCOME) {
                     WelcomeScreen(
-                        onEnterSettings = ::goSettingsRoot,
-                        onEnterApp = ::goMainScreen
+                        onEnterSettings = ::popBackToSettingsRoot,
+                        onEnterApp = ::popBackMainScreen
                     )
                 }
 
@@ -856,53 +869,63 @@ fun MainAppUi(
                 ) {
                     settingComposable(SETTINGS.ROOT) {
                         SettingsScreen(
-                            onAdvSettings = ::goAdvSettingsRoot,
-                            onNestEdit = ::goNestEdit,
-                            onBack = ::goMainScreen
+                            onAdvSettings = {
+                                goSettings(SETTINGS.ADVANCED_ROOT, false)
+                            },
+                            onNestEdit = {
+                                goSettings(SETTINGS.NESTS_EDIT.replace("{id}", it.toString()), false)
+                            },
+                            onBack = ::popBackMainScreen
                         )
                     }
-                    settingComposable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(::launchApp) { goSettingsRoot() } }
-                    settingComposable(SETTINGS.APPEARANCE) { AppearanceTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.WALLPAPER) { WallpaperTab(::goAppearance) }
-                    settingComposable(SETTINGS.ICON_PACK) { IconPackTab(::goAppearance) }
-                    settingComposable(SETTINGS.STATUS_BAR) { StatusBarTab(::goAppearance) }
-//                    noAnimComposable(SETTINGS.THEME) { ThemesTab(::goAppearance) }
-                    settingComposable(SETTINGS.PERMISSIONS) { PermissionsTab { goAdvSettingsRoot() } }
 
-                    settingComposable(SETTINGS.BEHAVIOR) { BehaviorTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.DRAWER) { DrawerTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.COLORS) { ColorSelectorTab(::goAppearance) }
-                    settingComposable(SETTINGS.DEBUG) { DebugTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.LOGS) { LogsTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::goDebug) }
-                    settingComposable(SETTINGS.LANGUAGE) { LanguageTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.ANGLE_LINE_EDIT) { AngleLineTab(::goAppearance) }
-                    settingComposable(SETTINGS.BACKUP) { BackupTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::goAdvSettingsRoot) }
-                    settingComposable(SETTINGS.FONTS) { FontTab(::goAppearance) }
-                    settingComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::goAppearance) }
-                    settingComposable(SETTINGS.MAINS_SCREEN_LAYERS) { MainScreeLayersOrderScreen(::goAppearance) }
+                    settingComposable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(::launchApp) { popBackToSettingsRoot() } }
 
-                    settingComposable(SETTINGS.WELLBEING) { WellbeingTab(::goAdvSettingsRoot) }
+                    // All the nested settings screens
+                    settingComposable(SETTINGS.APPEARANCE) { AppearanceTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.PERMISSIONS) { PermissionsTab { popBackToAdvSettingsRoot() } }
+                    settingComposable(SETTINGS.BEHAVIOR) { BehaviorTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.DRAWER) { DrawerTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.LOGS) { LogsTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.LANGUAGE) { LanguageTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.BACKUP) { BackupTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.WELLBEING) { WellbeingTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.DEBUG) { DebugTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::popBackToDebug) }
 
-                    settingComposable(SETTINGS.NESTS_EDIT) {
+                    // All the appearance sub-settings
+                    settingComposable(SETTINGS.COLORS) { ColorSelectorTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.WALLPAPER) { WallpaperTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.ICON_PACK) { IconPackTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.STATUS_BAR) { StatusBarTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.FONTS) { FontTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.ANGLE_LINE_EDIT) { AngleLineTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::popBackToAppearance) }
+                    settingComposable(SETTINGS.MAINS_SCREEN_LAYERS) { MainScreeLayersOrderScreen(::popBackToAppearance) }
+
+
+                    settingComposable(
+                        route = SETTINGS.NESTS_EDIT,
+                        arguments = listOf(navArgument("id") { type = NavType.StringType }),
+                    ) { backStack ->
                         NestEditingScreen(
-                            nestId = pendingNestToEdit,
-                            onBack = ::goSettingsRoot
+                            nestId = backStack.arguments!!.getString("id")!!.toInt(),
+                            onBack = ::popBackToSettingsRoot
                         )
                     }
 
                     settingComposable(
-                        route = "${SETTINGS.WIDGETS_FLOATING_APPS}?nestId={nestId}",
-                        arguments = listOf(navArgument("nestId") { type = NavType.IntType; defaultValue = 0 })
+                        route = SETTINGS.WIDGETS_FLOATING_APPS,
+                        arguments = listOf(navArgument("id") { type = NavType.StringType })
                     ) { backStack ->
                         FloatingAppsTab(
-                            onBack = ::goAppearance,
+                            onBack = ::popBackToAppearance,
                             onLaunchSystemWidgetPicker = ::launchWidgetsPicker,
                             onResetWidgetSize = onResetWidgetSize,
                             onRemoveWidget = onRemoveFloatingApp,
-                            initialNestId = backStack.arguments?.getInt("nestId") ?: 0
+                            initialNestId = backStack.arguments!!.getString("id").takeIf { it != "{id}" }?.toInt() ?: 0
                         )
                     }
 
@@ -913,7 +936,7 @@ fun MainAppUi(
                                     SETTINGS.WORKSPACE_DETAIL.replace("{id}", id)
                                 )
                             },
-                            onBack = ::goAdvSettingsRoot
+                            onBack = ::popBackToAdvSettingsRoot
                         )
                     }
 
@@ -1040,7 +1063,7 @@ fun MainAppUi(
                         isUnlocked = true
                         showPinDialog = null
                         pinError = null
-                        goSettings(routeQuery)
+                        goSettings(routeQuery, false)
                     } else {
                         pinError = ctx.getString(R.string.wrong_pin)
                         failedTries++

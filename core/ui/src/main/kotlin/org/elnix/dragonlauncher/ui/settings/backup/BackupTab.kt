@@ -8,16 +8,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -26,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,12 +48,12 @@ import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.components.TextDivider
-import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
+import org.elnix.dragonlauncher.ui.dialogs.selectedActionRow
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
@@ -78,6 +76,24 @@ fun BackupTab(onBack: () -> Unit) {
     val autoBackupUriString by BackupSettingsStore.autoBackupUri.asState()
     val lastBackupTime by PrivateSettingsStore.lastBackupTime.asState()
     val backupStores by BackupSettingsStore.backupStores.asState()
+
+
+    val selectedStores = remember(backupStores) {
+        mutableStateMapOf<DataStoreName, Boolean>().apply {
+            backupableStores.forEach { put(it.key, it.value.dataStoreName.value in backupStores) }
+        }
+    }
+//
+//    LaunchedEffect(selectedStores) {
+//        logD(BACKUP_TAG) { "Setting: ${selectedStores.size} stores" }
+//        scope.launch {
+//            if (selectedStores.size == backupableStores.size) {
+//                BackupSettingsStore.backupStores.reset(ctx)
+//            } else {
+//                BackupSettingsStore.backupStores.set(ctx, selectedStores.map { it.key.value }.toSet())
+//            }
+//        }
+//    }
 
     LaunchedEffect(lastBackupTime) {
         ctx.showToast(lastBackupTime)
@@ -258,56 +274,15 @@ fun BackupTab(onBack: () -> Unit) {
 
         item { TextDivider(ctx.getString(R.string.auto_backup_stores)) }
 
-        item {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    DragonButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            scope.launch {
-                                BackupSettingsStore.backupStores.set(ctx, emptySet())
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Deselect,
-                            contentDescription = stringResource(R.string.deselect_all)
-                        )
-                        Text(stringResource(R.string.deselect_all))
-                    }
 
-
-                    DragonButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            scope.launch {
-                                BackupSettingsStore.backupStores.reset(ctx)
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.SelectAll,
-                            contentDescription = stringResource(R.string.select_all)
-                        )
-                        Text(stringResource(R.string.select_all))
-                    }
-                }
-            }
-
-        }
+        selectedActionRow(selectedStores, backupableStores.size)
 
         items(backupableStores.entries.toList()) { entry ->
             val dataStoreName = entry.key
             val settingsStore = entry.value
             val isSelected = backupStores.contains(dataStoreName.value)
 
-            DragonSurfaceRow(
+            DragonRow(
                 onClick = {
                     scope.launch {
                         val updated = if (isSelected) backupStores - dataStoreName.value
@@ -385,10 +360,6 @@ fun BackupTab(onBack: () -> Unit) {
     }
 }
 
-
-// ───────────────────────────────────────
-// Shared Buttons (internal)
-// ───────────────────────────────────────
 @Composable
 private fun BackupButtons(
     onExport: () -> Unit,

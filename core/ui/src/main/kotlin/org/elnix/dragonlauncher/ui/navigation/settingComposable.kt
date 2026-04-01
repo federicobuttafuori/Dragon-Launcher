@@ -1,8 +1,6 @@
 package org.elnix.dragonlauncher.ui.navigation
 
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -10,16 +8,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
 
-/**
- * No anim composable
- *
- * Blocks enter/exit transitions of screen in a navHost
- *
- * @param route
- * @param arguments
- * @param content
- * @receiver
- */
 fun NavGraphBuilder.settingComposable(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),

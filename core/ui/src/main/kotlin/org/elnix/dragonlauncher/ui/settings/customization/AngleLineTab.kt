@@ -40,11 +40,12 @@ import org.elnix.dragonlauncher.common.serializables.ColorSerializer
 import org.elnix.dragonlauncher.common.serializables.CustomObjectBlockProperties
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.ANGLE_LINE_TAG
-import org.elnix.dragonlauncher.common.utils.UiConstants
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.settings.stores.AngleLineSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
+import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AngleLineObjectsOrderDialog

@@ -26,7 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -77,7 +77,6 @@ import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.undoredo.UndoRedoManager
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.WIDGET_TAG
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.enumsui.UndRedoEditTools
 import org.elnix.dragonlauncher.enumsui.WidgetsToolsAddNestRemove
 import org.elnix.dragonlauncher.enumsui.WidgetsToolsCenterReset
@@ -88,7 +87,9 @@ import org.elnix.dragonlauncher.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel.ResizeCorner
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WidgetsSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.components.FloatingAppsHostView
+import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonColumn
 import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
@@ -254,8 +255,6 @@ fun FloatingAppsTab(
         /* ──────────────── Widget canvas ──────────────── */
         floatingApps
             .filter { it.nestId == nestId }
-            // Dont sort them, because when you press the reorder buttons, it feels strange
-//            .sortedBy { it.id == selected?.id } // Selected is always displayed first for easier click access
             .forEach { floatingApp ->
                 key(floatingApp.id, nestId) {
                     DraggableFloatingApp(
@@ -267,37 +266,6 @@ fun FloatingAppsTab(
                         selected = floatingApp.id == selected?.id,
                         onPrecisionModeChange = { isPrecisionModeActive = it },
                         onSelect = { selected = floatingApp },
-
-
-//                        onMove = { dx, dy ->
-//                            // I don't apply to stack on every movement, and so don't save
-//                            floatingAppsViewModel.moveFloatingApp(floatingApp.id, dx, dy, false)
-//                        },
-//                        onMoveEnd = {
-//                            // Only save on move end to avoid I/O overhead
-//                            applyChange {
-//                                floatingAppsViewModel.moveFloatingApp(floatingApp.id, 0f, 0f, snapMove)
-//                            }
-//                        },
-
-//                        onRotateEnd = {
-//                            applyChange {
-//                                // Just apply the change, don't rotate more, as it is already rotated by the real-time thing
-//                                floatingAppsViewModel.rotateFloatingApp(floatingApp.id, it, snapRotation)
-//                            }
-//                        },
-
-
-//                        onResize = { corner, dx, dy ->
-//                            // Same thing here, don't apply change until fully resized
-//                            floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, dx, dy, false)
-//                        },
-//                        onResizeEnd = { corner ->
-//                            applyChange {
-//                                floatingAppsViewModel.resizeFloatingApp(floatingApp.id, corner, 0f, 0f, snapResize)
-//                            }
-//                        },
-
                         onEdit = {
                             applyChange {
                                 logD(WIDGET_TAG) { "applyChange\nold widget: $floatingApp\new one: $it" }
@@ -357,7 +325,7 @@ fun FloatingAppsTab(
                 Triple(
                     {
                         showScaleDropdown = !showScaleDropdown
-                    }, Icons.Default.MoreHoriz,
+                    }, Icons.Default.MoreVert,
                     stringResource(R.string.more)
                 )
             ),
@@ -371,7 +339,6 @@ fun FloatingAppsTab(
                 ) {
                     MultiSelectConnectedButtonRow(
                         entries = WidgetsToolsSnapping.entries,
-                        showLabel = false,
                         isChecked = {
                             when (it) {
                                 WidgetsToolsSnapping.SnapGrid -> snapMove
@@ -403,8 +370,6 @@ fun FloatingAppsTab(
 
                     MultiSelectConnectedButtonRow(
                         entries = UndRedoEditTools.entries,
-                        showLabel = false,
-
                         isEnabled = {
                             when (it) {
                                 UndRedoEditTools.UndoAll -> undoButtonEnabled
@@ -435,7 +400,6 @@ fun FloatingAppsTab(
                 ) {
                     MultiSelectConnectedButtonRow(
                         entries = WidgetsToolsAddNestRemove.entries,
-                        showLabel = false,
                         isChecked = {
                             when (it) {
                                 WidgetsToolsAddNestRemove.Add, WidgetsToolsAddNestRemove.Nests -> true
@@ -561,10 +525,9 @@ fun FloatingAppsTab(
             content = {
                 Column(Modifier.fillMaxSize()) {
                     AnimatedVisibility(showScaleDropdown) {
-                        Column(
-                            modifier = Modifier.settingsGroup()
-                        ) {
-                            Text("${stringResource(R.string.widget_number)}: ${floatingApps.size}")
+                        DragonColumnGroup {
+                            Text("${stringResource(R.string.widget_number_total)}: ${floatingApps.size}")
+                            Text("${stringResource(R.string.widget_number_nest)}: ${floatingApps.count { it.nestId == nestId}}")
                             Text("${stringResource(R.string.current_nest)}: $nestId")
 
                             HorizontalDivider()

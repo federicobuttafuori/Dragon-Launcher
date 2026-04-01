@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.FilterNone
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SettingsSuggest
@@ -31,7 +30,7 @@ fun defaultThemeName(mode: DefaultThemes) = when (mode) {
 }
 
 
-enum class ColorPickerButtonAction { RANDOM, RESET, COPY, PASTE, NONE }
+enum class ColorPickerButtonAction { RANDOM, RESET, COPY, PASTE }
 
 @Composable
 fun colorPickerButtonIcon(mode: ColorPickerButtonAction) = when (mode) {
@@ -39,7 +38,6 @@ fun colorPickerButtonIcon(mode: ColorPickerButtonAction) = when (mode) {
     ColorPickerButtonAction.RESET ->  Icons.Default.Restore
     ColorPickerButtonAction.COPY -> Icons.Default.ContentCopy
     ColorPickerButtonAction.PASTE ->  Icons.Default.ContentPaste
-    ColorPickerButtonAction.NONE ->  Icons.Default.FilterNone
 }
 
 enum class CustomColorModeEditing { NORMAL, CUSTOM }

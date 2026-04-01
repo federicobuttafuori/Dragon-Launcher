@@ -1,15 +1,19 @@
 package org.elnix.dragonlauncher.ui.colors
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -25,11 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
 
 @Composable
 fun DefaultColorPicker(
     initialColor: Color,
-//    defaultColor: Color,
     onColorSelected: (Color) -> Unit
 ) {
     var selectedColor by remember { mutableStateOf(initialColor) }
@@ -60,14 +64,14 @@ fun DefaultColorPicker(
         Color(0xFFBDBDBD), // Light Gray
         Color(0xFF616161), // Dark Gray
         Color(0xFF000000)  // Black
-
     )
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(5.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(5.dp)
     ) {
-        // === Color palette ===
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -80,26 +84,44 @@ fun DefaultColorPicker(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     rowColors.forEach { color ->
-                        Box(
+                        val isSelected = color == selectedColor
+
+                        val backgroundColor by animateColorAsState(
+                            targetValue = with(MaterialTheme.colorScheme) {
+                                if (isSelected) primary
+                                else surface
+                            }
+                        )
+
+                        Row(
                             modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(color)
-                                .border(
-                                    width = if (color == selectedColor) 3.dp else 1.dp,
-                                    color = if (color == selectedColor)
-                                        MaterialTheme.colorScheme.onBackground
-                                    else
-                                        MaterialTheme.colorScheme.outline,
-                                    shape = CircleShape
-                                )
-                                .clickable {
+                                .weight(1f)
+                                .shapedClickable {
                                     selectedColor = color
                                     onColorSelected(color)
-                                },
-                            contentAlignment = Alignment.Center
+                                }
+                                .background(backgroundColor)
+                                .padding(3.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            if (color == selectedColor) {
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(CircleShape)
+                                    .background(color)
+                                    .border(
+                                        width = if (isSelected) 3.dp else 1.dp,
+                                        color = if (isSelected)
+                                            MaterialTheme.colorScheme.onBackground
+                                        else
+                                            MaterialTheme.colorScheme.outline,
+                                        shape = CircleShape
+                                    ),
+                            )
+
+                            AnimatedVisibility(isSelected) {
+                                Spacer(Modifier.width(3.dp))
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,

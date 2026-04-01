@@ -31,7 +31,7 @@ import org.elnix.dragonlauncher.common.utils.ADBCommands
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 
 
 @Composable
@@ -115,7 +115,7 @@ fun <T : ADBCommands> AdbCommandPickerDialog(
 
                 HorizontalDivider()
 
-                DragonSurfaceRow(
+                DragonRow(
                     onClick = {
                         toast = !toast
                     }

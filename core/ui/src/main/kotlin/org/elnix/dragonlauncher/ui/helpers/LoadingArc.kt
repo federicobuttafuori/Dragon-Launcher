@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.base.ktx.px
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.common.utils.UiConstants
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowShapePath
 

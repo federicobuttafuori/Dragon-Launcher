@@ -5,7 +5,6 @@ package org.elnix.dragonlauncher.ui.colors
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,17 +36,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.colors.blendWith
 import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
@@ -55,14 +51,16 @@ import org.elnix.dragonlauncher.common.utils.pasteClipboard
 import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.enumsui.ColorPickerMode
-import org.elnix.dragonlauncher.enumsui.colorPickerText
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.CustomAlertDialog
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
+import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
 
 @Composable
 fun ColorPickerRow(
@@ -81,7 +79,7 @@ fun ColorPickerRow(
     val savedMode by ColorModesSettingsStore.colorPickerMode.asState()
     val initialPage = remember(savedMode) { ColorPickerMode.entries.indexOf(savedMode) }
 
-    DragonSurfaceRow(
+    DragonRow(
         enabled = enabled,
         onClick = { showPicker = true }
     ) {
@@ -90,8 +88,6 @@ fun ColorPickerRow(
                 text = label,
                 color = MaterialTheme.colorScheme.onSurface.semiTransparentIfDisabled(enabled),
                 modifier = Modifier.weight(1f),
-                maxLines = Int.MAX_VALUE,
-                softWrap = true
             )
         }
 
@@ -134,22 +130,25 @@ fun ColorPickerRow(
             imePadding = false,
             modifier = modifier.padding(15.dp),
             onDismissRequest = { showPicker = false },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Restore,
-                    contentDescription = "Reset Color",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .padding(8.dp)
-                        .clickable { onColorPicked(null) }
-                )
-            },
             title = {
-                Text(
-                    text = label,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(
+                        text = label,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.Restore,
+                        contentDescription = "Reset Color",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .shapedClickable { onColorPicked(null) }
+                            .padding(8.dp)
+                    )
+                }
             },
             text = {
                 ColorPicker(
@@ -191,36 +190,24 @@ private fun ColorPicker(
         hexText = color.toHexWithAlpha()
     }
 
+    val currentMode = pickerModes[pagerState.currentPage]
     // Save the current page as mode whenever changed
-    LaunchedEffect(pagerState.currentPage) {
-        val currentMode = pickerModes[pagerState.currentPage]
+    LaunchedEffect(currentMode) {
         ColorModesSettingsStore.colorPickerMode.set(ctx, currentMode)
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Tabs to indicate and jump
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+
+        MultiSelectConnectedButtonRow(
+            entries = pickerModes,
+            showLabels = ShowLabels.Always,
+            isChecked = {
+                currentMode == it
+            },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
         ) {
-            pickerModes.forEachIndexed { idx, mode ->
-                Text(
-                    text = colorPickerText(mode),
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(DragonShape)
-                        .clickable { scope.launch { pagerState.scrollToPage(idx) } }
-                        .background(
-                            if (pagerState.currentPage == idx) MaterialTheme.colorScheme.secondary
-                            else MaterialTheme.colorScheme.surface
-                        )
-                        .padding(12.dp),
-                    color = if (pagerState.currentPage == idx) MaterialTheme.colorScheme.onSecondary
-                    else MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
-            }
+            scope.launch { pagerState.animateScrollToPage(it.ordinal) }
         }
 
         Spacer(Modifier.height(5.dp))
@@ -292,19 +279,22 @@ private fun ColorPicker(
 
         Spacer(Modifier.height(15.dp))
 
-        HorizontalPager(state = pagerState) { page ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.height(380.dp)
+        ) { page ->
             when (pickerModes[page]) {
+                ColorPickerMode.DEFAULTS -> DefaultColorPicker(
+                    initialColor = color,
+                    onColorSelected = onColorSelected
+                )
+
                 ColorPickerMode.SLIDERS -> SliderColorPicker(
                     actualColor = color,
                     onColorSelected = onColorSelected
                 )
 
                 ColorPickerMode.GRADIENT -> GradientColorPicker(
-                    initialColor = color,
-                    onColorSelected = onColorSelected
-                )
-
-                ColorPickerMode.DEFAULTS -> DefaultColorPicker(
                     initialColor = color,
                     onColorSelected = onColorSelected
                 )

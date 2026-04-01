@@ -40,7 +40,7 @@ import org.elnix.dragonlauncher.common.serializables.CustomHapticFeedbackSeriali
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.NESTS_TAG
 import org.elnix.dragonlauncher.common.utils.UiCircle
-import org.elnix.dragonlauncher.common.utils.UiConstants
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.common.utils.circles.computePointPosition
 import org.elnix.dragonlauncher.common.utils.performCustomHaptic
 import org.elnix.dragonlauncher.common.utils.resolveShape

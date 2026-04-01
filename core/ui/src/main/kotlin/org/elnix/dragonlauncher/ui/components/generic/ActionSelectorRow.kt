@@ -1,13 +1,11 @@
-@file:Suppress("AssignedValueIsNeverRead")
+@file:Suppress("AssignedValueIsNeverRead", "VariableNeverRead")
 
 package org.elnix.dragonlauncher.ui.components.generic
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,10 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
-import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.dialogs.CustomAlertDialog
+import org.elnix.dragonlauncher.ui.helpers.text.TextWithDescription
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 
 
@@ -49,34 +48,22 @@ fun <T> ActionSelectorRow(
     toggled: Boolean? = null,
     onSelected: (T?) -> Unit
 ) {
-    val textColor = MaterialTheme.colorScheme.onSurface
-
     var showDialog by remember { mutableStateOf(false) }
-
-    val baseModifier = Modifier.fillMaxWidth()
 
     val switchInteractionSource = remember { MutableInteractionSource() }
     val globalInteractionSource = remember { MutableInteractionSource() }
 
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = baseModifier
-            .clip(DragonShape)
-            .height(IntrinsicSize.Max)
-            .background(MaterialTheme.colorScheme.surface.semiTransparentIfDisabled(enabled))
-            .conditional(enabled && toggled != true) {
-                clickable(
-                    interactionSource = switchInteractionSource
-                ) { showDialog = true }
-            }
+    DragonRow(
+        onClick = { showDialog = true },
+        enabled = enabled
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
+                .fillMaxWidth()
                 .conditional(enabled && toggled == true) {
                     clickable(
                         interactionSource = globalInteractionSource
@@ -84,18 +71,12 @@ fun <T> ActionSelectorRow(
                 }
                 .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {
-            Text(
+            TextWithDescription(
                 text = label,
-                color = textColor.semiTransparentIfDisabled(enabled),
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            Text(
-                text = optionLabel(selected),
-                color = textColor.semiTransparentIfDisabled(enabled),
-                style = MaterialTheme.typography.labelLarge
+                description = optionLabel(selected),
             )
         }
+
 
         // Right side toggle + divider wrapped in a clickable container
         if (toggled != null) {

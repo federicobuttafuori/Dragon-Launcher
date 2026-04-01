@@ -938,7 +938,8 @@
     <string name="loading">Loading…</string>
     <string name="charging_animation">Charging animation</string>
     <string name="charging_animation_desc">Play a beautiful charging animation when the phone is charging</string>
-    <string name="widget_number">Widgets Number</string>
+    <string name="widget_number_total">Widgets Number (total)</string>
+    <string name="widget_number_nest">Widgets Number (nest)</string>
     <string name="shape">Shape</string>
     <string name="scale">Scale</string>
     <string name="current_nest">Current nest</string>
@@ -985,4 +986,8 @@
     <string name="command">command</string>
     <string name="show_toast">Show toast</string>
     <string name="show_tooltips">Show Tooltips</string>
+    <string name="gradient">Gradient</string>
+    <string name="sliders">Sliders</string>
+    <string name="common_settings">Common settings</string>
+    <string name="dragging_display">Dragging display</string>
 </resources>

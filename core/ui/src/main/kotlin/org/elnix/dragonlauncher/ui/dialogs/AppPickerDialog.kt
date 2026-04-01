@@ -63,12 +63,12 @@ import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.serializables.WorkspaceType
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.PRIVATE_SPACE_TAG
 import org.elnix.dragonlauncher.common.utils.PrivateSpaceUtils
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.ui.UiConstants
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.AppDrawerSearch
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
-import org.elnix.dragonlauncher.ui.modifiers.rememberPressedShape
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
@@ -251,9 +251,6 @@ fun AppPickerDialog(
                                 MaterialTheme.colorScheme.surfaceVariant
                         )
 
-                        val (shape, interactionSource) = rememberPressedShape(selected)
-
-
                         TextButton(
                             onClick = {
                                 scope.launch {
@@ -261,8 +258,7 @@ fun AppPickerDialog(
                                 }
                             },
                             modifier = Modifier.padding(5.dp),
-                            interactionSource = interactionSource,
-                            shape = shape,
+                            shapes = UiConstants.dragonShapes(),
                             colors = ButtonDefaults.textButtonColors(
                                 containerColor = animatedColor
                             )

@@ -77,11 +77,13 @@ import kotlinx.coroutines.yield
 import org.elnix.dragonlauncher.base.ktx.px
 import org.elnix.dragonlauncher.base.ktx.toDp
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.WorkspaceType
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.Constants
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.DRAWER_TAG
 import org.elnix.dragonlauncher.common.utils.PrivateSpaceUtils
 import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.openSearch
@@ -96,7 +98,6 @@ import org.elnix.dragonlauncher.enumsui.DrawerActions.OPEN_KB
 import org.elnix.dragonlauncher.enumsui.DrawerActions.SEARCH_WEB
 import org.elnix.dragonlauncher.enumsui.DrawerActions.TOGGLE_KB
 import org.elnix.dragonlauncher.enumsui.DrawerToolbar
-import org.elnix.dragonlauncher.enumsui.height
 import org.elnix.dragonlauncher.enumsui.isUsed
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
@@ -309,15 +310,35 @@ fun AppDrawerScreen(
     }
 
 
+    val filteredToolbarsOrder by remember(drawerToolbarsOrder) {
+        derivedStateOf {
+            drawerToolbarsOrder.filterNot {
+                (showRecentlyUsedApps && it == DrawerToolbar.RecentlyUsed) ||
+                        (showSearchBar && it == DrawerToolbar.SearchBar)
+            }
+        }
+    }
+
     // Computes the position of the spacer in the toolbars list, and deduce 2 lists:
     // one with the elements that come before, and one with those that come after
-    val spacerIndex = drawerToolbarsOrder.indexOf(DrawerToolbar.Spacer).takeIf { it != -1 } ?: 0
-    val beforeSpacer = drawerToolbarsOrder.subList(0, spacerIndex)
-    val afterSpacer = drawerToolbarsOrder.subList(spacerIndex + 1, drawerToolbarsOrder.size)
+    val spacerIndex = remember(filteredToolbarsOrder) {
+        filteredToolbarsOrder.indexOf(DrawerToolbar.Spacer).takeIf { it != -1 } ?: 0
+    }
+    val beforeSpacer = remember(filteredToolbarsOrder) {
+        filteredToolbarsOrder.subList(0, spacerIndex)
+    }
+    val afterSpacer = remember(filteredToolbarsOrder) {
+        filteredToolbarsOrder.subList(spacerIndex + 1, filteredToolbarsOrder.size)
+    }
 
-    val topPadding = beforeSpacer.sumOf { it.height }.dp
-    val bottomPadding = afterSpacer.sumOf { it.height }.dp
+    val topPadding = remember(beforeSpacer) {
+        beforeSpacer.sumOf { it.height }.dp
+    }
+    val bottomPadding = remember(afterSpacer) {
+        afterSpacer.sumOf { it.height }.dp
+    }
 
+    logD(DRAWER_TAG) { "SpacerIndex: $spacerIndex, beforeSpacer: $beforeSpacer, after: $afterSpacer\ntopPadding: $topPadding, bottomPadding: $bottomPadding" }
 
     /* ───────────── Pull Down System ───────────── */
 
@@ -341,9 +362,9 @@ fun AppDrawerScreen(
     val pullProgress = 1 - (pullOffset / thresholdPx).coerceAtMost(1f)
 
     /**
-     * Hapticed; if the haptic feedback has already been executes, to avoid repeating it indefinitely
+     * If the haptic feedback has already been executed, to avoid repeating it indefinitely
      */
-    var hapticed by remember { mutableStateOf(false) }
+    var hasHapticed by remember { mutableStateOf(false) }
 
     /**
      * The scroll state basically, defines what happen on vertical scrolls, the horizontal being handled by the pager
@@ -378,11 +399,11 @@ fun AppDrawerScreen(
                     val thresholdReachedNow = pullOffset > thresholdPx
 
                     // Haptic feedback
-                    if (thresholdReachedNow && !hapticed) {
-                        hapticed = true
+                    if (thresholdReachedNow && !hasHapticed) {
+                        hasHapticed = true
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
-                    if (!thresholdReachedNow && hapticed) hapticed = false
+                    if (!thresholdReachedNow && hasHapticed) hasHapticed = false
 
                     // consume only what we used
                     return Offset(0f, available.y)
@@ -394,7 +415,7 @@ fun AppDrawerScreen(
                     pullOffset = (pullOffset + available.y).coerceAtLeast(0f)
 
 
-                    if (!(pullOffset > thresholdPx) && hapticed) hapticed = false
+                    if (!(pullOffset > thresholdPx) && hasHapticed) hasHapticed = false
                     return Offset(0f, available.y)
                 }
 
@@ -421,7 +442,7 @@ fun AppDrawerScreen(
 
                 // reset
                 pullOffset = 0f
-                hapticed = false
+                hasHapticed = false
 
                 return Velocity.Zero
             }
@@ -429,11 +450,10 @@ fun AppDrawerScreen(
     }
 
 
-    val scaleFactor =
-        if (pullDownScaleIn) (pullProgress.pow(0.9f)).coerceIn(0.95f, 1f)
+    val animatedScale by animateFloatAsState(
+        targetValue =  if (pullDownScaleIn) (pullProgress.pow(0.9f)).coerceIn(0.95f, 1f)
         else 1f
-
-    val animatedScale by animateFloatAsState(targetValue = scaleFactor)
+    )
 
 
     val pullDownPadding = if (pullDownAnimations) pullOffset else 0f
@@ -442,13 +462,13 @@ fun AppDrawerScreen(
 
     /* ───────────── Dim wallpaper system ───────────── */
     val wallpaperDimDrawerScreen by UiSettingsStore.wallpaperDimDrawerScreen.asState()
-    val pullDownWallPaperDimFade by DrawerSettingsStore.pullDownWallPaperDimFade.asState()
+    val pullDownWallPaperDimFadeEnabled by DrawerSettingsStore.pullDownWallPaperDimFade.asState()
 
     val animatedDim by animateFloatAsState(targetValue = pullProgress)
     // Dims the wallpaper, when the user starts pulling down,
     // the dim amount is reduced proportionally to the drag amount
     val dimAmount = wallpaperDimDrawerScreen *
-            if (pullDownWallPaperDimFade) animatedDim
+            if (pullDownWallPaperDimFadeEnabled) animatedDim
             else 1f
 
 
@@ -577,7 +597,7 @@ fun AppDrawerScreen(
                                             DragonIconButton(
                                                 onClick = { appLifecycleViewModel.onUnlockPrivateSpace() },
                                                 imageVector = Icons.Default.Lock,
-                                                contentDescription = "Private Space Locked"
+                                                contentDescription = stringResource(R.string.private_space_locked)
                                             )
                                         }
                                     }

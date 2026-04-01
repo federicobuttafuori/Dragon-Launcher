@@ -29,8 +29,9 @@ import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +55,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.theme.DefaultExtraColors
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.common.utils.definedOrNull
 import org.elnix.dragonlauncher.enumsui.CustomColorModeEditing
@@ -71,6 +71,7 @@ import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.ExpandableSection
@@ -86,11 +87,13 @@ import org.elnix.dragonlauncher.ui.components.settings.asStateNull
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
+import org.elnix.dragonlauncher.ui.helpers.text.AutoResizeableText
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.remembers.ExpandableSectionState
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.theme.getSystemColorScheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Suppress("AssignedValueIsNeverRead")
 @Composable
 fun ColorSelectorTab(
@@ -543,8 +546,7 @@ fun ColorSelectorTab(
             if (colorTestMode) {
                 DragonButton(
                     onClick = { showExitTestValidation = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = AppObjectsColors.buttonColors()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.exit_test_mode))
                 }
@@ -554,28 +556,22 @@ fun ColorSelectorTab(
         if (defaultTheme == CUSTOM) {
 
             item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                @Suppress("DEPRECATION")
+                ButtonGroup(
+                    Modifier.fillMaxWidth(),
                 ) {
-                    Button(
-                        onClick = { showResetValidation = true },
-                        modifier = Modifier.weight(1f),
-                        colors = AppObjectsColors.buttonColors()
+                    DragonButton(
+                        onClick = { showResetValidation = true }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Restore,
                             contentDescription = stringResource(R.string.reset),
-                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .padding(5.dp)
                         )
 
-                        Text(
-                            text = stringResource(R.string.reset_to_default_colors),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
+                        AutoResizeableText(stringResource(R.string.reset_to_default_colors),)
                     }
 
                     Box {
@@ -685,7 +681,6 @@ fun ColorSelectorTab(
                 )
             } else {
 
-                // === Extra custom action colors ===
                 item {
                     SettingsColorPicker(
                         settingObject = ColorSettingsStore.angleLineColor,

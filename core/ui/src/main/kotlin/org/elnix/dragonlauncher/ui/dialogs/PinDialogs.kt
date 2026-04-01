@@ -16,7 +16,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,7 +49,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -68,7 +66,7 @@ import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.common.utils.vibrate
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.ui.components.settings.asState
-import org.elnix.dragonlauncher.ui.modifiers.rememberPressedShape
+import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
 
 /**
  * Dialog for entering a PIN to unlock settings.
@@ -507,18 +505,14 @@ private fun Modifier.keyPadModifier(
     onClick: (() -> Unit)? = null
 ): Modifier {
 
-    val (shape, interactionSource) = rememberPressedShape()
-
     return this
         .aspectRatio(1f)
-        .clip(shape)
         .then(
             onClick?.let { click ->
-                Modifier.clickable(
-                    enabled = enabled,
-                    interactionSource = interactionSource,
-                    onClick = click
-                )
+                Modifier.shapedClickable(
+                enabled = enabled,
+                onClick = click
+            )
             } ?: Modifier
         )
         .background(MaterialTheme.colorScheme.surface.semiTransparentIfDisabled(enabled))

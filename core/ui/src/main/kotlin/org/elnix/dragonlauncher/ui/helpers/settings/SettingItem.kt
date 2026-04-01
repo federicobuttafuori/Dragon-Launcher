@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,7 +19,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
+import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.helpers.IconC
 
 @Composable
@@ -32,19 +31,16 @@ fun SettingsItem(
     comingSoon: Boolean = false,
     icon: Any? = null,
     leadIcon: Any? = null,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit
 ) {
 
-    DragonSurfaceRow (
+    DragonRow (
         modifier = modifier,
         enabled = enabled,
-        backgroundColor = backgroundColor,
         onLongClick = onLongClick,
         onClick = onClick
     ) {
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(15.dp),

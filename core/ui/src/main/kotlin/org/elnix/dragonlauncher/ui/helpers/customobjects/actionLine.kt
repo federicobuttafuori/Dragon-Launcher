@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.common.utils.UiConstants
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Angle
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.End
@@ -164,7 +164,7 @@ private fun DrawScope.angleObject(
     val strokeWidth = (angleLineCustomObject.stroke ?: UiConstants.defaultAngleCustomObject.stroke!!).dp.toPx()
     if (strokeWidth <= 0f) return
 
-//    val shape = (angleLineCustomObject.shape ?: UiConstants.defaultAngleCustomObject.shape!!).resolveShape()
+//    val shape = (angleLineCustomObject.shape ?: org.elnix.dragonlauncher.ui.UiConstants.defaultAngleCustomObject.shape!!).resolveShape()
 
     val radius = (angleLineCustomObject.size ?: UiConstants.defaultAngleCustomObject.size!!).dp.toPx() / 2
     val diameterPx = radius * 2

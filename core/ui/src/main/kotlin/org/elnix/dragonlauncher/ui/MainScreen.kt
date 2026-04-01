@@ -381,7 +381,7 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
                                         BurgerAction(
                                             onClick = {
                                                 showDropDownMenuSettings = false
-                                                onSettings("${SETTINGS.WIDGETS_FLOATING_APPS}?nestId=$nestId")
+                                                onSettings(SETTINGS.WIDGETS_FLOATING_APPS.replace("{id}", nestId.toString()))
                                             }
                                         ) {
                                             Icon(
