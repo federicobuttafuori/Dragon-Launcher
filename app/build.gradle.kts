@@ -230,5 +230,12 @@ tasks.register("downloadExtensionsRegistry") {
 // Use preBuild tasks instead of merge* (they exist in AGP)
 tasks.named("preBuild") {
     dependsOn("copyChangelogsToAssets")
-    dependsOn("downloadExtensionsRegistry")
+
+    // Only download extensions registry on release builds
+    val isReleaseVariant = gradle.startParameter.taskRequests.any {
+        it.args.any { arg -> arg.contains("Release", ignoreCase = true) }
+    }
+    if (isReleaseVariant) {
+        dependsOn("downloadExtensionsRegistry")
+    }
 }
