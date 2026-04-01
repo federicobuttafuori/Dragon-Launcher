@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.ADBCommands
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.dragon.DragonSurfaceRow
@@ -66,7 +66,9 @@ fun <T : ADBCommands> AdbCommandPickerDialog(
             )
         },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
                 options.forEach { option ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -76,7 +78,8 @@ fun <T : ADBCommands> AdbCommandPickerDialog(
                             .clickable {
                                 selected = option
                             }
-                            .padding(15.dp)
+                            .padding(15.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Column(
                             modifier = Modifier.weight(1f),
