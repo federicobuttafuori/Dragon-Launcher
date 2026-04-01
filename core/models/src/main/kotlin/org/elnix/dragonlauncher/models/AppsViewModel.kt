@@ -393,45 +393,6 @@ class AppsViewModel(
                 } else {
                     logI(APPS_TAG) { "Pending private assignments is empty : $pendingPrivateAssignments" }
                 }
-
-                // Apply persisted private assignments (survives reloads)
-//                try {
-//                    val persistedJson = AppsSettingsStore.privateAssignedPackages.get(ctx)
-//
-//                    if (!persistedJson.isNullOrEmpty() && persistedJson.isNotBlankJson) {
-//                        val persistedMap: Map<String, Int?> = gson.fromJson(
-//                            persistedJson,
-//                            object : TypeToken<Map<String, Int?>>() {}.type
-//                        )
-//                        if (persistedMap.isNotEmpty()) {
-//                            logI(
-//                                APPS_TAG,
-//                                "Applying persisted private assignments: ${persistedMap.size} entries"
-//                            )
-//                            finalApps = finalApps.map { app ->
-//                                val identity = app.iconCacheKey
-//                                val cacheKeyString = identity.cacheKey
-//
-//                                val identityAssigned = persistedMap[cacheKeyString]
-//
-//                                if (identityAssigned != null || persistedMap.containsKey(
-//                                        cacheKeyString
-//                                    )
-//                                ) {
-//                                    app.copy(
-//                                        isPrivateProfile = true,
-//                                        isWorkProfile = false,
-//                                        userId = identityAssigned ?: app.userId
-//                                    )
-//                                } else app
-//                            }
-//                        } else {
-//                            logI(APPS_TAG, "Persisted is empty : $persistedJson")
-//                        }
-//                    }
-//                } catch (e: Exception) {
-//                    logE(APPS_TAG, "Error applying persisted private assignments", e)
-//                }
             }
 
             logD(APPS_TAG) { "Total apps loaded: ${finalApps.size}" }
