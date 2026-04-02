@@ -57,15 +57,13 @@ import org.elnix.dragonlauncher.base.theme.DefaultExtraColors
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.common.utils.definedOrNull
-import org.elnix.dragonlauncher.enumsui.CustomColorModeEditing
+import org.elnix.dragonlauncher.enumsui.ColorSelectorModes
 import org.elnix.dragonlauncher.enumsui.DefaultThemes
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.AMOLED
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.CUSTOM
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.DARK
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.LIGHT
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.SYSTEM
-import org.elnix.dragonlauncher.enumsui.customColorModeEditingIcon
-import org.elnix.dragonlauncher.enumsui.customColorModeEditingName
 import org.elnix.dragonlauncher.enumsui.defaultThemeName
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
@@ -79,7 +77,8 @@ import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.generic.ActionRow
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
@@ -412,7 +411,7 @@ fun ColorSelectorTab(
 
     var showBurgerMenu by remember { mutableStateOf(false) }
 
-    var selectedCustomView by remember { mutableStateOf(CustomColorModeEditing.NORMAL) }
+    var selectedCustomView by remember { mutableStateOf(ColorSelectorModes.NORMAL) }
 
     var showRandomColorsValidation by remember { mutableStateOf(false) }
     var showAllColorsValidation by remember { mutableStateOf(false) }
@@ -631,15 +630,14 @@ fun ColorSelectorTab(
             }
 
             item {
-                ActionRow(
-                    actions = CustomColorModeEditing.entries,
-                    actionIcon = { customColorModeEditingIcon(it) },
-                    actionName = { customColorModeEditingName(ctx, it) },
-                    selectedView = selectedCustomView,
+                MultiSelectConnectedButtonRow(
+                    entries = ColorSelectorModes.entries,
+                    showLabels = ShowLabels.Always,
+                    isChecked = { it == selectedCustomView }
                 ) { selectedCustomView = it }
             }
 
-            if (selectedCustomView == CustomColorModeEditing.NORMAL) {
+            if (selectedCustomView == ColorSelectorModes.NORMAL) {
                 colorsGroup(
                     expandableSectionState = primarySectionState,
                     colors = primaryColors
