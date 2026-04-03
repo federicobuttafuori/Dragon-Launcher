@@ -152,7 +152,7 @@ fun AppGrid(
                         if (onReload != null) {
                             Crossfade(isLoading) { showLoadingIcon ->
                                 if (showLoadingIcon) {
-                                    LoadingIndicator()
+                                    CircularProgressIndicator()
                                     LaunchedEffect(Unit) {
                                         waitASec()
                                         isLoading = false
