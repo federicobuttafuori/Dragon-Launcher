@@ -125,7 +125,7 @@ fun StatusBarConnectivity(
             )
         }
 
-        if (connectivityState.isMobileDataEnabled && element.showMobileData) {
+        if (!connectivityState.isAirplaneMode && connectivityState.isMobileDataEnabled && element.showMobileData) {
             Icon(
                 imageVector = Icons.Filled.SignalCellularAlt,
                 contentDescription = connectivityState.mobileDataStatus,
