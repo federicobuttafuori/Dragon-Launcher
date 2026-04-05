@@ -6,10 +6,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.navigaton.routeResId
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
-import org.elnix.dragonlauncher.enumsui.routeName
 import org.elnix.dragonlauncher.ui.remembers.LocalNests
 
 @Composable
@@ -72,7 +72,7 @@ fun actionLabel(action: SwipeActionSerializable): String {
 
         is SwipeActionSerializable.OpenAppDrawer -> stringResource(R.string.app_drawer)
 
-        is SwipeActionSerializable.OpenDragonLauncherSettings -> "${stringResource(R.string.dragon_launcher_settings)} (${routeName(action.route)})"
+        is SwipeActionSerializable.OpenDragonLauncherSettings -> "${stringResource(R.string.dragon_launcher_settings)} (${stringResource(routeResId(action.route))})"
 
         SwipeActionSerializable.Lock -> stringResource(R.string.lock)
 

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
@@ -55,10 +56,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
@@ -85,6 +82,8 @@ import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 enum class DateFormat(val pattern: String, val displayName: String) {
     SHORT("MMM dd", "Short (Dec 25)"),
@@ -290,7 +289,9 @@ fun EditStatusBar() {
         }
     }
 
+    val lazyListState = rememberLazyListState()
     val reorderState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
         onMove = { from, to ->
             try {
                 if (from.key == to.key) return@rememberReorderableLazyListState
@@ -305,10 +306,6 @@ fun EditStatusBar() {
             } catch (e: Exception) {
                 logE(STATUS_BAR_TAG, e) { "Crash avoided during reorder" }
             }
-        },
-        onDragEnd = { _, _ ->
-            // Persist changes
-            save()
         }
     )
 
@@ -320,7 +317,6 @@ fun EditStatusBar() {
                 .fillMaxWidth()
                 .height(100.dp)
                 .background(MaterialTheme.colorScheme.surface, DragonShape)
-                .reorderable(reorderState)
                 .background(statusBarBackground)
                 .padding(
                     start = leftStatusBarPadding.dp,
@@ -330,7 +326,7 @@ fun EditStatusBar() {
                 ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(3.dp),
-            state = reorderState.listState
+            state = lazyListState
         ) {
 
             items(elements, key = { it.id }) { statusBarElement ->
@@ -377,7 +373,7 @@ fun EditStatusBar() {
                     Box(
                         modifier = Modifier
                             .scale(scale)
-                            .detectReorderAfterLongPress(reorderState)
+                            .longPressDraggableHandle(onDragStopped = ::save)
                             .sizeIn(minWidth = 50.dp, minHeight = 50.dp)
                             .border(1.dp, borderColor, DragonShape)
                             .clip(DragonShape)

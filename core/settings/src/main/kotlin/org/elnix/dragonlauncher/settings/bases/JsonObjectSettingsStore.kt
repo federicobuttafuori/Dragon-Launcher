@@ -42,7 +42,7 @@ abstract class JsonObjectSettingsStore :
         // Skips if default value provided (no changes made), keeps the backup lighter
         val raw = jsonSetting.getEncoded(ctx)?.trim() ?: return null
 
-        logI(WORKSPACES_TAG) { raw }
+//        logI(WORKSPACES_TAG) { raw }
         return try {
             if (raw.isEmpty()) null else JSONObject(raw)
         } catch (e: JSONException) {

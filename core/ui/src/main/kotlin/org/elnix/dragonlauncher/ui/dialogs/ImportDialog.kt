@@ -4,20 +4,20 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.settings.DataStoreName
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
-import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.json.JSONObject
 
 @Composable
@@ -42,27 +42,21 @@ fun ImportSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm(availableStores.filter { selected[it.key] == true })
-                },
-                colors = AppObjectsColors.buttonColors()
+
+            ValidateCancelButtons(
+                onCancel = onDismiss
             ) {
-                Text("Import")
+                onConfirm(availableStores.filter { selected[it.key] == true })
             }
         },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                colors = AppObjectsColors.cancelButtonColors()
-            ) { Text("Cancel") }
-        },
-        title = { Text("Select settings to import") },
+        title = { Text(stringResource(R.string.select_settings_to_import)) },
         text = {
             LazyColumn(
                 modifier = Modifier.heightIn(max = 600.dp)
             ) {
-                selectedActionRow(selected, availableStores.size)
+                item {
+                    SelectedActionRow(selected, availableStores.size) { }
+                }
 
                 items(availableStores.entries.toList()) { entry ->
                     StoreItem(selected, entry.key, entry.value)

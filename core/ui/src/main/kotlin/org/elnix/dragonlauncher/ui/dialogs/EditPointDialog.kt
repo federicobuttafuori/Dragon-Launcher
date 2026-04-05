@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,10 +39,9 @@ import org.elnix.dragonlauncher.base.theme.LocalExtraColors
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
-import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.definedOrNull
 import org.elnix.dragonlauncher.enumsui.SelectedUnselectedViewMode
-import org.elnix.dragonlauncher.enumsui.selectedUnselectedViewName
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.actionColor
 import org.elnix.dragonlauncher.ui.actions.actionLabel
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
@@ -53,7 +51,8 @@ import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.generic.ActionRow
+import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.helpers.ShapeRow
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
@@ -67,7 +66,6 @@ fun EditPointDialog(
     onDismiss: () -> Unit,
     onConfirm: (SwipePointSerializable) -> Unit
 ) {
-    val ctx = LocalContext.current
     val extraColors = LocalExtraColors.current
     val defaultPoint = LocalDefaultPoint.current
 
@@ -89,7 +87,7 @@ fun EditPointDialog(
         actionColor(editPoint.action, extraColors, editPoint.customActionColor?.let { Color(it) })
 
 
-    var selectedView by remember { mutableStateOf(SelectedUnselectedViewMode.UNSELECTED) }
+    var selectedView by remember { mutableStateOf(SelectedUnselectedViewMode.Unselected) }
 
 
     val defaultBorderStroke =
@@ -228,7 +226,8 @@ fun EditPointDialog(
         },
         text = {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(5.dp)
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 if (!isDefaultEditing) {
@@ -357,16 +356,15 @@ fun EditPointDialog(
 
                 item { TextDivider(stringResource(R.string.individual_options)) }
                 item {
-                    ActionRow(
-                        actions = SelectedUnselectedViewMode.entries,
-                        selectedView = selectedView,
-                        backgroundColorUnselected = MaterialTheme.colorScheme.surfaceVariant,
-                        actionName = { selectedUnselectedViewName(ctx, it) },
+                    MultiSelectConnectedButtonRow(
+                        entries = SelectedUnselectedViewMode.entries,
+                        isChecked = { selectedView == it },
+                        showLabels = ShowLabels.Always
                     ) { selectedView = it }
                 }
                 item {
 
-                    AnimatedContent(selectedView == SelectedUnselectedViewMode.UNSELECTED) { selectedMode ->
+                    AnimatedContent(selectedView == SelectedUnselectedViewMode.Unselected) { selectedMode ->
                         DragonColumnGroup {
                             if (selectedMode) {
                                 SliderWithLabel(
@@ -457,8 +455,6 @@ fun EditPointDialog(
                         }
                     }
                 }
-
-
 
 
                 // Can not edit the haptic feedback in default mode, has to go to nest settings to edit it circle by circle

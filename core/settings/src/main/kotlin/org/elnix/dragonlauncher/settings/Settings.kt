@@ -8,10 +8,12 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import org.elnix.dragonlauncher.common.logging.logI
 import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.IconShapeGson
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 
@@ -164,6 +166,27 @@ object Settings {
             onChanged = onChange
         )
 
+    fun stringList(
+        key: String,
+        dataStoreName: DataStoreName,
+        default: List<String>,
+        onChange: (() -> Unit)? = null
+    ): BaseSettingObject<List<String>, String> =
+        BaseSettingObject(
+            key = key,
+            dataStoreName = dataStoreName,
+            default = default,
+            preferenceKey = stringPreferencesKey(key),
+            encode = { list ->
+
+                val encoded = list.joinToString(",")
+                logI(BACKUP_TAG) { "Encoded: $encoded" }
+                encoded
+            },
+            decode = { raw -> getStringListStrict(raw, default) },
+            onChanged = onChange
+        )
+
     fun <E : Enum<E>> enum(
         key: String,
         dataStoreName: DataStoreName,
@@ -180,6 +203,26 @@ object Settings {
             decode = { raw -> getEnumStrict(raw, default, enumClass) },
             onChanged = onChange
         )
+
+    fun <E : Enum<E>> enumList(
+        key: String,
+        dataStoreName: DataStoreName,
+        default: List<E>,
+        enumClass: Class<E>,
+        onChange: (() -> Unit)? = null
+    ): BaseSettingObject<List<E>, String> =
+        BaseSettingObject(
+            key = key,
+            dataStoreName = dataStoreName,
+            default = default,
+            preferenceKey = stringPreferencesKey(key),
+            encode = { list ->
+                list.joinToString(",") { it.name }
+            },
+            decode = { raw -> getEnumListStrict(raw, default, enumClass) },
+            onChanged = onChange
+        )
+
 
     fun color(
         key: String,

@@ -33,6 +33,12 @@ object SettingsBackupManager {
             return
         }
 
+        val lastBackupTime = PrivateSettingsStore.lastBackupTime.get(ctx)
+        if (System.currentTimeMillis() - lastBackupTime < 1000L) {
+            logW(BACKUP_TAG) { "Auto-backup fired too quickly, canceling it" }
+            return
+        }
+
         try {
             val uriString = BackupSettingsStore.autoBackupUri.get(ctx)
             if (uriString.isBlank()) {
@@ -104,7 +110,7 @@ object SettingsBackupManager {
             val settingsStore = entry.value
 
             if (dataStoreName.backupKey in requestedStores.map { it.backupKey }) {
-                logW(BACKUP_TAG) { "$dataStoreName ,backup : ${settingsStore.exportForBackup(ctx)}" }
+//                logW(BACKUP_TAG) { "$dataStoreName ,backup : ${settingsStore.exportForBackup(ctx)}" }
                 settingsStore.exportForBackup(ctx)?.let {
                     json.put(dataStoreName.backupKey, it)
                 }

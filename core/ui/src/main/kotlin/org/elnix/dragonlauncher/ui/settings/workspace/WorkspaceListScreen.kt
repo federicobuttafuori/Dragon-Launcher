@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -31,8 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logI
@@ -49,6 +48,8 @@ import org.elnix.dragonlauncher.ui.dialogs.CreateOrEditWorkspaceDialog
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 
 @Composable
@@ -106,7 +107,9 @@ fun WorkspaceListScreen(
         }
     }
 
+    val lazyListState = rememberLazyListState()
     val reorderState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
         onMove = { from, to ->
             if (from.index in uiList.indices && to.index in uiList.indices) {
                 val tmp = uiList.toMutableList()
@@ -115,10 +118,6 @@ fun WorkspaceListScreen(
                 uiList.clear()
                 uiList.addAll(tmp)
             }
-        },
-        onDragEnd = { _, _ ->
-            // Commit changes to ViewModel
-            scope.launch { appsViewModel.setWorkspaceOrder(uiList) }
         }
     )
 
@@ -129,14 +128,12 @@ fun WorkspaceListScreen(
             helpText = stringResource(R.string.workspace_help),
             onReset = {
                 scope.launch { appsViewModel.resetWorkspacesAndOverrides() }
-            },
-            reorderState = reorderState
+            }
         ) {
             items(uiList, key = { it.id }) { ws ->
                 ReorderableItem(state = reorderState, key = ws.id) { isDragging ->
                     WorkspaceRow(
                         workspace = ws,
-                        reorderState = reorderState,
                         isDragging = isDragging,
                         showSamsungSettingsIcon = ws.type == WorkspaceType.PRIVATE && isSamsung && ws.enabled,
                         onSamsungSettingsClick = {
@@ -160,6 +157,10 @@ fun WorkspaceListScreen(
                                     }
                                 }
                             }
+                        },
+                        onDragEnd = {
+                            // Commit changes to ViewModel
+                            scope.launch { appsViewModel.setWorkspaceOrder(uiList) }
                         }
                     )
                 }

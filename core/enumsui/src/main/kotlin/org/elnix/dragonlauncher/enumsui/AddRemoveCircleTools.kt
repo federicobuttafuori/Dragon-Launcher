@@ -9,8 +9,8 @@ import org.elnix.dragonlauncher.common.R
 enum class AddRemoveCircleTools(
     override val resId: Int?,
     override val iconEnabled: ImageVector,
-    override val iconDisabled: ImageVector?
+    override val iconDisabled: ImageVector? = null
 ) : ToggleButtonOption {
-    Add(R.string.add_circle, Icons.Default.AddCircle, null),
-    Remove(R.string.remove_circle, Icons.Default.RemoveCircle, null)
+    Add(R.string.add_circle, Icons.Default.AddCircle),
+    Remove(R.string.remove_circle, Icons.Default.RemoveCircle)
 }

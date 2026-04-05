@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -62,6 +63,9 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.logging.logW
+import org.elnix.dragonlauncher.common.navigaton.EDIT_SCREENS
+import org.elnix.dragonlauncher.common.navigaton.ROUTES
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.serializables.ColorSerializer
 import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.serializables.IconShape
@@ -80,8 +84,6 @@ import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Navigation.transparentScreens
 import org.elnix.dragonlauncher.common.utils.Constants.PackageNames.SHIZUKU_PACKAGE_NAME
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.URL_SHIZUKU_SITE
-import org.elnix.dragonlauncher.common.utils.ROUTES
-import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.common.utils.isAppInstalled
@@ -666,12 +668,13 @@ fun MainAppUi(
         }
     }
 
-    val containerColor =
+    val containerColor by animateColorAsState(
         if (currentRoute in transparentScreens) {
             Color.Transparent
         } else {
             MaterialTheme.colorScheme.background
         }
+    )
 
 
     /* ───────────── Start Composition locals getters ───────────── */
@@ -876,13 +879,13 @@ fun MainAppUi(
                                 goSettings(SETTINGS.ADVANCED_ROOT, false)
                             },
                             onNestEdit = {
-                                goSettings(SETTINGS.NESTS_EDIT.replace("{id}", it.toString()), false)
+                                goSettings(EDIT_SCREENS.NESTS_EDIT.replace("{id}", it.toString()), false)
                             },
                             onBack = ::popBackMainScreen
                         )
                     }
 
-                    settingComposable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen(::launchAction) { popBackToSettingsRoot() } }
+                    settingComposable(SETTINGS.ADVANCED_ROOT) { AdvancedSettingsScreen { popBackToSettingsRoot() } }
 
                     // All the nested settings screens
                     settingComposable(SETTINGS.APPEARANCE) { AppearanceTab(::popBackToAdvSettingsRoot) }
@@ -910,7 +913,7 @@ fun MainAppUi(
 
 
                     settingComposable(
-                        route = SETTINGS.NESTS_EDIT,
+                        route = EDIT_SCREENS.NESTS_EDIT,
                         arguments = listOf(navArgument("id") { type = NavType.StringType }),
                     ) { backStack ->
                         NestEditingScreen(
@@ -936,7 +939,7 @@ fun MainAppUi(
                         WorkspaceListScreen(
                             onOpenWorkspace = { id ->
                                 navController.navigate(
-                                    SETTINGS.WORKSPACE_DETAIL.replace("{id}", id)
+                                    EDIT_SCREENS.WORKSPACE_DETAIL.replace("{id}", id)
                                 )
                             },
                             onBack = ::popBackToAdvSettingsRoot
@@ -944,7 +947,7 @@ fun MainAppUi(
                     }
 
                     settingComposable(
-                        route = SETTINGS.WORKSPACE_DETAIL,
+                        route = EDIT_SCREENS.WORKSPACE_DETAIL,
                         arguments = listOf(navArgument("id") { type = NavType.StringType }),
                     ) { backStack ->
                         WorkspaceDetailScreen(

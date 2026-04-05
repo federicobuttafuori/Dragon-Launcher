@@ -34,8 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.common.utils.formatDateTime
@@ -53,7 +55,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
-import org.elnix.dragonlauncher.ui.dialogs.selectedActionRow
+import org.elnix.dragonlauncher.ui.dialogs.SelectedActionRow
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
@@ -83,17 +85,17 @@ fun BackupTab(onBack: () -> Unit) {
             backupableStores.forEach { put(it.key, it.value.dataStoreName.value in backupStores) }
         }
     }
-//
-//    LaunchedEffect(selectedStores) {
-//        logD(BACKUP_TAG) { "Setting: ${selectedStores.size} stores" }
-//        scope.launch {
-//            if (selectedStores.size == backupableStores.size) {
-//                BackupSettingsStore.backupStores.reset(ctx)
-//            } else {
-//                BackupSettingsStore.backupStores.set(ctx, selectedStores.map { it.key.value }.toSet())
-//            }
-//        }
-//    }
+
+    fun save() {
+        logD(BACKUP_TAG) { "Setting: ${selectedStores.size} stores" }
+        scope.launch {
+            if (selectedStores.size == backupableStores.size) {
+                BackupSettingsStore.backupStores.reset(ctx)
+            } else {
+                BackupSettingsStore.backupStores.set(ctx, selectedStores.map { it.key.value }.toSet())
+            }
+        }
+    }
 
     LaunchedEffect(lastBackupTime) {
         ctx.showToast(lastBackupTime)
@@ -110,6 +112,8 @@ fun BackupTab(onBack: () -> Unit) {
     var importJson by remember { mutableStateOf<JSONObject?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
     var showExportDialog by remember { mutableStateOf(false) }
+    var hasTriggeredManualAutoBackup by remember { mutableStateOf(false) }
+
 
 
     val settingsExportLauncher = rememberSettingsExportLauncher(selectedStoresForExport)
@@ -246,10 +250,14 @@ fun BackupTab(onBack: () -> Unit) {
                         title = stringResource(R.string.last_backup),
                         description = lastBackupTime.formatDateTime(),
                         icon = Icons.Default.Restore,
+                        enabled = !hasTriggeredManualAutoBackup,
                         onClick = {
+                            hasTriggeredManualAutoBackup = true
                             scope.launch {
                                 SettingsBackupManager.triggerBackup(ctx)
                                 ctx.showToast(ctx.getString(R.string.backup_triggered))
+                                delay(1000)
+                                hasTriggeredManualAutoBackup = false
                             }
                         }
                     )
@@ -275,24 +283,20 @@ fun BackupTab(onBack: () -> Unit) {
         item { TextDivider(ctx.getString(R.string.auto_backup_stores)) }
 
 
-        selectedActionRow(selectedStores, backupableStores.size)
+        item {
+            SelectedActionRow(selectedStores, backupableStores.size) { save() }
+        }
 
-        items(backupableStores.entries.toList()) { entry ->
-            val dataStoreName = entry.key
-            val settingsStore = entry.value
-            val isSelected = backupStores.contains(dataStoreName.value)
+        items(selectedStores.entries.toList()) { (datastoreName, isSelected) ->
 
             DragonRow(
                 onClick = {
-                    scope.launch {
-                        val updated = if (isSelected) backupStores - dataStoreName.value
-                        else backupStores + dataStoreName.value
-                        BackupSettingsStore.backupStores.set(ctx, updated)
-                    }
+                    selectedStores[datastoreName] = !isSelected
+                    save()
                 }
             ) {
                 Text(
-                    text = settingsStore.name,
+                    text = backupableStores[datastoreName]!!.name,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)

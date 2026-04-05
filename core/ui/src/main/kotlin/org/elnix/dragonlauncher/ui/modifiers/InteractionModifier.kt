@@ -10,8 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.Role
 import org.elnix.dragonlauncher.ui.UiConstants
+import org.elnix.dragonlauncher.ui.helpers.withHaptic
 
 
 @Composable
@@ -39,6 +41,11 @@ fun Modifier.shapedClickable(
 
     val shape = RoundedCornerShape(shapeRound)
 
+    val onclickWithOptionalHaptic = if (hapticFeedback) {
+        withHaptic(HapticFeedbackType.LongPress) {
+            onClick()
+        }
+    } else onClick
 
     return this
         .clip(shape)
@@ -47,7 +54,7 @@ fun Modifier.shapedClickable(
             enabled = enabled,
             onClickLabel = onClickLabel,
             role = role,
-            onClick = onClick,
+            onClick = onclickWithOptionalHaptic,
             onLongClick = onLongClick
         )
 }

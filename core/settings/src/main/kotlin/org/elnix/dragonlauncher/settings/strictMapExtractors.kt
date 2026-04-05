@@ -1,8 +1,10 @@
 package org.elnix.dragonlauncher.settings
 
 import androidx.compose.ui.graphics.Color
+import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.ANGLE_LINE_TAG
 
 
 fun getBooleanStrict(
@@ -17,6 +19,7 @@ fun getBooleanStrict(
             "false", "0", "no", "n", "off" -> false
             else -> null
         }
+
         else -> null
     } ?: def
 }
@@ -32,6 +35,7 @@ fun getIntStrict(
         else -> null
     } ?: def
 }
+
 fun getFloatStrict(
     raw: Any?,
     def: Float
@@ -113,10 +117,27 @@ fun getStringSetStrict(
                 setOf(raw)
             }
         }
+
         else -> null
     } ?: def
 }
 
+fun getStringListStrict(
+    raw: Any?,
+    def: List<String>
+): List<String> {
+    return try {
+        with(raw.toString()) {
+            val clean = trim()
+            if (clean.isBlank()) return emptyList()
+            clean.split(",")
+                .map { it.trim().trim('"').trim('\'') }
+                .filter { it.isNotBlank() }
+        }
+    } catch (_: Exception) {
+        def
+    }
+}
 
 
 private fun Collection<*>.flattenStrings(): List<String> = flatMap { item ->
@@ -137,7 +158,33 @@ fun <E : Enum<E>> getEnumStrict(
         ?: def
 }
 
+/**
+ * Decodes a list of enum from a string, comma separated statements
+ */
+fun <E : Enum<E>> getEnumListStrict(
+    raw: Any?,
+    def: List<E>,
+    enumClass: Class<E>
+): List<E> {
 
+    return when (raw) {
+        is String ->
+            try {
+                raw
+                    .takeIf { it.isNotEmpty() }
+                    ?.split(",")
+                    ?.mapNotNull { elem ->
+                        enumClass.enumConstants
+                            ?.firstOrNull { it.name == elem.trim() }
+                    }.orEmpty()
+            } catch (e: Exception) {
+                logE(ANGLE_LINE_TAG, e) { "Failed to decode enumClass $enumClass object, using default value" }
+                null
+            }
+
+        else -> null
+    } ?: def
+}
 
 
 fun getColorStrict(
@@ -154,6 +201,7 @@ fun getColorStrict(
             raw.toLongOrNull(16)
                 ?.let { Color(it.toInt()) }
         }
+
         else -> null
     } ?: def
 }

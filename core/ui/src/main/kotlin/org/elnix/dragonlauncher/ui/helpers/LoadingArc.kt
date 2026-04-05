@@ -29,8 +29,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.base.ktx.px
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.common.utils.resolveShape
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowShapePath
 
 private fun DrawScope.holdTolerance(
@@ -54,6 +54,7 @@ fun HoldToActivateArc(
     rotationsPerSecond: Float,
     customObjectSerializable: CustomObjectSerializable,
     erase: Boolean = false,
+    playAnimation: Boolean = true,
     showHoldTolerance: (() -> Float)? = null
 ) {
     val ctx = LocalContext.current
@@ -140,7 +141,7 @@ fun HoldToActivateArc(
                         rotate(degrees = rotationAngleStart.toFloat(), pivot = center)
 
                         // Rotates with the animation rotation, computed above
-                        if (rotationsPerSecond > 0) {
+                        if (rotationsPerSecond > 0 && playAnimation) {
                             rotate(degrees = rotationAnimation, pivot = center)
                         }
                         translate(center.x, center.y)

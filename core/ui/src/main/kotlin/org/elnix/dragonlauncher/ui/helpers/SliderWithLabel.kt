@@ -178,7 +178,7 @@ private fun SliderWithLabelInternal(
                     onReset != null -> {
                         DragonIconButton(
                             onClick = onReset,
-                            enabled = enabled,
+                            enabled = { enabled },
                             imageVector = Icons.Default.Restore,
                             contentDescription = "Reset"
                         )

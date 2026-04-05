@@ -1,4 +1,4 @@
-package org.elnix.dragonlauncher.common.utils
+package org.elnix.dragonlauncher.common.navigaton
 
 
 // ──────────────────── SETTINGS ────────────────────
@@ -13,12 +13,10 @@ object SETTINGS {
     const val THEME = "settings/advanced/appearance/theme"
     const val FONTS = "settings/advanced/appearance/fonts"
     const val PERMISSIONS = "settings/advanced/permissions"
-    const val WIDGETS_FLOATING_APPS = "settings/advanced/widgets_floating_apps/{id}"
     const val BEHAVIOR = "settings/advanced/behavior"
     const val COLORS = "settings/advanced/appearance/colors"
     const val DRAWER = "settings/advanced/drawer"
     const val WORKSPACE = "settings/advanced/workspace"
-    const val WORKSPACE_DETAIL = "settings/advanced/workspace/{id}"
     const val BACKUP = "settings/advanced/backup"
     const val WELLBEING = "settings/advanced/wellbeing"
     const val DEBUG = "settings/advanced/debug"
@@ -27,10 +25,16 @@ object SETTINGS {
     const val LANGUAGE = "settings/advanced/language"
     const val CHANGELOGS = "settings/advanced/changelogs"
     const val EXTENSIONS = "settings/advanced/extensions"
-    const val NESTS_EDIT = "settings/nest/{id}"
     const val ANGLE_LINE_EDIT = "settings/advanced/angleLineEdit"
     const val HOLD_TO_ACTIVATE_ARC = "settings/advanced/hold_to_activate"
     const val MAINS_SCREEN_LAYERS = "settings/advanced/main_screen_layers"
+    const val WIDGETS_FLOATING_APPS = "settings/advanced/widgets_floating_apps/{id}"
+
+}
+
+object EDIT_SCREENS {
+    const val WORKSPACE_DETAIL = "settings/advanced/workspace/{id}"
+    const val NESTS_EDIT = "settings/nest/{id}"
 }
 
 object ROUTES {

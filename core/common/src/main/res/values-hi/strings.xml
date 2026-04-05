@@ -11,7 +11,6 @@
     <string name="do_not_remind_me_again">मुझे फिर से याद मत दिलाओ</string>
     <string name="coming_soon">जल्दी ही आगमन।।।</string>
     <string name="settings">सेटिंग</string>
-    <string name="appearance">उपस्थिति/अनुकूलन</string>
     <string name="appearance_tab_text">प्रकटन सेटिंग बदलना</string>
     <string name="fullscreen_app">फ़ुलस्क्रीन ऐप</string>
     <string name="app_display">ऐप डिस्प्ले</string>
@@ -39,7 +38,6 @@
     <string name="version">विवरण</string>
     <string name="export_cancelled">निर्यात रद्द कर दिया गया</string>
     <string name="import_cancelled">आयात रद्द किया गया</string>
-    <string name="backup_restore">बैकअप/पुनर्स्थापना</string>
     <string name="backup_restore_text">बैकअप या सेटिंग्स और अनुप्रयोग की क्रियाओं को पुनर्स्थापित करें, स्वचालित बैकअप स्वचालित रूप से प्रत्येक एप्लिकेशन लॉन्च पर चालू कर रहे हैं / रोकें/छोड़ें या नीचे \"ट्रिगर\" बटन दबाकर</string>
     <string name="export_settings">निर्यात सेटिंग्स</string>
     <string name="import_settings">सेटिंग्स आयात करें</string>

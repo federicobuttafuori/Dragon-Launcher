@@ -72,7 +72,7 @@ fun SliderColorPicker(
             DragonIconButton(
                 onClick = { popLastColor() },
                 modifier = Modifier.weight(1f),
-                enabled = canPopLastColor,
+                enabled = { canPopLastColor },
                 imageVector = Icons.Default.Replay,
                 contentDescription = stringResource(R.string.undo),
             )

@@ -18,9 +18,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.navigaton.routeResId
+import org.elnix.dragonlauncher.common.navigaton.settingsRoutes
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
-import org.elnix.dragonlauncher.enumsui.routeName
-import org.elnix.dragonlauncher.enumsui.settingsRoutes
 
 @Composable
 fun SettingsPagePicker(
@@ -62,7 +62,7 @@ fun SettingsPagePicker(
                         )
 
                         Text(
-                            text = routeName(route),
+                            text = stringResource(routeResId(route)),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }

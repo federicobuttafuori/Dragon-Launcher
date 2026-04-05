@@ -18,6 +18,8 @@ object HoldToActivateArcSettingsStore : MapSettingsStore() {
             this.holdToActivateSettingsTolerance,
             this.holdToActivateArcCustomObject,
             this.showToleranceOnMainScreen,
+            this.rotationPerSecond,
+            this.holdMenuEntries
         )
 
 
@@ -54,13 +56,16 @@ object HoldToActivateArcSettingsStore : MapSettingsStore() {
         default = "",
     )
 
-    /**
-     * The number of rotation/second the object do
-     */
     val rotationPerSecond = Settings.float(
         key = "rotationPerSecond",
         dataStoreName = dataStoreName,
         default = 0f,
         allowedRange = 0f..5f
+    )
+
+    val holdMenuEntries = Settings.stringList(
+        key = "holdMenuEntries",
+        dataStoreName = dataStoreName,
+        default = listOf()
     )
 }

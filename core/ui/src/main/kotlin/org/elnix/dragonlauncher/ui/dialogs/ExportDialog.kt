@@ -6,15 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
@@ -22,7 +19,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons
 import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons.DESELECT_ALL
 import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons.INVERT
@@ -31,7 +30,7 @@ import org.elnix.dragonlauncher.settings.DataStoreName
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
-import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
 
 @Composable
@@ -51,27 +50,20 @@ fun ExportSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm(availableStores.filter { selected[it.key] == true })
-                },
-                colors = AppObjectsColors.buttonColors()
+            ValidateCancelButtons(
+                onCancel = onDismiss
             ) {
-                Text("Export")
+                onConfirm(availableStores.filter { selected[it.key] == true })
             }
         },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                colors = AppObjectsColors.cancelButtonColors()
-            ) { Text("Cancel") }
-        },
-        title = { Text("Select settings to export") },
+        title = { Text(stringResource(R.string.select_settings_to_export)) },
         text = {
             LazyColumn(
                 modifier = Modifier.heightIn(max = 600.dp)
             ) {
-                selectedActionRow(selected, availableStores.size)
+                item {
+                    SelectedActionRow(selected, availableStores.size) { }
+                }
 
                 items(availableStores.entries.toList()) { entry ->
                     StoreItem(selected, entry.key, entry.value)
@@ -84,37 +76,43 @@ fun ExportSettingsDialog(
     )
 }
 
-fun LazyListScope.selectedActionRow(
-    selected: SnapshotStateMap<DataStoreName, Boolean>,
-    totalStoresNumber: Int
+@Composable
+fun <T> SelectedActionRow(
+    selected: SnapshotStateMap<T, Boolean>,
+    totalNumber: Int,
+    onAnyAction: () -> Unit
 ) {
-    item {
-        MultiSelectConnectedButtonRow(
-            entries = BackupSelectStoresButtons.entries,
-            isEnabled = {
-                when (it) {
-                    DESELECT_ALL -> selected.isNotEmpty()
-                    SELECT_ALL -> selected.size < totalStoresNumber
-                    INVERT -> true
-                }
+    MultiSelectConnectedButtonRow(
+        entries = BackupSelectStoresButtons.entries,
+        isEnabled = { entry ->
+            val selectedCount = selected.map { it.value }.count { it }
+            when (entry) {
+                DESELECT_ALL -> selectedCount > 0
+                SELECT_ALL -> selectedCount < totalNumber
+                INVERT -> true
             }
-        ) {
-            when (it) {
-                DESELECT_ALL -> {
-                    selected.forEach { (store, _) ->
-                        selected[store] = false
-                    }
+        }
+    ) {
+        when (it) {
+            DESELECT_ALL -> {
+                selected.forEach { (store, _) ->
+                    selected[store] = false
                 }
-                SELECT_ALL -> {
-                    selected.forEach { (store, _) ->
-                        selected[store] = true
-                    }
+                onAnyAction()
+            }
+
+            SELECT_ALL -> {
+                selected.forEach { (store, _) ->
+                    selected[store] = true
                 }
-                INVERT -> {
-                    selected.forEach { (store, isSelected) ->
-                        selected[store] = !isSelected
-                    }
+                onAnyAction()
+            }
+
+            INVERT -> {
+                selected.forEach { (store, isSelected) ->
+                    selected[store] = !isSelected
                 }
+                onAnyAction()
             }
         }
     }

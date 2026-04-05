@@ -20,10 +20,6 @@ fun NavGraphBuilder.settingComposable(
         exitTransition = { slideFadeOutToLeft() },
         popEnterTransition = { slideFadeInFromLeft() },
         popExitTransition = { slideFadeOutToRight() },
-//        enterTransition = { EnterTransition.None },
-//        exitTransition = { ExitTransition.None },
-//        popEnterTransition = { EnterTransition.None },
-//        popExitTransition = { ExitTransition.None },
         content = content
     )
 }

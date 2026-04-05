@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.SETTINGS
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.enumsui.LockMethod
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
@@ -98,6 +98,36 @@ fun BehaviorTab(onBack: () -> Unit) {
             }
         }
     ) {
+
+        item {
+            SettingsItem(
+                title = stringResource(R.string.settings_language_title),
+                icon = Icons.Default.Language,
+                onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !forceAppLanguageSelector) {
+                        openSystemLanguageSettings(ctx)
+                    } else {
+                        navController.navigate(SETTINGS.LANGUAGE)
+                    }
+                }
+            )
+        }
+
+        item {
+            val lockDescription = when (currentLockMethod) {
+                LockMethod.NONE -> stringResource(R.string.lock_none)
+                LockMethod.PIN -> stringResource(R.string.lock_pin)
+                LockMethod.DEVICE_UNLOCK -> stringResource(R.string.lock_device_unlock)
+            }
+            SettingsItem(
+                title = stringResource(R.string.lock_method),
+                description = lockDescription,
+                icon = Icons.Default.Lock
+            ) {
+                showLockMethodPicker = true
+            }
+        }
+
         item {
             ExpandableSection(commonSettingsState) {
                 SettingsSwitchRow(
@@ -269,35 +299,6 @@ fun BehaviorTab(onBack: () -> Unit) {
                         }
                     }
                 )
-            }
-        }
-
-        item {
-            SettingsItem(
-                title = stringResource(R.string.settings_language_title),
-                icon = Icons.Default.Language,
-                onClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !forceAppLanguageSelector) {
-                        openSystemLanguageSettings(ctx)
-                    } else {
-                        navController.navigate(SETTINGS.LANGUAGE)
-                    }
-                }
-            )
-        }
-
-        item {
-            val lockDescription = when (currentLockMethod) {
-                LockMethod.NONE -> stringResource(R.string.lock_none)
-                LockMethod.PIN -> stringResource(R.string.lock_pin)
-                LockMethod.DEVICE_UNLOCK -> stringResource(R.string.lock_device_unlock)
-            }
-            SettingsItem(
-                title = stringResource(R.string.lock_method),
-                description = lockDescription,
-                icon = Icons.Default.Lock
-            ) {
-                showLockMethodPicker = true
             }
         }
 

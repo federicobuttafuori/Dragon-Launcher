@@ -17,7 +17,6 @@ import org.elnix.dragonlauncher.common.serializables.CustomIconShapeSerializable
 import org.elnix.dragonlauncher.common.serializables.IconCornerType
 import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.allShapes
-import org.elnix.dragonlauncher.common.utils.UiConstants.DragonShape
 import kotlin.math.abs
 import kotlin.math.cbrt
 import kotlin.math.pow
@@ -31,7 +30,6 @@ fun IconShape?.resolveShape(default: IconShape = IconShape.PlatformDefault): Sha
         IconShape.Circle -> CircleShape
         IconShape.Square -> RectangleShape
         IconShape.RoundedSquare -> RoundedCornerShape(25)
-        IconShape.Dragon -> DragonShape
         IconShape.Triangle -> TriangleShape
         IconShape.Squircle -> SquircleShape
         IconShape.Hexagon -> HexagonShape

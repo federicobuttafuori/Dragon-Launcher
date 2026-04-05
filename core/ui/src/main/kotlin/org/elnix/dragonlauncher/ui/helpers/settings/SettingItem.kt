@@ -2,25 +2,25 @@ package org.elnix.dragonlauncher.ui.helpers.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.colors.adjustBrightness
 import org.elnix.dragonlauncher.common.utils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
-import org.elnix.dragonlauncher.ui.helpers.IconC
+import org.elnix.dragonlauncher.ui.helpers.text.TextWithDescription
 
 @Composable
 fun SettingsItem(
@@ -28,14 +28,13 @@ fun SettingsItem(
     modifier: Modifier = Modifier,
     description: String? = null,
     enabled: Boolean = true,
-    comingSoon: Boolean = false,
-    icon: Any? = null,
-    leadIcon: Any? = null,
+    icon: ImageVector? = null,
+    leadIcon: ImageVector? = null,
     onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit
 ) {
 
-    DragonRow (
+    DragonRow(
         modifier = modifier,
         enabled = enabled,
         onLongClick = onLongClick,
@@ -48,8 +47,8 @@ fun SettingsItem(
         ) {
 
             if (icon != null) {
-                IconC(
-                    icon = icon,
+                Icon(
+                    imageVector = icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(enabled)
                 )
@@ -59,41 +58,22 @@ fun SettingsItem(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
+                TextWithDescription(
                     text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.semiTransparentIfDisabled(enabled)
+                    description = description
                 )
-
-                if (description != null) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.adjustBrightness(if (enabled) 0.8f else 0.4f),
-                        modifier = Modifier.sizeIn(maxHeight = 30.dp)
-                    )
-                }
             }
             if (leadIcon != null) {
-                IconC(
-                    icon = leadIcon,
+                Icon(
+                    imageVector = leadIcon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary.semiTransparentIfDisabled(enabled),
                     modifier = Modifier.sizeIn(maxHeight = 25.dp)
                 )
             }
         }
-
-        if (comingSoon) {
-            Text(
-                text = stringResource(R.string.coming_soon),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.adjustBrightness(0.5f)
-            )
-        }
     }
 }
-
 
 
 @Composable
@@ -102,9 +82,8 @@ fun SettingItemWithExternalOpen(
     modifier: Modifier = Modifier,
     description: String? = null,
     enabled: Boolean = true,
-    comingSoon: Boolean = false,
-    icon: Any? = null,
-    leadIcon: Any? = null,
+    icon: ImageVector? = null,
+    leadIcon: ImageVector? = null,
     extIcon: ImageVector = Icons.AutoMirrored.Filled.OpenInNew,
     onLongClick: (() -> Unit)? = null,
     onExtClick: () -> Unit,
@@ -112,14 +91,14 @@ fun SettingItemWithExternalOpen(
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ){
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.height(IntrinsicSize.Min)
+    ) {
         SettingsItem(
             title = title,
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
             description = description,
             enabled = enabled,
-            comingSoon = comingSoon,
             icon = icon,
             leadIcon = leadIcon,
             onLongClick = onLongClick,
@@ -128,9 +107,11 @@ fun SettingItemWithExternalOpen(
 
         DragonIconButton(
             onClick = onExtClick,
-            modifier = Modifier.size(52.dp),
             contentDescription = title,
-            imageVector = extIcon
+            imageVector = extIcon,
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 56.dp),
         )
     }
 }

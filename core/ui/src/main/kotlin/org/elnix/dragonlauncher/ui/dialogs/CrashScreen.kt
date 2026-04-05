@@ -34,14 +34,12 @@ import org.elnix.dragonlauncher.ui.remembers.rememberSafeSettingsExportLauncher
 
 
 @Composable
-fun CrashDialog(
+fun CrashScreen(
     stackTrace: String,
     onDismiss: () -> Unit
 ) {
     val ctx = LocalContext.current
     val lines = remember(stackTrace) { stackTrace.lines() }
-
-
     val settingsExportLauncher = rememberSafeSettingsExportLauncher(backupableStores.keys)
 
     Column(

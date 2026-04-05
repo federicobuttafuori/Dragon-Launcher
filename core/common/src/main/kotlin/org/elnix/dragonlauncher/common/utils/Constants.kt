@@ -1,6 +1,8 @@
 package org.elnix.dragonlauncher.common.utils
 
 import org.elnix.dragonlauncher.common.logging.LogTag
+import org.elnix.dragonlauncher.common.navigaton.ROUTES
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 
 const val obtainiumPackageName = "dev.imranr.obtainium.fdroid"
@@ -199,6 +201,7 @@ object Constants {
         val WORKSPACES_TAG = LogTag("WorkspacesDebug")
         val NESTS_TAG = LogTag("NestsDebug")
         val ANGLE_LINE_TAG = LogTag("AngleLineDebug")
+        val HOLD_TAG = LogTag("HoldDebug")
         val LAUNCHER_WIDGET_HOLDER_TAG = LogTag("LauncherWidgetHolder")
         val PRIVATE_SPACE_UTILS = LogTag("PrivateSpaceUtils")
         val PINNED_SHORTCUTS = LogTag("PinnedShortcuts")
@@ -229,6 +232,7 @@ object Constants {
         const val MAILTO_LINK = "mailto:elnix91@proton.me"
         const val DRAGON_WEBSITE = "https://dragonlauncher.lthb.fr/"
         const val URL_SHIZUKU_SITE = "https://shizuku.rikka.app"
+        const val WEBLATE_LINK = "https://hosted.weblate.org/engage/dragon-launcher/"
 
     }
 

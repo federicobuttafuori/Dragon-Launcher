@@ -10,7 +10,6 @@
     <string name="do_not_remind_me_again">もう二度と思い出させないで</string>
     <string name="coming_soon">もうすぐです。。。</string>
     <string name="settings">設定</string>
-    <string name="appearance">外観/カスタマイズ</string>
     <string name="appearance_tab_text">外観設定の変更</string>
     <string name="fullscreen_app">フルスクリーンアプリ</string>
     <string name="app_display">アプリの表示</string>
@@ -30,7 +29,6 @@
     <string name="version">バージョン</string>
     <string name="export_cancelled">輸出中止</string>
     <string name="import_cancelled">輸入キャンセル</string>
-    <string name="backup_restore">バックアップ/リストア</string>
     <string name="backup_restore_text">設定やアプリの操作をバックアップまたは復元し、各アプリの起動・一時停止・終了時、または下の「トリガー」ボタンを押すことで自動バックアップが発動します</string>
     <string name="export_settings">エクスポート設定</string>
     <string name="import_settings">インポート設定</string>

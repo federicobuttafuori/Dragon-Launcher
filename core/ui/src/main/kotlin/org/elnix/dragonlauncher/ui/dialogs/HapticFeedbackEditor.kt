@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentPaste
@@ -51,11 +53,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.logging.logE
@@ -74,6 +71,8 @@ import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.dragon.DragonButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 private data class HapticEntry(
     val id: Long, // stable key for reorderable list
@@ -104,7 +103,10 @@ fun HapticFeedbackEditor(
 
     val entries = remember { mutableStateListOf<HapticEntry>().also { it.addAll(initialEntries) } }
 
+    val lazyListState = rememberLazyListState()
+
     val reorderState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
         onMove = { from, to ->
             entries.add(to.index, entries.removeAt(from.index))
         }
@@ -157,7 +159,7 @@ fun HapticFeedbackEditor(
             val decoded = Json.decodeFromString<CustomHapticFeedbackSerializable>(clipboardContent)
 
             selectPreset(decoded)
-            ctx.showToast(":✅ Successfully imported!")
+            ctx.showToast("✅ Successfully imported!")
 
         } catch (e: Exception) {
             logE(HAPTIC_TAG, e) { "Failed to decode '$clipboardContent' from clipboard" }
@@ -209,6 +211,7 @@ fun HapticFeedbackEditor(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(DragonShape)
                         .horizontalScroll(rememberScrollState())
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
@@ -295,14 +298,13 @@ fun HapticFeedbackEditor(
                     }
                 } else {
 
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .detectReorderAfterLongPress(reorderState)
-                            .reorderable(reorderState),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        state = lazyListState
                     ) {
-                        entries.forEachIndexed { index, entry ->
+                        items(entries, key = { it.id }) { entry ->
+                            val index = entries.indexOf(entry)
+
                             ReorderableItem(
                                 state = reorderState,
                                 key = entry.id
@@ -319,7 +321,7 @@ fun HapticFeedbackEditor(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .scale(scale)
-                                        .detectReorderAfterLongPress(reorderState),
+                                        .longPressDraggableHandle(),
                                     elevation = elevatedCardElevation(elevation),
                                     colors = AppObjectsColors.cardColors(),
                                     shape = RoundedCornerShape(12.dp)
@@ -384,7 +386,7 @@ fun HapticFeedbackEditor(
                                                 imageVector = Icons.Default.DragHandle,
                                                 contentDescription = stringResource(R.string.drag_handle),
                                                 tint = MaterialTheme.colorScheme.outline,
-                                                modifier = Modifier.detectReorder(reorderState)
+                                                modifier = Modifier.draggableHandle()
                                             )
                                         }
 
@@ -437,7 +439,7 @@ private fun RotatingPlayIcon(
             onClick()
         },
         modifier = Modifier.rotate(playIconRotation.value),
-        enabled = enabled,
+        enabled = { enabled },
         imageVector = Icons.Default.PlayArrow,
         contentDescription = stringResource(R.string.play),
     )

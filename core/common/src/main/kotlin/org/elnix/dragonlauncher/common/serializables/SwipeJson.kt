@@ -3,10 +3,10 @@ package org.elnix.dragonlauncher.common.serializables
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.elnix.dragonlauncher.common.logging.logE
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.utils.BluetoothADBCommands
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.SWIPE_TAG
 import org.elnix.dragonlauncher.common.utils.DataADBCommands
-import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.WifiADBCommands
 import java.util.UUID
 

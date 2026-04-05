@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
@@ -34,11 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.utils.Constants
@@ -48,6 +44,8 @@ import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.settings.asState
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
@@ -91,7 +89,9 @@ fun DrawerToolbarsOrderDialog(
     }
 
 
+    val lazyListState = rememberLazyListState()
     val reorderState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
         onMove = { from, to ->
             toolbarItems = toolbarItems.toMutableList().apply {
                 add(to.index, removeAt(from.index))
@@ -112,10 +112,7 @@ fun DrawerToolbarsOrderDialog(
         title = { Text(stringResource(R.string.choose_action)) },
         text = {
             LazyColumn(
-                state = reorderState.listState,
-                modifier = Modifier
-                    .detectReorderAfterLongPress(reorderState)
-                    .reorderable(reorderState)
+                state = lazyListState,
             ) {
                 items(toolbarItems, key = { it.name }) { item ->
 
@@ -127,7 +124,8 @@ fun DrawerToolbarsOrderDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                                .scale(scale),
+                                .scale(scale)
+                                .longPressDraggableHandle(),
                             elevation = elevatedCardElevation(elevation),
                             colors = AppObjectsColors.cardColors(),
                             shape = RoundedCornerShape(12.dp)
@@ -180,7 +178,7 @@ fun DrawerToolbarsOrderDialog(
                                 Icon(
                                     imageVector = Icons.Default.DragHandle,
                                     contentDescription = "Drag handle",
-                                    modifier = Modifier.detectReorder(reorderState),
+                                    modifier = Modifier.draggableHandle(),
                                     tint = MaterialTheme.colorScheme.outline
                                 )
                             }

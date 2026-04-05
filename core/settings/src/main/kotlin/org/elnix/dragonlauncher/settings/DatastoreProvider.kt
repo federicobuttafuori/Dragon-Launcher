@@ -133,7 +133,7 @@ private val Context.holeToActivateDatastore by preferencesDataStore(name = HOLD_
 
 
 
-fun Context.resolveDataStore(name: DataStoreName): DataStore<Preferences> {
+internal fun Context.resolveDataStore(name: DataStoreName): DataStore<Preferences> {
     val appCtx = this.applicationContext
     return when (name) {
         UI -> appCtx.uiDatastore

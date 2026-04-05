@@ -5,9 +5,15 @@ package org.elnix.dragonlauncher.ui.settings.customization
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,16 +37,21 @@ import kotlinx.serialization.modules.SerializersModule
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.ColorSerializer
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
+import org.elnix.dragonlauncher.ui.components.dragon.ToggleableDragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.components.settings.asState
+import org.elnix.dragonlauncher.ui.dialogs.HoldSettingsOrderDialog
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
+import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.customobjects.EditCustomObjectBlock
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
+import org.elnix.dragonlauncher.ui.helpers.withHaptic
 import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
 
 
@@ -58,6 +70,9 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
     val holdCustomObject = LocalHoldCustomObject.current
 
     var mutableHoldObject by remember(holdCustomObject) { mutableStateOf(holdCustomObject) }
+    var showHoldSettingsOrderDialog by remember { mutableStateOf(false) }
+    var playAnimation by remember { mutableStateOf(true) }
+
 
     val rgbLoading by UiSettingsStore.rgbLoading.asState()
 
@@ -92,18 +107,41 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
         titleContent = {
             var boxSize by remember { mutableStateOf(IntSize.Zero) }
 
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ToggleableDragonIconButton(
+                    onClick = withHaptic(HapticFeedbackType.LongPress) { playAnimation = !playAnimation },
+                    toggled = { playAnimation },
+                    imageVectorEnabled = Icons.Default.Stop,
+                    imageVectorDisabled = Icons.Default.PlayArrow,
+                    contentDescription = stringResource(R.string.play)
+                )
+
+                SliderWithLabel(
+                    label = null,
+                    showValue = false,
+                    value = progress.value,
+                    valueRange = 0f..1f
+                ) {
+                    scope.launch {
+                        progress.animateTo(it)
+                    }
+                }
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .onSizeChanged { boxSize = it },
-                contentAlignment = Alignment.Center
+                    .onSizeChanged { boxSize = it }
             ) {
                 val center = Offset(
                     x = boxSize.width / 2f,
                     y = boxSize.height / 2f - 15f
                 )
-
 
                 HoldToActivateArc(
                     center = center,
@@ -111,6 +149,7 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
                     rgbLoading = rgbLoading,
                     rotationsPerSecond = rotationPerSecond,
                     customObjectSerializable = mutableHoldObject,
+                    playAnimation = playAnimation,
                     showHoldTolerance = if (showToleranceOnMainScreen) {
                         { holdToActivateSettingsTolerance }
                     } else null
@@ -122,9 +161,10 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
 
             LaunchedEffect(
                 holdDelayBeforeStartingLongClickSettings,
-                longCLickSettingsDuration
+                longCLickSettingsDuration,
+                playAnimation
             ) {
-                while (true) {
+                while (playAnimation) {
                     progress.snapTo(0f)
 
                     delay(holdDelayBeforeStartingLongClickSettings.toLong())
@@ -177,6 +217,14 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
                     valueRange = 0f..5f
                 )
 
+                SettingsItem(
+                    title = stringResource(R.string.edit_hold_to_activate_elements),
+                    description = stringResource(R.string.edit_hold_to_activate_elements_desc),
+                    icon = Icons.Default.Edit
+                ) {
+                    showHoldSettingsOrderDialog = true
+                }
+
                 SettingsSwitchRow(
                     setting = HoldToActivateArcSettingsStore.showToleranceOnMainScreen,
                     title = stringResource(R.string.show_tolerance_on_main_screen),
@@ -191,5 +239,9 @@ fun HoldToActivateArcTab(onBack: () -> Unit) {
             }
         }
     )
+
+    if (showHoldSettingsOrderDialog) {
+        HoldSettingsOrderDialog { showHoldSettingsOrderDialog = false }
+    }
 }
 

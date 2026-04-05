@@ -35,9 +35,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.burnoutcrew.reorderable.ReorderableLazyListState
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.reorderable
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.modifiers.conditional
@@ -54,7 +51,6 @@ fun SettingsScaffold(
     modifier: Modifier = Modifier,
     resetTitle: String = stringResource(R.string.reset_default_settings),
     resetText: String? = stringResource(R.string.reset_settings_in_this_tab),
-    reorderState: ReorderableLazyListState? = null,
     listState: LazyListState? = null,
     titleContent: @Composable (ColumnScope.() -> Unit)? = null,
     bottomContent: @Composable (ColumnScope.() -> Unit)? = null,
@@ -104,13 +100,7 @@ fun SettingsScaffold(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(bottom = if (bottomContent != null) 0.dp else bottomPadding),
-                    modifier = modifier
-                        .conditional(reorderState != null) {
-                            val state = reorderState!!
-                            reorderable(state)
-                                .detectReorderAfterLongPress(state)
-                        },
-                    state = reorderState?.listState ?: listState ?: rememberLazyListState()
+                    state = listState ?: rememberLazyListState()
                 ) { lazyContent() }
 
             } else {
@@ -120,11 +110,6 @@ fun SettingsScaffold(
                     modifier = modifier
                         .conditional(scrollableContent) {
                             verticalScroll(rememberScrollState())
-                        }
-                        .conditional(reorderState != null) {
-                            val state = reorderState!!
-                            reorderable(state)
-                                .detectReorderAfterLongPress(state)
                         }
                 ) { content!!() }
             }

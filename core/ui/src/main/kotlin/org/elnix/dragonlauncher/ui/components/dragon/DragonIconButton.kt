@@ -1,5 +1,6 @@
 package org.elnix.dragonlauncher.ui.components.dragon
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,7 +35,7 @@ fun DragonIconButtonImpl(
 fun DragonIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
+    enabled: () -> Boolean = { true },
     colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
     imageVector: ImageVector,
     contentDescription: String
@@ -44,7 +45,7 @@ fun DragonIconButton(
         DragonIconButtonImpl(
             onClick = onClick,
             modifier = modifier,
-            enabled = enabled,
+            enabled = enabled(),
             colors = colors
         ) {
             Icon(
@@ -55,3 +56,39 @@ fun DragonIconButton(
     }
 }
 
+
+@Composable
+fun ToggleableDragonIconButton(
+    onClick: () -> Unit,
+    toggled: () -> Boolean,
+    modifier: Modifier = Modifier,
+    enabled: () -> Boolean = { true },
+    colors: IconButtonColors = AppObjectsColors.iconButtonColors(),
+    imageVectorEnabled: ImageVector,
+    imageVectorDisabled: ImageVector,
+    contentDescription: String
+) {
+
+    DragonTooltip(contentDescription) {
+        DragonIconButtonImpl(
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled(),
+            colors = colors
+        ) {
+            Crossfade(toggled()) {
+                if (it) {
+                    Icon(
+                        imageVector = imageVectorEnabled,
+                        contentDescription = contentDescription
+                    )
+                } else {
+                    Icon(
+                        imageVector = imageVectorDisabled,
+                        contentDescription = contentDescription
+                    )
+                }
+            }
+        }
+    }
+}

@@ -55,7 +55,6 @@ class IconShapeAdapter :
             IconShape.Pebble -> obj.addProperty("type", "Pebble")
             IconShape.EasterEgg -> obj.addProperty("type", "EasterEgg")
             IconShape.Random -> obj.addProperty("type", "Random")
-            IconShape.Dragon -> obj.addProperty("type", "Dragon")
 
             is IconShape.Custom -> {
                 obj.addProperty("type", "Custom")
@@ -89,7 +88,6 @@ class IconShapeAdapter :
             "Pebble" -> IconShape.Pebble
             "EasterEgg" -> IconShape.EasterEgg
             "Random" -> IconShape.Random
-            "Dragon" -> IconShape.Dragon
             "Custom" -> {
                 val shape = context?.deserialize<CustomIconShapeSerializable>(
                     obj.get("shape"),

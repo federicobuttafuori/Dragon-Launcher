@@ -10,7 +10,6 @@
     <string name="do_not_remind_me_again">Não me lembre de novo</string>
     <string name="coming_soon">Em breve…</string>
     <string name="settings">Configurações</string>
-    <string name="appearance">Aparência / Personalização</string>
     <string name="appearance_tab_text">Alterar configurações de aparência</string>
     <string name="fullscreen_app">Aplicativo em tela cheia</string>
     <string name="app_display">Exibição do aplicativo</string>
@@ -30,7 +29,6 @@
     <string name="version">Versão</string>
     <string name="export_cancelled">Exportação Cancelada</string>
     <string name="import_cancelled">Importação Cancelada</string>
-    <string name="backup_restore">Backup / Restauração</string>
     <string name="backup_restore_text">Faça backup ou restaure as configurações e ações do app, backups automáticos são acionados automaticamente a cada iniciação/pausa/saída do app ou pressionando o botão \"Trigger\" abaixo</string>
     <string name="export_settings">Configurações de Exportação</string>
     <string name="import_settings">Configurações de importação</string>

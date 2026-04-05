@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Wallpaper
-import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -46,7 +44,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.ktx.toDp
-import org.elnix.dragonlauncher.common.R
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
+import org.elnix.dragonlauncher.common.navigaton.routeResId
 import org.elnix.dragonlauncher.common.serializables.FloatingAppObject
 import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
@@ -54,7 +53,6 @@ import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.serializables.enabled
-import org.elnix.dragonlauncher.common.utils.SETTINGS
 import org.elnix.dragonlauncher.common.utils.circles.rememberNestNavigation
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
@@ -98,6 +96,7 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
     val floatingAppObjects by floatingAppsViewModel.floatingApps.collectAsState()
     val defaultPoint by appsViewModel.defaultPoint.collectAsState(defaultSwipePointsValues)
 
+    val holdMenuEntriesString by HoldToActivateArcSettingsStore.holdMenuEntries.asState()
 
     /* ───────────── Custom Actions ─────────────*/
     val doubleClickAction by BehaviorSettingsStore.doubleClickAction.asStateNull()
@@ -127,17 +126,6 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
     var tempStartPos by remember { mutableStateOf(start) }
     var showDropDownMenuSettings by remember { mutableStateOf(false) }
 
-    val hold = rememberHoldToOpenSettings(
-        onSettings = {
-            showDropDownMenuSettings = true
-            tempStartPos = start
-            start = null
-            current = null
-        },
-        holdDelay = holdDelayBeforeStartingLongClickSettings.toLong(),
-        loadDuration = longCLickSettingsDuration.toLong(),
-        tolerance = holdToActivateSettingsTolerance
-    )
 
 
     /* ───────────── status bar things ───────────── */
@@ -201,6 +189,34 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
             )
         )
     }
+
+    val hold = rememberHoldToOpenSettings(
+        onSettings = {
+
+            // When the list only has 1 element, directly go to that screen, otherwise, open the menu
+            // If the list is empty, do nothing
+            if (holdMenuEntriesString.size > 1) {
+
+                showDropDownMenuSettings = true
+                tempStartPos = start
+
+            } else if (holdMenuEntriesString.size == 1) {
+                val routeToGo = when (val route = holdMenuEntriesString.first()) {
+                    SETTINGS.WIDGETS_FLOATING_APPS -> route.replace("{id}", nestId.toString())
+                    else -> route
+                }
+
+                onSettings(routeToGo)
+            }
+
+            start = null
+            current = null
+        },
+        holdDelay = holdDelayBeforeStartingLongClickSettings.toLong(),
+        loadDuration = longCLickSettingsDuration.toLong(),
+        tolerance = holdToActivateSettingsTolerance
+    )
+
 
 
     /**
@@ -364,46 +380,27 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
                                     )
                                 }
                             ) {
-                                BurgerListAction(
-                                    actions = listOf(
-                                        BurgerAction(
-                                            onClick = {
-                                                showDropDownMenuSettings = false
-                                                onSettings(SETTINGS.ROOT)
+                                val actions = holdMenuEntriesString.map {
+                                    BurgerAction(
+                                        onClick = {
+                                            showDropDownMenuSettings = false
+
+                                            val routeToGo = when (it) {
+                                                SETTINGS.WIDGETS_FLOATING_APPS -> it.replace("{id}", nestId.toString())
+                                                else -> it
                                             }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Settings,
-                                                contentDescription = null
-                                            )
-                                            Text(stringResource(R.string.settings))
-                                        },
-                                        BurgerAction(
-                                            onClick = {
-                                                showDropDownMenuSettings = false
-                                                onSettings(SETTINGS.WIDGETS_FLOATING_APPS.replace("{id}", nestId.toString()))
-                                            }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Widgets,
-                                                contentDescription = null
-                                            )
-                                            Text(stringResource(R.string.widgets))
-                                        },
-                                        BurgerAction(
-                                            onClick = {
-                                                showDropDownMenuSettings = false
-                                                onSettings(SETTINGS.WALLPAPER)
-                                            }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Wallpaper,
-                                                contentDescription = null
-                                            )
-                                            Text(stringResource(R.string.wallpaper))
+                                            onSettings(routeToGo)
                                         }
-                                    )
-                                )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Settings,
+                                            contentDescription = null
+                                        )
+                                        Text(stringResource(routeResId(it)))
+                                    }
+                                }
+
+                                BurgerListAction(actions)
                             }
                         }
                     }

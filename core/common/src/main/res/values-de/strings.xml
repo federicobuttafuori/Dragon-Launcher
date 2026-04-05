@@ -11,7 +11,6 @@
     <string name="do_not_remind_me_again">Erinnere mich nicht noch einmal daran.</string>
     <string name="coming_soon">Demnächst…</string>
     <string name="settings">Einstellungen</string>
-    <string name="appearance">Aussehen / Anpassung</string>
     <string name="appearance_tab_text">Aussehende Einstellungen ändern</string>
     <string name="fullscreen_app">Vollbild-App</string>
     <string name="app_display">App-Anzeige</string>
@@ -39,7 +38,6 @@
     <string name="version">Version</string>
     <string name="export_cancelled">Export abgebrochen</string>
     <string name="import_cancelled">Import abgebrochen</string>
-    <string name="backup_restore">Backup / Wiederherstellung</string>
     <string name="backup_restore_text">Sichern oder stellen Sie die Einstellungen und Aktionen der App wieder her, automatische Backups werden automatisch bei jedem App-Start / Pause / Beenden oder durch Drücken der \"Trigger\"-Schaltfläche unten ausgelöst</string>
     <string name="export_settings">Exporteinstellungen</string>
     <string name="import_settings">Importeinstellungen</string>

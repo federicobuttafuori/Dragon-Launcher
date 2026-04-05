@@ -1,13 +1,9 @@
 package org.elnix.dragonlauncher.ui.components.settings
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 
 /**
@@ -36,32 +32,5 @@ fun <T, R> BaseSettingObject<T, R>.asState(default: T? = null): State<T> {
 @Composable
 fun <T, R> BaseSettingObject<T, R>.asStateNull(): State<T?> {
     val ctx = LocalContext.current
-    return flow(ctx).map { it }.collectAsState(initial = null)
-}
-
-/**
- * Updates the value of this setting from within a Compose context using a coroutine.
- *
- * This provides an ergonomic way to write to settings directly in Composable, without manually
- * managing [android.content.Context] or [kotlinx.coroutines.CoroutineScope]. Launches a coroutine scoped to the current Composable.
- *
- * Example:
- * ```
- * store.primaryColor(newValue)
- * ```
- *
- * @param value The new value to set. Can be null to reset the setting to its default.
- */
-@Composable
-operator fun <T, R> BaseSettingObject<T, R>.invoke(value: T?) {
-    val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        scope.launch {
-            set(ctx, value)
-        }
-    }
-
-    return
+    return flow(ctx).collectAsState(initial = null)
 }

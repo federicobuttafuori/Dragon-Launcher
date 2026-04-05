@@ -25,26 +25,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import org.burnoutcrew.reorderable.ReorderableLazyListState
-import org.burnoutcrew.reorderable.detectReorder
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.Workspace
 import org.elnix.dragonlauncher.common.serializables.WorkspaceType
-import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.enumsui.WorkspaceAction
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @Composable
-fun WorkspaceRow(
+fun ReorderableCollectionItemScope.WorkspaceRow(
     workspace: Workspace,
-    reorderState: ReorderableLazyListState,
     isDragging: Boolean = false,
     onClick: () -> Unit,
     onCheck: (Boolean) -> Unit,
     showSamsungSettingsIcon: Boolean = false,
     onSamsungSettingsClick: (() -> Unit)? = null,
-    onAction: (WorkspaceAction) -> Unit
+    onAction: (WorkspaceAction) -> Unit,
+    onDragEnd: () -> Unit
 ) {
     val enabled = workspace.enabled
     val elevation = animateDpAsState(
@@ -111,7 +110,7 @@ fun WorkspaceRow(
                         imageVector = Icons.Default.DragIndicator,
                         contentDescription = stringResource(R.string.drag_handle),
                         tint = if (isDragging) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.detectReorder(reorderState)
+                        modifier = Modifier.draggableHandle(onDragStopped = onDragEnd)
                     )
                 }
 
@@ -166,7 +165,7 @@ fun WorkspaceRow(
                     imageVector = Icons.Default.DragIndicator,
                     contentDescription = stringResource(R.string.drag_handle),
                     tint = if (isDragging) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.detectReorder(reorderState)
+                    modifier = Modifier.draggableHandle(onDragStopped = onDragEnd)
                 )
             }
         }

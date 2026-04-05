@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
@@ -35,9 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.MainScreenLayer
 import org.elnix.dragonlauncher.common.serializables.MainScreenLayerJson
@@ -52,6 +50,8 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun MainScreeLayersOrderScreen(
@@ -72,14 +72,13 @@ fun MainScreeLayersOrderScreen(
         }
     }
 
+    val lazyListState = rememberLazyListState()
     val reorderState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
         onMove = { from, to ->
             objects = objects.toMutableList().apply {
                 add(to.index, removeAt(from.index))
             }
-        },
-        onDragEnd = { _, _ ->
-            save()
         }
     )
 
@@ -92,7 +91,7 @@ fun MainScreeLayersOrderScreen(
                 UiSettingsStore.mainScreenLayers.reset(ctx)
             }
         },
-        reorderState = reorderState,
+        listState = lazyListState,
         bottomPadding = 0.dp,
         resetTitle = stringResource(R.string.main_screen_layers_reset_title),
         resetText = stringResource(R.string.main_screen_layers_reset),
@@ -116,7 +115,10 @@ fun MainScreeLayersOrderScreen(
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .scale(scale),
+                        .scale(scale)
+                        .longPressDraggableHandle(
+                            onDragStopped = ::save
+                        ),
                     elevation = elevatedCardElevation(elevation),
                     colors = AppObjectsColors.cardColors(),
                     shape = RoundedCornerShape(12.dp)
@@ -154,12 +156,12 @@ fun MainScreeLayersOrderScreen(
                                 imageVector = Icons.Default.DragHandle,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.outline,
-                                modifier = Modifier.detectReorder(reorderState)
+                                modifier = Modifier.draggableHandle(
+                                    onDragStopped = ::save
+                                )
                             )
                         }
 
-                        // WTF it should animate but it doesn't in my phone, why, only Android knows, TODO
-                        @Suppress("UnusedExpression")
                         AnimatedVisibility(item.enabled) {
                             when (item) {
                                 is MainScreenLayer.CustomDim -> {
@@ -215,7 +217,8 @@ fun MainScreeLayersOrderScreen(
                                         }
                                     }
                                 }
-                                else -> null
+
+                                else -> {}
                             }
                         }
                     }

@@ -7,14 +7,14 @@ import org.json.JSONObject
 /**
  * Base abstract class for a collection of related settings in a [androidx.datastore.core.DataStore].
  *
- * A `BaseSettingsStore` represents a **group of settings** (e.g., all color settings,
- * all user preferences, etc.) and provides a consistent API to:
+ * A `BaseSettingsStore` represents a **group of settings** (a settings **Store**) and provides a consistent API to:
  *   - access all settings in the store,
  *   - reset them,
  *   - get/set the entire store as a single object,
  *   - import/export for backup.
  *
  * @param T The aggregate type representing the values of the entire store.
+ * @param B The aggregate type representing the backup type,I use 3 main backup types: [JSONObject], [org.json.JSONArray] and `Map<String, Any?`, which is used across the app to store conveniently data
  *
  * ### Responsibilities
  * - Defines a list of all contained settings via [ALL].
@@ -23,42 +23,21 @@ import org.json.JSONObject
  *   at once ([getAll], [setAll]).
  * - Supports backup and restore via JSON ([exportForBackup], [importFromBackup]).
  *
- * ### Example Usage
- * ```
- * class ColorSettingsStore(
- *     override val dataStoreName: DataStoreName
- * ) : BaseSettingsStore<ColorSettingsState>() {
- *
- *     override val name = "ColorSettings"
- *
- *     val primaryColor = Settings.color("primary_color", dataStoreName, AmoledDefault.Primary)
- *     val secondaryColor = Settings.color("secondary_color", dataStoreName, AmoledDefault.Secondary)
- *
- *     override val ALL: List<BaseSettingObject<*, *>> = listOf(
- *         primaryColor, secondaryColor
- *     )
- *
- *     override suspend fun getAll(ctx: Context): ColorSettingsState { ... }
- *     override suspend fun setAll(ctx: Context, value: ColorSettingsState) { ... }
- *     override suspend fun exportForBackup(ctx: Context): JSONObject? { ... }
- *     override suspend fun importFromBackup(ctx: Context, json: JSONObject) { ... }
- * }
- * ```
- *
- * ### Notes
- * - Each element in [ALL] should be a concrete subclass of [BaseSettingObject].
- * - `resetAll(ctx)` iterates over all settings in [ALL] and restores their default values.
- * - The type [T] allows a store to represent the **combined state** of all settings, useful for
- *   loading, saving, and backup in one operation.
  */
 abstract class BaseSettingsStore<T, B> {
 
-    /** Human-readable name for this settings store, e.g., "ColorSettings". */
+    /** Human-readable name for this settings store, e.g., "Colors". */
     abstract val name: String
 
     /** Identifier of the [androidx.datastore.core.DataStore] used to persist these settings. */
     abstract val dataStoreName: DataStoreName
 
+
+    /**
+     * Lambda use to detect if a setting was changed, and redirect them to the backup manager, in order to trigger a backup.
+     * The value is constructed by applying all [BaseSettingObject.onChanged] lambdas to this one.
+     * This way, on any settings changed, this lambda is triggered and I don't need to listed to ALL the settings in the app
+     */
     var onAnySettingChanged: (() -> Unit)? = null
         set(value) {
             field = value
@@ -85,7 +64,7 @@ abstract class BaseSettingsStore<T, B> {
     }
 
     /**
-     * Reads the current state of all settings in this store.
+     * Reads the current state of all settings in this store and returns it in the form of the store's backup type [T]
      *
      * @param ctx The Android [Context] required to access the underlying DataStore.
      * @return The aggregate state of type [T].
@@ -101,18 +80,18 @@ abstract class BaseSettingsStore<T, B> {
     abstract suspend fun setAll(ctx: Context, value: T)
 
     /**
-     * Exports the current state of all settings as a [JSONObject] for backup purposes.
+     * Exports the current state of all settings as a [B] type object for backup purposes.
      *
      * @param ctx The Android [Context] required to access the underlying DataStore.
-     * @return A [JSONObject] representing all settings, or `null` if nothing to export.
+     * @return A [B] representing all settings in the store's type, or `null` if nothing to export.
      */
     abstract suspend fun exportForBackup(ctx: Context): B?
 
     /**
-     * Imports settings from a [JSONObject] backup.
+     * Imports settings from a [B] type backup.
      *
      * @param ctx The Android [Context] required to access the underlying DataStore.
-     * @param json The [JSONObject] containing backup values.
+     * @param json The [B] containing backup values.
      */
     abstract suspend fun importFromBackup(ctx: Context, json: B?)
 }

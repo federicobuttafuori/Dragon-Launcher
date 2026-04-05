@@ -1,8 +1,6 @@
 package org.elnix.dragonlauncher.settings.bases
 
 import android.content.Context
-import org.elnix.dragonlauncher.common.logging.logI
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.SETTINGS_TAG
 import org.elnix.dragonlauncher.settings.putIfNonDefault
 import org.json.JSONObject
 
@@ -19,6 +17,7 @@ import org.json.JSONObject
  * - Values are read and written individually, not as a single blob.
  * - Import/export operates on raw values and relies on each `BaseSettingObject`
  *   to decode and validate its own type.
+ * - Exports data in a [JSONObject] via [getAll]
  *
  * This design enables:
  * - fine-grained persistence (only changed keys are written)
@@ -51,10 +50,10 @@ abstract class MapSettingsStore :
     override suspend fun setAll(ctx: Context, value: Map<String, Any?>) {
         ALL.forEach { setting ->
             val raw = value[setting.key]
-            logI(SETTINGS_TAG) { "Raw : $raw" }
+//            logI(SETTINGS_TAG) { "Raw : $raw" }
             val typedValue = setting.decode(raw)
 
-            logI(SETTINGS_TAG) { "Typed value : $typedValue" }
+//            logI(SETTINGS_TAG) { "Typed value : $typedValue" }
             setting.setAny(ctx, typedValue)
         }
     }

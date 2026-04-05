@@ -35,7 +35,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +54,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.DISCORD_INVITE_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.DRAGON_WEBSITE
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.ELNIX90_GITHUB_PROFILE_LINK
@@ -65,35 +64,31 @@ import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_RELEASES_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.MAILTO_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.REDDIT_LINK
-import org.elnix.dragonlauncher.common.utils.SETTINGS
-import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
+import org.elnix.dragonlauncher.common.utils.Constants.URLs.WEBLATE_LINK
 import org.elnix.dragonlauncher.common.utils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.getVersionCode
-import org.elnix.dragonlauncher.common.utils.obtainiumPackageName
 import org.elnix.dragonlauncher.common.utils.openUrl
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.settings.SettingsStoreRegistry
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.components.TextDivider
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.remembers.LocalNavController
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun AdvancedSettingsScreen(
-    onLaunchAction: (SwipeActionSerializable) -> Unit,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
-    val appsViewModel = LocalAppsViewModel.current
     val navController = LocalNavController.current
 
     val scope = rememberCoroutineScope()
@@ -101,10 +96,6 @@ fun AdvancedSettingsScreen(
     val versionCode = ctx.getVersionCode()
 
     val isDebugModeEnabled by DebugSettingsStore.debugEnabled.asState()
-
-
-    val allApps by appsViewModel.allApps.collectAsState()
-    val isObtainiumInstalled = allApps.filter { it.packageName == obtainiumPackageName }.size == 1
 
     var toast by remember { mutableStateOf<Toast?>(null) }
     val versionName = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "unknown"
@@ -307,6 +298,16 @@ fun AdvancedSettingsScreen(
                 )
 
                 Icon(
+                    painterResource(R.drawable.weblate_icon),
+                    contentDescription = "Weblate icon",
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(DragonShape)
+                        .clickable { ctx.openUrl(WEBLATE_LINK) }
+                )
+
+                Icon(
                     painterResource(R.drawable.protonmail_icon),
                     contentDescription = "Proton Mail icon",
                     tint = Color.Unspecified,
@@ -337,33 +338,14 @@ fun AdvancedSettingsScreen(
         }
 
         item {
-            if (isObtainiumInstalled) {
-                SettingItemWithExternalOpen(
-                    title = stringResource(R.string.check_for_update),
-                    description = stringResource(R.string.check_for_updates_obtainium),
-                    icon = Icons.Default.Update,
-                    leadIcon = painterResource(R.drawable.obtainium),
-                    onLongClick = { ctx.copyToClipboard(GITHUB_REPO_RELEASES_LINK) },
-                    onExtClick = { ctx.openUrl(GITHUB_REPO_RELEASES_LINK) }
-                ) {
-                    onLaunchAction(
-                        SwipeActionSerializable.LaunchApp(
-                            obtainiumPackageName,
-                            false,
-                            0
-                        )
-                    )
-                }
-            } else {
-                SettingsItem(
-                    title = stringResource(R.string.check_for_update),
-                    description = stringResource(R.string.check_for_updates_github),
-                    icon = Icons.Default.Update,
-                    leadIcon = Icons.AutoMirrored.Filled.Launch,
-                    onLongClick = { ctx.copyToClipboard(GITHUB_REPO_RELEASES_LINK) }
-                ) {
-                    ctx.openUrl(GITHUB_REPO_RELEASES_LINK)
-                }
+            SettingsItem(
+                title = stringResource(R.string.check_for_update),
+                description = stringResource(R.string.check_for_updates_github),
+                icon = Icons.Default.Update,
+                leadIcon = Icons.AutoMirrored.Filled.Launch,
+                onLongClick = { ctx.copyToClipboard(GITHUB_REPO_RELEASES_LINK) }
+            ) {
+                ctx.openUrl(GITHUB_REPO_RELEASES_LINK)
             }
         }
 
@@ -413,7 +395,6 @@ fun AdvancedSettingsScreen(
                 githubUrl = "https://github.com/YoannDev90"
             )
         }
-
 
 
         // Version name (clickable to access debug / copy)
