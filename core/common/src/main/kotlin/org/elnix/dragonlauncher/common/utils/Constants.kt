@@ -217,6 +217,7 @@ object Constants {
         val WELCOME_TAG = LogTag("WelcomeDebug")
         val MAIN_SCREEN_LAYERS_TAG = LogTag("MainScreenLayersTag")
         val SHIZUKU_TAG = LogTag("ShizukuDebug")
+        val NAVIGATION_TAG = LogTag("NavigationDebug")
     }
 
     /*  ─────────────  Links  ─────────────  */

@@ -78,6 +78,7 @@ import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.ANGLE_LINE_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.APP_LAUNCH_TAG
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.NAVIGATION_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.SHIZUKU_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
@@ -443,8 +444,15 @@ fun MainAppUi(
 
         fun go() {
             if (popBackStack) {
-                navController.popBackStack(route, inclusive = false)
+                logD(NAVIGATION_TAG) { "Popping back stack to $route" }
+                val popped = navController.popBackStack(route, inclusive = false)
+                if (!popped) {
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                    }
+                }
             } else {
+                logD(NAVIGATION_TAG) { "Navigating to $route" }
                 navController.navigate(route)
             }
         }
