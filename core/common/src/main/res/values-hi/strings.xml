@@ -118,11 +118,9 @@
     <string name="search_apps">ऐप्स खोजें</string>
     <string name="remove_from_workspace">कार्यस्थान से निकालें</string>
     <string name="add_to_workspace">कार्यस्थान में जोड़ें</string>
-    <string name="change_app_icon">ऐप आइकन बदलें</string>
     <string name="app_info">ऐप की जानकारी</string>
     <string name="uninstall">स्थापना रद्द करें</string>
     <string name="open">खोलना</string>
-    <string name="rename_app">ऐप का नाम बदलें</string>
     <string name="icon_updated">आइकन अपडेट किया गया</string>
     <string name="icon_update_failed">चिह्न अद्यतन विफल रहा</string>
     <string name="none">कोई नहीं</string>
@@ -363,7 +361,6 @@
     <string name="fast_minimal_powerful_gestures_infinite_custom">तेज़। न्यूनतम. शक्तिशाली इशारे. अनंत अनुकूलन</string>
     <string name="customize_apps">अनुप्रयोगों को अनुकूलित करें</string>
     <string name="dont_customize">अनुकूलित न करें और सीधे ड्रैगन लॉन्चर का उपयोग प्रारंभ न करें</string>
-    <string name="app_aliases">ऐप उपनाम</string>
     <string name="edit_alias">उपनाम संपादित करें</string>
     <string name="alias">उपनाम</string>
     <string name="add_alias">उपनाम जोड़ें</string>
@@ -629,7 +626,7 @@
     <string name="hold_delay_before_starting_long_click_settings_desc">लोडिंग सेटिंग्स लोड होने से पहले कितनी देर तक होल्ड करना है</string>
     <string name="keep_screen_on_desc">स्क्रीन को बंद या लॉक न करें, ड्रैगन पर ध्यान केंद्रित होने पर इसे हमेशा चालू रखें</string>
     <string name="drag_zone_padding">ज़ोन पैडिंग खींचें</string>
-    <string name="points_settings">प्वाइंट सेटिंग्स (डिफ़ॉल्ट)</string>
+    <string name="points_settings">प्वाइंट सेटिंग्स</string>
     <string name="logs">लॉग्स</string>
     <string name="settings_json">सेटिंग्स JSON</string>
     <string name="pick_a_settings_screen">एक सेटिंग स्क्रीन चुनें</string>

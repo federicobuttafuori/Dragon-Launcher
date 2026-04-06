@@ -73,5 +73,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
 
+    implementation(project(":core:logging"))
     implementation(project(":core:common"))
 }

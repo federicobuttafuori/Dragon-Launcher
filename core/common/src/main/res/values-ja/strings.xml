@@ -120,11 +120,10 @@
     <string name="search_apps">検索アプリ</string>
     <string name="remove_from_workspace">ワークスペースから削除する</string>
     <string name="add_to_workspace">ワークスペースに追加</string>
-    <string name="change_app_icon">アプリアイコンの変更</string>
     <string name="app_info">アプリ情報</string>
     <string name="uninstall">アンインストール</string>
     <string name="open">開けて</string>
-    <string name="rename_app">リネームアプリ</string>
+    <string name="rename">リネームアプリ</string>
     <string name="icon_updated">アイコンが更新されました</string>
     <string name="icon_update_failed">アイコンアップデートに失敗</string>
     <string name="none">全くありません</string>

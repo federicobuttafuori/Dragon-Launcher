@@ -46,7 +46,10 @@ class IconShapeAdapter :
             IconShape.PlatformDefault -> obj.addProperty("type", "PlatformDefault")
             IconShape.Circle -> obj.addProperty("type", "Circle")
             IconShape.Square -> obj.addProperty("type", "Square")
-            IconShape.RoundedSquare -> obj.addProperty("type", "RoundedSquare")
+
+            // I encode Dragon the same way I encode Rounded square, cause I removed it. I keep if for legacy purposes
+
+            IconShape.RoundedSquare, IconShape.Dragon -> obj.addProperty("type", "RoundedSquare")
             IconShape.Triangle -> obj.addProperty("type", "Triangle")
             IconShape.Squircle -> obj.addProperty("type", "Squircle")
             IconShape.Hexagon -> obj.addProperty("type", "Hexagon")

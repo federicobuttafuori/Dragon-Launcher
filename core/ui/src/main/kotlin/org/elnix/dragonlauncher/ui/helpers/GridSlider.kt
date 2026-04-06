@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.AppModel
-import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.components.settings.asState
 
 @Composable
@@ -73,8 +73,11 @@ fun GridSizeSlider(apps: List<AppModel>) {
                 txtColor = MaterialTheme.colorScheme.onBackground,
                 showIcons = showIcons,
                 showLabels = showLabels,
-                useCategory = useCategory
-            ) { }
+                useCategory = useCategory,
+                longPressPopup = null,
+                onLongClick = null,
+                onClick = null
+            )
         }
     }
 }

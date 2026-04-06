@@ -4,13 +4,13 @@ import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.enumsui.DrawerActions
 import org.elnix.dragonlauncher.enumsui.DrawerToolbar
 import org.elnix.dragonlauncher.settings.DataStoreName
-import org.elnix.dragonlauncher.settings.Settings.boolean
-import org.elnix.dragonlauncher.settings.Settings.enum
-import org.elnix.dragonlauncher.settings.Settings.float
-import org.elnix.dragonlauncher.settings.Settings.int
-import org.elnix.dragonlauncher.settings.Settings.shape
-import org.elnix.dragonlauncher.settings.Settings.string
-import org.elnix.dragonlauncher.settings.Settings.stringSet
+import org.elnix.dragonlauncher.settings.bases.Settings.boolean
+import org.elnix.dragonlauncher.settings.bases.Settings.enum
+import org.elnix.dragonlauncher.settings.bases.Settings.float
+import org.elnix.dragonlauncher.settings.bases.Settings.int
+import org.elnix.dragonlauncher.settings.bases.Settings.shape
+import org.elnix.dragonlauncher.settings.bases.Settings.string
+import org.elnix.dragonlauncher.settings.bases.Settings.stringSet
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
 

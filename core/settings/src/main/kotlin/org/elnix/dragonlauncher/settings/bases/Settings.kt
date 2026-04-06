@@ -1,4 +1,4 @@
-package org.elnix.dragonlauncher.settings
+package org.elnix.dragonlauncher.settings.bases
 
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -8,17 +8,17 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import org.elnix.dragonlauncher.common.logging.logI
 import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.IconShapeGson
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
+import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
-import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
+import org.elnix.dragonlauncher.logging.logI
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 
 /**
- * Factory object for creating typed [org.elnix.dragonlauncher.settings.bases.BaseSettingObject] instances backed by DataStore.
+ * Factory object for creating typed [BaseSettingObject] instances backed by DataStore.
  *
  * This object provides convenient functions to create strongly-typed settings without
  * manually specifying generic parameters or creating dedicated subclasses for every type.
@@ -26,9 +26,9 @@ import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
  * Supported types include:
  * - Primitive types: [Boolean], [Int], [Long], [Float], [Double], [String], [Set<String>]
  * - Enum types: any [Enum] using its name as the stored string
- * - Complex types: [Color] and [SwipeActionSerializable], with proper encode/decode handling
+ * - Complex types: [androidx.compose.ui.graphics.Color] and [org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable], with proper encode/decode handling
  *
- * Each function returns a [org.elnix.dragonlauncher.settings.bases.BaseSettingObject] which can be used to get/set values, reset
+ * Each function returns a [BaseSettingObject] which can be used to get/set values, reset
  * the setting, or observe changes via flows.
  *
  * Example usage:
@@ -46,11 +46,11 @@ import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
  * )
  * ```
  */
-object Settings {
+internal object Settings {
 
     fun boolean(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Boolean,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<Boolean, Boolean> =
@@ -66,7 +66,7 @@ object Settings {
 
     fun int(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Int,
         allowedRange: ClosedRange<Int>,
         onChange: (() -> Unit)? = null
@@ -84,7 +84,7 @@ object Settings {
 
     fun float(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Float,
         allowedRange: ClosedRange<Float>,
         onChange: (() -> Unit)? = null
@@ -101,7 +101,7 @@ object Settings {
 
     fun long(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Long,
         allowedRange: ClosedRange<Long>,
         onChange: (() -> Unit)? = null
@@ -118,7 +118,7 @@ object Settings {
 
     fun double(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Double,
         allowedRange: ClosedRange<Double>,
         onChange: (() -> Unit)? = null
@@ -136,7 +136,7 @@ object Settings {
 
     fun string(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: String,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<String, String> =
@@ -152,7 +152,7 @@ object Settings {
 
     fun stringSet(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Set<String>,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<Set<String>, Set<String>> =
@@ -168,7 +168,7 @@ object Settings {
 
     fun stringList(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: List<String>,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<List<String>, String> =
@@ -180,7 +180,7 @@ object Settings {
             encode = { list ->
 
                 val encoded = list.joinToString(",")
-                logI(BACKUP_TAG) { "Encoded: $encoded" }
+                logI(Constants.Logging.BACKUP_TAG) { "Encoded: $encoded" }
                 encoded
             },
             decode = { raw -> getStringListStrict(raw, default) },
@@ -189,7 +189,7 @@ object Settings {
 
     fun <E : Enum<E>> enum(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: E,
         enumClass: Class<E>,
         onChange: (() -> Unit)? = null
@@ -206,7 +206,7 @@ object Settings {
 
     fun <E : Enum<E>> enumList(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: List<E>,
         enumClass: Class<E>,
         onChange: (() -> Unit)? = null
@@ -226,7 +226,7 @@ object Settings {
 
     fun color(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: Color,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<Color, String> =
@@ -242,7 +242,7 @@ object Settings {
 
     fun swipeAction(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: SwipeActionSerializable,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<SwipeActionSerializable, String> =
@@ -259,7 +259,7 @@ object Settings {
 
     fun shape(
         key: String,
-        dataStoreName: DataStoreName,
+        dataStoreName: DatastoreProvider,
         default: IconShape,
         onChange: (() -> Unit)? = null
     ): BaseSettingObject<IconShape, String> =

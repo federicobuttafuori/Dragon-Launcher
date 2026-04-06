@@ -207,6 +207,9 @@ fun MainScreen(onLaunchAction: (SwipePointSerializable) -> Unit) {
                 }
 
                 onSettings(routeToGo)
+            } else {
+                // If list if empty, directly navigate to settings root. Never block the user out of settings
+                onSettings(SETTINGS.ROOT)
             }
 
             start = null

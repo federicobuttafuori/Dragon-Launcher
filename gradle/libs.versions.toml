@@ -21,9 +21,8 @@ timber = "5.0.1"
 runtime = "1.10.6"
 kotlinx-serialization = "1.10.0"
 shapeindicators = "2.1.0"
-
 #noinspection NewerVersionAvailable
-shizuku = "13.1.0" # Don't update this (deprecated usage in newer versions)
+shizuku = "13.1.0"
 
 [libraries]
 android-image-cropper = { module = "com.vanniktech:android-image-cropper", version.ref = "androidImageCropper" }

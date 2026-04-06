@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.settings.bases
 
 import android.content.Context
-import org.elnix.dragonlauncher.settings.DataStoreName
 import org.json.JSONObject
 
 /**
@@ -30,7 +29,7 @@ abstract class BaseSettingsStore<T, B> {
     abstract val name: String
 
     /** Identifier of the [androidx.datastore.core.DataStore] used to persist these settings. */
-    abstract val dataStoreName: DataStoreName
+    abstract val dataStoreName: DatastoreProvider
 
 
     /**

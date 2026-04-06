@@ -26,7 +26,7 @@ import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons
 import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons.DESELECT_ALL
 import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons.INVERT
 import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons.SELECT_ALL
-import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
@@ -36,13 +36,13 @@ import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButton
 @Composable
 fun ExportSettingsDialog(
     onDismiss: () -> Unit,
-    availableStores: Map<DataStoreName, BaseSettingsStore<*, *>> = backupableStores,
-    defaultStores: Map<DataStoreName, BaseSettingsStore<*, *>> = backupableStores,
-    onConfirm: (selectedStores: Map<DataStoreName, BaseSettingsStore<*, *>>) -> Unit
+    availableStores: Map<DatastoreProvider, BaseSettingsStore<*, *>> = backupableStores,
+    defaultStores: Map<DatastoreProvider, BaseSettingsStore<*, *>> = backupableStores,
+    onConfirm: (selectedStores: Map<DatastoreProvider, BaseSettingsStore<*, *>>) -> Unit
 ) {
 
     val selected = remember(availableStores) {
-        mutableStateMapOf<DataStoreName, Boolean>().apply {
+        mutableStateMapOf<DatastoreProvider, Boolean>().apply {
             availableStores.forEach { put(it.key, it.value in defaultStores.values) }
         }
     }
@@ -121,8 +121,8 @@ fun <T> SelectedActionRow(
 
 @Composable
 fun StoreItem(
-    selected: SnapshotStateMap<DataStoreName, Boolean>,
-    dataStoreName: DataStoreName,
+    selected: SnapshotStateMap<DatastoreProvider, Boolean>,
+    dataStoreName: DatastoreProvider,
     settingsStore: BaseSettingsStore<*, *>
 ) {
     Row(

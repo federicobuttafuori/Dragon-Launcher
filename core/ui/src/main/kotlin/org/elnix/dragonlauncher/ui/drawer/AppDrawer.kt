@@ -77,7 +77,6 @@ import kotlinx.coroutines.yield
 import org.elnix.dragonlauncher.base.ktx.px
 import org.elnix.dragonlauncher.base.ktx.toDp
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.logging.logD
 import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
@@ -99,6 +98,7 @@ import org.elnix.dragonlauncher.enumsui.DrawerActions.SEARCH_WEB
 import org.elnix.dragonlauncher.enumsui.DrawerActions.TOGGLE_KB
 import org.elnix.dragonlauncher.enumsui.DrawerToolbar
 import org.elnix.dragonlauncher.enumsui.isUsed
+import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
@@ -107,7 +107,7 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonDropDownMenu
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AppAliasesDialog
-import org.elnix.dragonlauncher.ui.dialogs.AppLongPressPopup
+import org.elnix.dragonlauncher.ui.dialogs.AppLongPressRow
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.dialogs.RenameAppDialog
 import org.elnix.dragonlauncher.ui.helpers.AppDrawerSearch
@@ -186,7 +186,6 @@ fun AppDrawerScreen(
     var haveToLaunchFirstApp by remember { mutableStateOf(false) }
 
     var searchQuery by remember { mutableStateOf("") }
-    var dialogApp by remember { mutableStateOf<AppModel?>(null) }
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -459,6 +458,55 @@ fun AppDrawerScreen(
     val pullDownPadding = if (pullDownAnimations) pullOffset else 0f
     val animatedPadding by animateDpAsState(targetValue = pullDownPadding.toDp)
 
+    @Composable
+    fun AppLongPressRow(app: AppModel) {
+        val cacheKey = app.iconCacheKey
+
+        AppLongPressRow(
+            app = app,
+            onOpen = { onLaunchAction(app.action) },
+            onSettings = if (!app.isPrivateProfile && !app.isWorkProfile) {
+                {
+                    ctx.startActivity(
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = "package:${app.packageName}".toUri()
+                        }
+                    )
+                    onClose()
+                }
+            } else null,
+            onUninstall = if (!app.isPrivateProfile && !app.isWorkProfile) {
+                {
+                    ctx.startActivity(
+                        Intent(Intent.ACTION_DELETE).apply {
+                            data = "package:${app.packageName}".toUri()
+                        }
+                    )
+                    onClose()
+                }
+            } else null,
+            onRemoveFromWorkspace = if (!app.isPrivateProfile) {
+                {
+                    workspaceId?.let { wsId ->
+                        scope.launch {
+                            appsViewModel.removeAppFromWorkspace(
+                                workspaceId = wsId,
+                                cacheKey = cacheKey
+                            )
+                        }
+                    }
+                }
+            } else null,
+            onRenameApp = {
+                renameText = app.name
+                renameTarget = app
+            },
+            onChangeAppIcon = { appTarget = app },
+            onAliases = { showAliasDialog = app }
+        )
+    }
+
+
 
     /* ───────────── Dim wallpaper system ───────────── */
     val wallpaperDimDrawerScreen by UiSettingsStore.wallpaperDimDrawerScreen.asState()
@@ -470,7 +518,6 @@ fun AppDrawerScreen(
     val dimAmount = wallpaperDimDrawerScreen *
             if (pullDownWallPaperDimFadeEnabled) animatedDim
             else 1f
-
 
     WallpaperDim(dimAmount)
 
@@ -622,7 +669,8 @@ fun AppDrawerScreen(
                                         else appsViewModel.reloadApps()
                                     }
                                 },
-                                onLongClick = { dialogApp = it }
+                                onLongClick = null,
+                                longPressPopup = { app -> AppLongPressRow(app) }
                             ) {
                                 onLaunchAction(it.action)
                             }
@@ -671,7 +719,8 @@ fun AppDrawerScreen(
                                     showIcons = showIcons,
                                     showLabels = showLabels,
                                     fillMaxSize = false,
-                                    onLongClick = { dialogApp = it }
+                                    onLongClick = null,
+                                    longPressPopup = { app -> AppLongPressRow(app) }
                                 ) {
                                     onLaunchAction(it.action)
                                 }
@@ -733,62 +782,14 @@ fun AppDrawerScreen(
         }
     }
 
-    if (dialogApp != null) {
-        val app = dialogApp!!
-        val cacheKey = app.iconCacheKey
 
-        AppLongPressPopup(
-            expanded = { true },
-            app = app,
-            onDismiss = { dialogApp = null },
-            onOpen = { onLaunchAction(app.action) },
-            onSettings = if (!app.isPrivateProfile && !app.isWorkProfile) {
-                {
-                    ctx.startActivity(
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = "package:${app.packageName}".toUri()
-                        }
-                    )
-                    onClose()
-                }
-            } else null,
-            onUninstall = if (!app.isPrivateProfile && !app.isWorkProfile) {
-                {
-                    ctx.startActivity(
-                        Intent(Intent.ACTION_DELETE).apply {
-                            data = "package:${app.packageName}".toUri()
-                        }
-                    )
-                    onClose()
-                }
-            } else null,
-            onRemoveFromWorkspace = if (!app.isPrivateProfile) {
-                {
-                    workspaceId?.let { wsId ->
-                        scope.launch {
-                            appsViewModel.removeAppFromWorkspace(
-                                workspaceId = wsId,
-                                cacheKey = cacheKey
-                            )
-                        }
-                    }
-                }
-            } else null,
-            onRenameApp = {
-                renameText = app.name
-                renameTarget = app
-            },
-            onChangeAppIcon = { appTarget = app },
-            onAliases = { showAliasDialog = app }
-        )
-    }
 
     if (renameTarget != null) {
         val app = renameTarget!!
         val cacheKey = app.iconCacheKey
 
         RenameAppDialog(
-            title = stringResource(R.string.rename_app),
+            title = stringResource(R.string.rename),
             name = { renameText },
             onNameChange = { renameText = it },
             onConfirm = {

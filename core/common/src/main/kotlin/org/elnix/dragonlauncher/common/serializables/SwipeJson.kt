@@ -2,12 +2,13 @@ package org.elnix.dragonlauncher.common.serializables
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.elnix.dragonlauncher.common.logging.logE
 import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.utils.BluetoothADBCommands
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.SWIPE_TAG
 import org.elnix.dragonlauncher.common.utils.DataADBCommands
 import org.elnix.dragonlauncher.common.utils.WifiADBCommands
+import org.elnix.dragonlauncher.logging.logD
+import org.elnix.dragonlauncher.logging.logE
 import java.util.UUID
 
 
@@ -56,6 +57,7 @@ sealed class SwipeActionSerializable {
 
     @Serializable
     data class OpenUrl(val url: String) : SwipeActionSerializable()
+
     @Serializable
     data class OpenFile(
         val uri: String,
@@ -64,21 +66,28 @@ sealed class SwipeActionSerializable {
 
     @Serializable
     object NotificationShade : SwipeActionSerializable()
+
     @Serializable
     object ControlPanel : SwipeActionSerializable()
+
     @Serializable
     data class OpenAppDrawer(val workspaceId: String? = null) : SwipeActionSerializable()
+
     @Serializable
     data class OpenDragonLauncherSettings(val route: String = SETTINGS.ROOT) : SwipeActionSerializable()
+
     @Serializable
     object Lock : SwipeActionSerializable()
+
     @Serializable
     object ReloadApps : SwipeActionSerializable()
 
     @Serializable
     object OpenRecentApps : SwipeActionSerializable()
+
     @Serializable
     data class OpenCircleNest(val nestId: Int) : SwipeActionSerializable()
+
     @Serializable
     object GoParentNest : SwipeActionSerializable()
 
@@ -99,7 +108,7 @@ sealed class SwipeActionSerializable {
     data class ToggleBluetooth(
         val command: BluetoothADBCommands = BluetoothADBCommands.Cmd,
         val toast: Boolean? = false
-    ): SwipeActionSerializable()
+    ) : SwipeActionSerializable()
 
     @Serializable
     data class ToggleData(
@@ -114,7 +123,7 @@ sealed class SwipeActionSerializable {
     ) : SwipeActionSerializable()
 
     @Serializable
-object None : SwipeActionSerializable()
+    object None : SwipeActionSerializable()
 }
 
 object SwipeJson {
@@ -132,16 +141,20 @@ object SwipeJson {
 
     /* ───────────── Points ───────────── */
 
-    fun encodePoints(points: List<SwipePointSerializable>): String =
-        jsonConfig.encodeToString(points)
+    fun encodePoints(points: List<SwipePointSerializable>): String {
+        return jsonConfig.encodeToString(points)
+    }
 
     fun encodePointsPretty(points: List<SwipePointSerializable>): String =
         jsonPretty.encodeToString(points)
 
     fun decodePoints(json: String): List<SwipePointSerializable> {
         return try {
-            jsonConfig.decodeFromString<List<SwipePointSerializable>>(json)
-                .takeIf { it.isNotEmpty() }
+            val decoded = jsonConfig.decodeFromString<List<SwipePointSerializable>>(json)
+
+            logD(SWIPE_TAG) { "Decoded value:\n$decoded" }
+
+            decoded.takeIf { it.isNotEmpty() }
                 // If empty, but no errors reported, try the old method anyways
                 ?: LegacySwipeJson.decodePoints(json)
         } catch (e: Exception) {

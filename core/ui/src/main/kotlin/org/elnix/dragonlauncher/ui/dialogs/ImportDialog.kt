@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
@@ -24,7 +24,7 @@ import org.json.JSONObject
 fun ImportSettingsDialog(
     backupJson: JSONObject,
     onDismiss: () -> Unit,
-    onConfirm: (selectedStores: Map<DataStoreName, BaseSettingsStore<*,*>>) -> Unit
+    onConfirm: (selectedStores: Map<DatastoreProvider, BaseSettingsStore<*,*>>) -> Unit
 ) {
 
     // Filter stores that exist in backup JSON
@@ -34,7 +34,7 @@ fun ImportSettingsDialog(
     }
 
     val selected = remember(availableStores) {
-        mutableStateMapOf<DataStoreName, Boolean>().apply {
+        mutableStateMapOf<DatastoreProvider, Boolean>().apply {
             availableStores.forEach { put(it.key, true) }
         }
     }

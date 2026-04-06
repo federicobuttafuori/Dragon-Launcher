@@ -25,6 +25,7 @@ import org.elnix.dragonlauncher.settings.DataStoreName.WELLBEING
 import org.elnix.dragonlauncher.settings.DataStoreName.WIDGETS
 import org.elnix.dragonlauncher.settings.DataStoreName.WORKSPACES
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.stores.AngleLineSettingsStore
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore
@@ -46,11 +47,14 @@ import org.elnix.dragonlauncher.settings.stores.WellbeingSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WidgetsSettingsStore
 import org.elnix.dragonlauncher.settings.stores.WorkspaceSettingsStore
 
-enum class  DataStoreName(
-    val value: String,
-    val backupKey: String,
-    val userBackup: Boolean = true
-) {
+
+
+
+enum class DataStoreName(
+    override val value: String,
+    override val backupKey: String,
+    override val userBackup: Boolean = true
+) : DatastoreProvider {
     UI("uiDatastore", "ui"),
     COLOR_MODE("colorModeDatastore", "color_mode"),
     COLOR("colorDatastore", "color"),
@@ -60,7 +64,7 @@ enum class  DataStoreName(
     DRAWER("drawerDatastore", "drawer"),
     DEBUG("debugDatastore", "debug"),
     WORKSPACES("workspacesDataStore", "workspaces"),
-    PRIVATE_APPS("privateAppsDatastore","private_apps", false),
+    PRIVATE_APPS("privateAppsDatastore", "private_apps", false),
     BEHAVIOR("behaviorDatastore", "behavior"),
     BACKUP("backupDatastore", "backup"),
     STATUS_BAR("statusDatastore", "status_bar"),
@@ -75,7 +79,7 @@ enum class  DataStoreName(
 
 
 object SettingsStoreRegistry {
-    val byName: Map<DataStoreName, BaseSettingsStore<*,*>> = mapOf(
+    val byName: Map<DatastoreProvider, BaseSettingsStore<*, *>> = mapOf(
         UI to UiSettingsStore,
         COLOR_MODE to ColorModesSettingsStore,
         COLOR to ColorSettingsStore,
@@ -132,8 +136,7 @@ private val Context.angleLineDatastore by preferencesDataStore(name = ANGLE_LINE
 private val Context.holeToActivateDatastore by preferencesDataStore(name = HOLD_TO_ACTIVATE.value)
 
 
-
-internal fun Context.resolveDataStore(name: DataStoreName): DataStore<Preferences> {
+internal fun Context.resolveDataStore(name: DatastoreProvider): DataStore<Preferences> {
     val appCtx = this.applicationContext
     return when (name) {
         UI -> appCtx.uiDatastore
@@ -156,5 +159,6 @@ internal fun Context.resolveDataStore(name: DataStoreName): DataStore<Preference
         STATUS_BAR_JSON -> appCtx.statusBarJsonDataStore
         ANGLE_LINE -> appCtx.angleLineDatastore
         HOLD_TO_ACTIVATE -> appCtx.holeToActivateDatastore
-    }
+        else -> null
+    } ?: error("Datastore not found")
 }
