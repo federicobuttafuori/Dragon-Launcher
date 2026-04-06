@@ -14,13 +14,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.definedOrNull
-import org.elnix.dragonlauncher.models.AppsViewModel
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.components.settings.asStateNull
@@ -73,8 +71,11 @@ fun IconPackTab(
                         txtColor = MaterialTheme.colorScheme.onBackground,
                         gridSize = 6,
                         showIcons = true,
-                        showLabels = false
-                    ) { }
+                        showLabels = false,
+                        longPressPopup = null,
+                        onLongClick = null,
+                        onClick = null
+                    )
                 }
             }
         }

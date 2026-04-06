@@ -120,11 +120,10 @@
     <string name="search_apps">Aplicativos de Busca</string>
     <string name="remove_from_workspace">Remover do Workspace</string>
     <string name="add_to_workspace">Adicionar ao Espaço de Trabalho</string>
-    <string name="change_app_icon">Ícone de Mudança de App</string>
     <string name="app_info">Informações do App</string>
     <string name="uninstall">Desinstalar</string>
     <string name="open">Aberto</string>
-    <string name="rename_app">Renomear o App</string>
+    <string name="rename">Renomear</string>
     <string name="icon_updated">Ícone Atualizado</string>
     <string name="icon_update_failed">Atualização do ícone falhou</string>
     <string name="none">Nenhum</string>

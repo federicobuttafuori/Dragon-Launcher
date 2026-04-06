@@ -45,6 +45,10 @@ sealed class IconShape {
     data class Custom(
         val shape: CustomIconShapeSerializable
     ) : IconShape()
+
+    // Not used anymore, it's here for legacy purposes, because it makes the import fail if people has some
+    @Serializable
+    object Dragon : IconShape()
 }
 
 

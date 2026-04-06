@@ -119,11 +119,11 @@
     <string name="search_apps">Applications de recherche</string>
     <string name="remove_from_workspace">Retirer de l’espace de travail</string>
     <string name="add_to_workspace">Ajouter à l’espace de travail</string>
-    <string name="change_app_icon">Icône de changement d’application</string>
+    <string name="change_app_icon">Changer l\'Icône</string>
     <string name="app_info">Infos sur l’application</string>
     <string name="uninstall">Désinstaller</string>
     <string name="open">Ouvrir</string>
-    <string name="rename_app">Renommer l’application</string>
+    <string name="rename">Renommer</string>
     <string name="icon_updated">Icône mise à jour</string>
     <string name="icon_update_failed">Mise à jour d’icônes échouée</string>
     <string name="none">Aucun</string>
@@ -630,7 +630,7 @@
     <string name="hold_delay_before_starting_long_click_settings_desc">Combien de temps faut-il tenir avant que les réglages de chargement ne commencent à se charger</string>
     <string name="keep_screen_on_desc">Ne désactivez pas l’écran ni ne verrouillez, gardez-le toujours allumé quand Dragon est concentré</string>
     <string name="drag_zone_padding">Rembourrage de zone de traînée</string>
-    <string name="points_settings">Réglages de points (par défaut)</string>
+    <string name="points_settings">Réglages de points</string>
     <string name="logs">Journaux d’ajournement</string>
     <string name="settings_json">Paramètres JSON</string>
     <string name="pick_a_settings_screen">Choisissez un écran de paramètres</string>

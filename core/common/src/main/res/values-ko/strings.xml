@@ -120,11 +120,9 @@
     <string name="search_apps">검색 앱</string>
     <string name="remove_from_workspace">작업 공간에서 제거하기</string>
     <string name="add_to_workspace">작업 공간에 추가</string>
-    <string name="change_app_icon">앱 아이콘 변경</string>
     <string name="app_info">앱 정보</string>
     <string name="uninstall">삭제</string>
     <string name="open">오픈</string>
-    <string name="rename_app">이름 변경 앱</string>
     <string name="icon_updated">아이콘 업데이트</string>
     <string name="icon_update_failed">아이콘 업데이트 실패</string>
     <string name="none">전혀 없습니다</string>

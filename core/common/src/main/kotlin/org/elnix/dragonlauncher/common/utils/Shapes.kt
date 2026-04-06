@@ -29,7 +29,7 @@ fun IconShape?.resolveShape(default: IconShape = IconShape.PlatformDefault): Sha
         IconShape.PlatformDefault -> PlatformShape
         IconShape.Circle -> CircleShape
         IconShape.Square -> RectangleShape
-        IconShape.RoundedSquare -> RoundedCornerShape(25)
+        IconShape.RoundedSquare, IconShape.Dragon -> RoundedCornerShape(25)
         IconShape.Triangle -> TriangleShape
         IconShape.Squircle -> SquircleShape
         IconShape.Hexagon -> HexagonShape

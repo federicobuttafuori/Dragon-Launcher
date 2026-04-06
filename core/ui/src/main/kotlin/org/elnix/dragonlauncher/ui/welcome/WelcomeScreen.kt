@@ -44,12 +44,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import `in`.hridayan.shapeindicators.ShapeIndicatorRow
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.logging.logD
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.WELCOME_TAG
+import org.elnix.dragonlauncher.logging.logD
+import org.elnix.dragonlauncher.logging.logE
 import org.elnix.dragonlauncher.models.BackupResult
-import org.elnix.dragonlauncher.settings.DataStoreName
-import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
@@ -233,6 +234,7 @@ fun WelcomeScreen(
                             )
                             importJson = null
                         } catch (e: Exception) {
+                            logE(BACKUP_TAG, e) { "Import Failed" }
                             backupViewModel.setResult(
                                 BackupResult(
                                     export = false,

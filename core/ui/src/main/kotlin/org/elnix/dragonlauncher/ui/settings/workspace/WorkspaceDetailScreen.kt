@@ -41,7 +41,7 @@ import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButton
 import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AppAliasesDialog
-import org.elnix.dragonlauncher.ui.dialogs.AppLongPressPopup
+import org.elnix.dragonlauncher.ui.dialogs.AppLongPressRow
 import org.elnix.dragonlauncher.ui.dialogs.AppPickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.dialogs.RenameAppDialog
@@ -81,7 +81,6 @@ fun WorkspaceDetailScreen(
 
 
     var showAppPicker by remember { mutableStateOf(false) }
-    var showDetailScreen by remember { mutableStateOf<AppModel?>(null) }
 
     var renameTarget by remember { mutableStateOf<AppModel?>(null) }
     var renameText by remember { mutableStateOf("") }
@@ -90,75 +89,11 @@ fun WorkspaceDetailScreen(
 
     var iconTargetApp by remember { mutableStateOf<AppModel?>(null) }
 
-    Box(Modifier.fillMaxSize()) {
-        SettingsScaffold(
-            title = "${stringResource(R.string.workspace)}: ${workspace.name}",
-            onBack = onBack,
-            helpText = stringResource(R.string.workspace_detail_help),
-            onReset = { appsViewModel.resetWorkspace(workspaceId) },
-            resetTitle = stringResource(R.string.reset_workspace),
-            resetText = stringResource(R.string.reset_this_workspace_to_default_apps),
-            content = {
-
-                MultiSelectConnectedButtonRow(
-                    entries = WorkspaceViewMode.entries,
-                    showLabels = ShowLabels.Selected,
-                    isChecked = { it == selectedView }
-                ) {
-                    selectedView = it
-                }
-
-                AppGrid(
-                    apps = apps.sortedBy { it.name },
-                    gridSize = gridSize,
-                    txtColor = Color.White,
-                    showIcons = showIcons,
-                    showLabels = showLabels,
-                    onLongClick = { showDetailScreen = it },
-                    onClick = { app -> showDetailScreen = app }
-                )
-            }
-        )
-
-        FloatingActionButton(
-            onClick = { showAppPicker = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary
-        ) {
-            Icon(Icons.Default.Add, null)
-        }
-
-        if (workspaceDebugInfos) {
-            Column(
-                modifier = Modifier.background(Color.DarkGray.copy(0.5f))
-            ) {
-                Text(workspace.toString())
-            }
-        }
-    }
-
-    if (showAppPicker) {
-        AppPickerDialog(
-            gridSize = gridSize,
-            showIcons = showIcons,
-            showLabels = showLabels,
-            onDismiss = { showAppPicker = false },
-            onAppSelected = { app ->
-                scope.launch {
-                    appsViewModel.addAppToWorkspace(workspaceId, app.iconCacheKey)
-                }
-            }
-        )
-    }
-
-    if (showDetailScreen != null) {
-        val app = showDetailScreen!!
+    @Composable
+    fun AppLongPressRow(app: AppModel) {
         val cacheKey = app.iconCacheKey
 
-        AppLongPressPopup(
-            expanded = { true },
+        AppLongPressRow(
             app = app,
             onOpen = { onLaunchAction(app.action) },
             onSettings = if (!app.isPrivateProfile && !app.isWorkProfile) {
@@ -215,16 +150,82 @@ fun WorkspaceDetailScreen(
             onChangeAppIcon = {
                 iconTargetApp = app
             },
-            onDismiss = { showDetailScreen = null },
             onAliases = { showAliasDialog = app }
         )
     }
+
+
+    Box(Modifier.fillMaxSize()) {
+        SettingsScaffold(
+            title = "${stringResource(R.string.workspace)}: ${workspace.name}",
+            onBack = onBack,
+            helpText = stringResource(R.string.workspace_detail_help),
+            onReset = { appsViewModel.resetWorkspace(workspaceId) },
+            resetTitle = stringResource(R.string.reset_workspace),
+            resetText = stringResource(R.string.reset_this_workspace_to_default_apps),
+            content = {
+
+                MultiSelectConnectedButtonRow(
+                    entries = WorkspaceViewMode.entries,
+                    showLabels = ShowLabels.Selected,
+                    isChecked = { it == selectedView }
+                ) {
+                    selectedView = it
+                }
+
+                AppGrid(
+                    apps = apps.sortedBy { it.name },
+                    gridSize = gridSize,
+                    txtColor = Color.White,
+                    showIcons = showIcons,
+                    showLabels = showLabels,
+                    onLongClick = null,
+                    longPressPopup = { app -> AppLongPressRow(app) },
+                    onClick = null
+                )
+            }
+        )
+
+        FloatingActionButton(
+            onClick = { showAppPicker = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(Icons.Default.Add, null)
+        }
+
+        if (workspaceDebugInfos) {
+            Column(
+                modifier = Modifier.background(Color.DarkGray.copy(0.5f))
+            ) {
+                Text(workspace.toString())
+            }
+        }
+    }
+
+    if (showAppPicker) {
+        AppPickerDialog(
+            gridSize = gridSize,
+            showIcons = showIcons,
+            showLabels = showLabels,
+            onDismiss = { showAppPicker = false },
+            onAppSelected = { app ->
+                scope.launch {
+                    appsViewModel.addAppToWorkspace(workspaceId, app.iconCacheKey)
+                }
+            }
+        )
+    }
+
+
 
     if (renameTarget != null) {
         val app = renameTarget!!
         val cacheKey = app.iconCacheKey
         RenameAppDialog(
-            title = stringResource(R.string.rename_app),
+            title = stringResource(R.string.rename),
             name = { renameText },
             onNameChange = { renameText = it },
             onConfirm = {
@@ -236,7 +237,6 @@ fun WorkspaceDetailScreen(
                     )
                 }
 
-                showDetailScreen = null
                 renameTarget = null
             },
             onReset = {

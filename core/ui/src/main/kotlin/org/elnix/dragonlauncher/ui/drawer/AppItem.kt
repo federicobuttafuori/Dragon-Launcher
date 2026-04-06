@@ -23,6 +23,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +35,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.AppModel
-import org.elnix.dragonlauncher.common.utils.bind
+import org.elnix.dragonlauncher.common.utils.Constants.Logging.APPS_TAG
+import org.elnix.dragonlauncher.common.utils.resolveShape
+import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.appIcon
-import org.elnix.dragonlauncher.common.utils.resolveShape
+import org.elnix.dragonlauncher.ui.components.dragon.DragonDropDownMenu
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 
@@ -45,56 +51,76 @@ fun AppItemHorizontal(
     showIcons: Boolean,
     showLabels: Boolean,
     txtColor: Color,
-    onLongClick: ((AppModel) -> Unit)? = null,
-    onClick: (AppModel) -> Unit
+    onLongClick: ((AppModel) -> Unit)?,
+    longPressPopup: @Composable ((AppModel) -> Unit)?,
+    onClick: ((AppModel) -> Unit)?
 ) {
+
+    require(!((onLongClick != null) and (longPressPopup != null))) {
+        "Long press action, or popup, or neither, but not both!"
+    }
+
     val iconShape = LocalIconShape.current
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(DragonShape)
-            .conditional(selected) {
-                background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
-            }
-            .combinedClickable(
-                onLongClick = onLongClick.bind(app),
-                onClick = { onClick(app) }
-            )
-            .padding(horizontal = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box {
-            if (showIcons) {
-                Image(
-                    painter = appIcon(app),
-                    contentDescription = app.name,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(iconShape.resolveShape()),
-                    contentScale = ContentScale.Fit
+    var showLongPressPopup by remember { mutableStateOf(false) }
+
+    Box {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(DragonShape)
+                .conditional(selected) {
+                    background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+                }
+                .combinedClickable(
+                    onLongClick = {
+                        if (longPressPopup != null) showLongPressPopup = true
+                        else onLongClick?.invoke(app)
+                    },
+                    onClick = { onClick?.invoke(app) }
                 )
-                Spacer(Modifier.width(12.dp))
+                .padding(horizontal = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box {
+                if (showIcons) {
+                    Image(
+                        painter = appIcon(app),
+                        contentDescription = app.name,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(iconShape.resolveShape()),
+                        contentScale = ContentScale.Fit
+                    )
+                    Spacer(Modifier.width(12.dp))
+                }
+                if (selected) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.BottomEnd)
+                            .offset(x = 4.dp, y = 4.dp)
+                            .background(MaterialTheme.colorScheme.surface, CircleShape)
+                    )
+                }
             }
-            if (selected) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 4.dp, y = 4.dp)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
+
+            if (showLabels) {
+                Text(
+                    text = app.name,
+                    color = txtColor
                 )
             }
         }
 
-        if (showLabels) {
-            Text(
-                text = app.name,
-                color = txtColor
-            )
+        DragonDropDownMenu(
+            expanded = showLongPressPopup,
+            onDismissRequest = { showLongPressPopup = false }
+        ) {
+            longPressPopup!!(app)
         }
     }
 }
@@ -108,65 +134,87 @@ fun AppItemGrid(
     showLabels: Boolean,
     txtColor: Color,
     onLongClick: ((AppModel) -> Unit)?,
-    onClick: (AppModel) -> Unit
+    longPressPopup: @Composable ((AppModel) -> Unit)?,
+    onClick: ((AppModel) -> Unit)?
 ) {
+
+    logD(APPS_TAG) { "LongPressPopup: $longPressPopup; onLongClick: $onLongClick"}
+
+    require(!((onLongClick != null) and (longPressPopup != null))) {
+        "Long press action, or popup, or neither, but not both!"
+    }
+
     val iconShape = LocalIconShape.current
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(DragonShape)
-            .conditional(selected) {
-                background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
-                    .border(
-                        2.dp,
-                        MaterialTheme.colorScheme.primary,
-                        DragonShape
-                    )
-            }
-            .combinedClickable(
-                onLongClick = onLongClick.bind(app),
-                onClick = { onClick(app) }
-            )
-            .padding(5.dp)
-    ) {
-        Box {
-            if (showIcons) {
-                Image(
-                    painter = appIcon(app),
-                    contentDescription = app.name,
-                    modifier = Modifier
-                        .sizeIn(maxWidth = maxIconSize.dp)
-                        .aspectRatio(1f)
-                        .clip(iconShape.resolveShape()),
-                    contentScale = ContentScale.Fit
+    var showLongPressPopup by remember { mutableStateOf(false) }
+
+    Box {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clip(DragonShape)
+                .conditional(selected) {
+                    background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+                        .border(
+                            2.dp,
+                            MaterialTheme.colorScheme.primary,
+                            DragonShape
+                        )
+                }
+                .combinedClickable(
+                    onLongClick = {
+                        if (longPressPopup != null) showLongPressPopup = true
+                        else onLongClick?.invoke(app)
+                    },
+                    onClick = { onClick?.invoke(app) }
                 )
+                .padding(5.dp)
+        ) {
+            Box {
+                if (showIcons) {
+                    Image(
+                        painter = appIcon(app),
+                        contentDescription = app.name,
+                        modifier = Modifier
+                            .sizeIn(maxWidth = maxIconSize.dp)
+                            .aspectRatio(1f)
+                            .clip(iconShape.resolveShape()),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                if (selected) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .align(Alignment.BottomEnd)
+                            .offset(x = 4.dp, y = 4.dp)
+                            .background(MaterialTheme.colorScheme.surface, CircleShape)
+                    )
+                }
             }
 
-            if (selected) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 4.dp, y = 4.dp)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
+            if (showLabels) {
+                Spacer(Modifier.height(6.dp))
+
+                Text(
+                    text = app.name,
+                    color = txtColor,
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
 
-        if (showLabels) {
-            Spacer(Modifier.height(6.dp))
-
-            Text(
-                text = app.name,
-                color = txtColor,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+        DragonDropDownMenu(
+            expanded = showLongPressPopup,
+            onDismissRequest = { showLongPressPopup = false }
+        ) {
+            longPressPopup!!(app)
         }
     }
 }

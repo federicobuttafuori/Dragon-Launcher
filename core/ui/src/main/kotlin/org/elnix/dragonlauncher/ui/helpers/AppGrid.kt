@@ -76,8 +76,9 @@ fun AppGrid(
 
     onTopStateChange: ((Boolean) -> Unit)? = null,
     onReload: (() -> Unit)? = null,
-    onLongClick: ((AppModel) -> Unit)? = null,
-    onClick: (AppModel) -> Unit
+    onLongClick: ((AppModel) -> Unit)?,
+    longPressPopup: @Composable ((AppModel) -> Unit)?,
+    onClick: ((AppModel) -> Unit)?
 ) {
     val maxIconSize by DrawerSettingsStore.maxIconSize.asState()
     val iconsSpacingVertical by DrawerSettingsStore.iconsSpacingVertical.asState()
@@ -198,6 +199,7 @@ fun AppGrid(
                                     txtColor = txtColor,
                                     showIcons = showIcons,
                                     onLongClick = onLongClick,
+                                    longPressPopup = longPressPopup,
                                     onClick = onClick,
                                     showCategoryName = showCategoryName,
                                     gridCells = categoryGridCells,
@@ -225,20 +227,19 @@ fun AppGrid(
                         showIcons = showIcons,
                         showLabels = showLabels,
                         txtColor = txtColor,
-                        onLongClick = {
-                            if (!isMultiSelectMode && onEnterMultiSelect != null) {
+                        onLongClick = if (onEnterMultiSelect != null && onToggleSelect != null) { app ->
+                            if (!isMultiSelectMode) {
                                 onEnterMultiSelect(app)
-                            } else if (isMultiSelectMode && onToggleSelect != null) {
-                                onToggleSelect(app)
                             } else {
-                                onLongClick?.invoke(app)
+                                onToggleSelect(app)
                             }
-                        },
+                        } else onLongClick,
+                        longPressPopup = longPressPopup,
                         onClick = {
                             if (isMultiSelectMode && onToggleSelect != null) {
                                 onToggleSelect(app)
                             } else {
-                                onClick(app)
+                                onClick?.invoke(app)
                             }
                         }
                     )
@@ -265,17 +266,18 @@ fun AppGrid(
                         maxIconSize = maxIconSize,
                         showLabels = showLabels,
                         txtColor = txtColor,
-                        onLongClick = {
-                            if (!isMultiSelectMode && onEnterMultiSelect != null) {
+                        onLongClick = if (onEnterMultiSelect != null && onToggleSelect != null) { app ->
+                            if (!isMultiSelectMode) {
                                 onEnterMultiSelect(app)
-                            } else if (isMultiSelectMode && onToggleSelect != null) {
+                            } else {
                                 onToggleSelect(app)
-                            } else onLongClick?.invoke(app)
-                        },
+                            }
+                        } else onLongClick,
+                        longPressPopup = longPressPopup,
                         onClick = {
                             if (isMultiSelectMode && onToggleSelect != null) {
                                 onToggleSelect(app)
-                            } else onClick(app)
+                            } else onClick?.invoke(app)
                         }
                     )
                 }
@@ -297,8 +299,9 @@ private fun CategoryGrid(
     gridCells: Int,
     showCategoryName: Boolean,
     modifier: Modifier = Modifier,
-    onLongClick: ((AppModel) -> Unit)? = null,
-    onClick: (AppModel) -> Unit,
+    onLongClick: ((AppModel) -> Unit)?,
+    longPressPopup: @Composable ((AppModel) -> Unit)?,
+    onClick: ((AppModel) -> Unit)?,
     onOpenCategory: () -> Unit
 ) {
     Column(
@@ -316,6 +319,7 @@ private fun CategoryGrid(
                 txtColor = txtColor,
                 showIcons = showIcons,
                 onLongClick = onLongClick,
+                longPressPopup = longPressPopup,
                 onClick = onClick,
                 gridCells = gridCells,
             )
@@ -342,7 +346,8 @@ private fun AppDefinedGrid(
     gridCells: Int,
     modifier: Modifier = Modifier,
     onLongClick: ((AppModel) -> Unit)? = null,
-    onClick: (AppModel) -> Unit,
+    longPressPopup: @Composable ((AppModel) -> Unit)?,
+    onClick: ((AppModel) -> Unit)?,
 ) {
     var appIndex = 0
 
@@ -372,6 +377,7 @@ private fun AppDefinedGrid(
                                 showLabels = false,
                                 txtColor = txtColor,
                                 onLongClick = onLongClick,
+                                longPressPopup = longPressPopup,
                                 onClick = onClick
                             )
                         } else if (appNumber > maxAppNumber) {

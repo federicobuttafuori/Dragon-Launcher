@@ -38,18 +38,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.APPS_TAG
 import org.elnix.dragonlauncher.common.utils.resolveShape
+import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.appIcon
 import org.elnix.dragonlauncher.ui.components.Spacer
-import org.elnix.dragonlauncher.ui.components.dragon.DragonDropDownMenu
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
 
@@ -60,20 +60,17 @@ private data class DialogEntry(
 )
 
 @Composable
-fun AppLongPressPopup(
-    expanded: () -> Boolean,
+fun AppLongPressRow(
+//    expanded: () -> Boolean,
     app: AppModel,
-    // Normal
-    onOpen: (() -> Unit)? = null,
+    onOpen: () -> Unit,
+    onRenameApp: () -> Unit,
+    onChangeAppIcon: () -> Unit,
+    onAliases: () -> Unit,
     onSettings: (() -> Unit)? = null,
     onUninstall: (() -> Unit)? = null,
-    // Workspace
     onRemoveFromWorkspace: (() -> Unit)? = null,
-    onAddToWorkspace: (() -> Unit)? = null,
-    onRenameApp: (() -> Unit)? = null,
-    onChangeAppIcon: (() -> Unit)? = null,
-    onAliases: (() -> Unit)? = null,
-    onDismiss: () -> Unit
+    onAddToWorkspace: (() -> Unit)? = null
 ) {
 
     val iconsShape = LocalIconShape.current
@@ -81,15 +78,14 @@ fun AppLongPressPopup(
     var showDetailedAppInfoDialog by remember { mutableStateOf(false) }
 
     val entries = buildList {
-        onOpen?.let {
-            add(
-                DialogEntry(
-                    label = stringResource(R.string.open),
-                    icon = Icons.AutoMirrored.Filled.OpenInNew,
-                    onClick = { onDismiss(); it() }
-                )
+
+        add(
+            DialogEntry(
+                label = stringResource(R.string.open),
+                icon = Icons.AutoMirrored.Filled.OpenInNew,
+                onClick = onOpen
             )
-        }
+        )
 
 
         onUninstall?.let {
@@ -97,47 +93,43 @@ fun AppLongPressPopup(
                 DialogEntry(
                     label = stringResource(R.string.uninstall),
                     icon = Icons.Default.Delete,
-                    onClick = { onDismiss(); it() }
+                    onClick = it
                 )
             )
         }
 
-        onAliases?.let {
-            add(
-                DialogEntry(
-                    label = stringResource(R.string.app_aliases),
-                    icon = Icons.Default.AlternateEmail,
-                    onClick = { onDismiss(); it() }
-                )
-            )
-        }
 
-        onRenameApp?.let {
-            add(
-                DialogEntry(
-                    label = stringResource(R.string.rename_app),
-                    icon = Icons.Default.Edit,
-                    onClick = { onDismiss(); it() }
-                )
+        add(
+            DialogEntry(
+                label = stringResource(R.string.app_aliases),
+                icon = Icons.Default.AlternateEmail,
+                onClick = onAliases
             )
-        }
+        )
 
-        onChangeAppIcon?.let {
-            add(
-                DialogEntry(
-                    label = stringResource(R.string.change_app_icon),
-                    icon = Icons.Default.Image,
-                    onClick = { onDismiss(); it() }
-                )
+
+        add(
+            DialogEntry(
+                label = stringResource(R.string.rename),
+                icon = Icons.Default.Edit,
+                onClick = onRenameApp
             )
-        }
+        )
+
+        add(
+            DialogEntry(
+                label = stringResource(R.string.change_app_icon),
+                icon = Icons.Default.Image,
+                onClick = onChangeAppIcon
+            )
+        )
 
         onAddToWorkspace?.let {
             add(
                 DialogEntry(
                     label = stringResource(R.string.add_to_workspace),
                     icon = Icons.Default.Add,
-                    onClick = { onDismiss(); it() }
+                    onClick = it
                 )
             )
         }
@@ -147,7 +139,7 @@ fun AppLongPressPopup(
                 DialogEntry(
                     label = stringResource(R.string.remove_from_workspace),
                     icon = Icons.Default.Close,
-                    onClick = { onDismiss(); it() }
+                    onClick = it
                 )
             )
         }
@@ -162,7 +154,6 @@ fun AppLongPressPopup(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            Text(app.name)
 
             Image(
                 painter = appIcon(app),
@@ -171,6 +162,10 @@ fun AppLongPressPopup(
                     .size(32.dp)
                     .clip(iconsShape.resolveShape())
             )
+
+            Spacer(5.dp)
+
+            Text(app.name)
 
             Spacer()
 
@@ -219,48 +214,42 @@ fun AppLongPressPopup(
                 fontSize = 10.sp,
                 softWrap = false,
                 overflow = TextOverflow.Visible,
+                textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall
             )
         }
     }
 
-
-    logD(APPS_TAG) { "Showing ${entries.size}" }
-
-
     var showOtherOptions by remember { mutableStateOf(false) }
 
-
-    DragonDropDownMenu(
-        expanded = expanded(),
-        onDismissRequest = onDismiss
+    CompositionLocalProvider(
+        LocalContentColor provides MaterialTheme.colorScheme.onSurface
     ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clip(DragonShape)
+                .background(MaterialTheme.colorScheme.surface)
 
-        CompositionLocalProvider(
-            LocalContentColor provides MaterialTheme.colorScheme.onSurface
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .clip(DragonShape)
-                    .background(MaterialTheme.colorScheme.surface)
 
-            ) {
+            val maxItemsPerRow = 4
 
-                val mainEntries = entries.take(5)
-                val otherEntries = if (entries.size > 5) {
-                    entries.drop(5)
-                } else null
+            val mainEntries = entries.take(maxItemsPerRow)
+            val otherEntries = if (entries.size > maxItemsPerRow) {
+                entries.drop(maxItemsPerRow)
+            } else null
 
-                logD(APPS_TAG) { "Main entries size: ${mainEntries.size}" }
-                logD(APPS_TAG) { "Other entries size: ${otherEntries?.size}" }
+            logD(APPS_TAG) { "Main entries size: ${mainEntries.size}" }
+            logD(APPS_TAG) { "Other entries size: ${otherEntries?.size}" }
 
-                Row {
-                    mainEntries.forEach {
-                        EntryButton(it, Modifier.weight(1f))
-                    }
+            Row(modifier = Modifier.fillMaxWidth()) {
+                mainEntries.forEach {
+                    EntryButton(it, Modifier.weight(1f))
+                }
 
+                if (otherEntries != null) {
                     EntryButton(
                         DialogEntry(
                             label = if (showOtherOptions) stringResource(R.string.less) else stringResource(R.string.more),
@@ -269,20 +258,25 @@ fun AppLongPressPopup(
                         )
                     )
                 }
+            }
 
-                AnimatedVisibility(showOtherOptions) {
-                    Row {
-                        otherEntries?.forEach {
-                            EntryButton(it, Modifier.weight(1f))
+            AnimatedVisibility(showOtherOptions) {
+                otherEntries?.chunked(maxItemsPerRow)?.forEach { rowEntries ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        repeat(maxItemsPerRow) { index ->
+                            if (index < rowEntries.size) {
+                                EntryButton(rowEntries[index], Modifier.weight(1f))
+                            } else {
+                                Spacer()
+                            }
                         }
                     }
                 }
-
-                TitleRow()
             }
+
+            TitleRow()
         }
     }
-
 
     if (showDetailedAppInfoDialog) {
         AppModelInfoDialog(app) { showDetailedAppInfoDialog = false }
