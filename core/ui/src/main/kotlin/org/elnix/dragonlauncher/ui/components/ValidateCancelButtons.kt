@@ -34,25 +34,24 @@ fun ValidateCancelButtons(
 
     @Suppress("DEPRECATION")
     ButtonGroup(Modifier.fillMaxWidth()) {
-        OutlinedButton(
-            onClick = withHaptic(HapticFeedbackType.Reject) {
-                if (onCancel != null) {
+        if(onCancel != null) {
+            OutlinedButton(
+                onClick = withHaptic(HapticFeedbackType.Reject) {
                     onCancel()
-                }
-            },
-            enabled = onCancel != null,
-            shapes = UiConstants.dragonShapes(),
-            modifier = Modifier
-                .weight(1f)
-                .animateWidth(interactionSources[0]),
-            interactionSource = interactionSources[0],
-            colors = AppObjectsColors.cancelButtonColors(),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-        ) {
-            AutoResizeableText(
-                text = cancelText,
-                style = MaterialTheme.typography.labelLarge
-            )
+                },
+                shapes = UiConstants.dragonShapes(),
+                modifier = Modifier
+                    .weight(1f)
+                    .animateWidth(interactionSources[0]),
+                interactionSource = interactionSources[0],
+                colors = AppObjectsColors.cancelButtonColors(),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+            ) {
+                AutoResizeableText(
+                    text = cancelText,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
         }
 
         Button(
