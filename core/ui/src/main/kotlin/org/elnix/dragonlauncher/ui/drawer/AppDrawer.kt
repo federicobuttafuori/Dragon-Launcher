@@ -78,6 +78,7 @@ import org.elnix.dragonlauncher.base.ktx.px
 import org.elnix.dragonlauncher.base.ktx.toDp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.logging.logD
+import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.WorkspaceType
@@ -85,7 +86,6 @@ import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.DRAWER_TAG
 import org.elnix.dragonlauncher.common.utils.PrivateSpaceUtils
-import org.elnix.dragonlauncher.common.navigaton.SETTINGS
 import org.elnix.dragonlauncher.common.utils.openSearch
 import org.elnix.dragonlauncher.enumsui.DrawerActions
 import org.elnix.dragonlauncher.enumsui.DrawerActions.CLEAR
@@ -107,7 +107,7 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonDropDownMenu
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AppAliasesDialog
-import org.elnix.dragonlauncher.ui.dialogs.AppLongPressDialog
+import org.elnix.dragonlauncher.ui.dialogs.AppLongPressPopup
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.dialogs.RenameAppDialog
 import org.elnix.dragonlauncher.ui.helpers.AppDrawerSearch
@@ -737,7 +737,8 @@ fun AppDrawerScreen(
         val app = dialogApp!!
         val cacheKey = app.iconCacheKey
 
-        AppLongPressDialog(
+        AppLongPressPopup(
+            expanded = { true },
             app = app,
             onDismiss = { dialogApp = null },
             onOpen = { onLaunchAction(app.action) },

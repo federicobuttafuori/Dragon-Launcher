@@ -995,5 +995,6 @@
     <string name="welcome_screen">Welcome Screen</string>
     <string name="edit_hold_to_activate_elements">Edit hold to activate elements</string>
     <string name="edit_hold_to_activate_elements_desc">Edit the actions that pops up when holding 3 sec. Only 1 mean auto redirect</string>
+    <string name="less">Less</string>
 
 </resources>

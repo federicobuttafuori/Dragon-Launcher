@@ -41,7 +41,7 @@ import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButton
 import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.components.settings.asState
 import org.elnix.dragonlauncher.ui.dialogs.AppAliasesDialog
-import org.elnix.dragonlauncher.ui.dialogs.AppLongPressDialog
+import org.elnix.dragonlauncher.ui.dialogs.AppLongPressPopup
 import org.elnix.dragonlauncher.ui.dialogs.AppPickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.IconEditorDialog
 import org.elnix.dragonlauncher.ui.dialogs.RenameAppDialog
@@ -157,7 +157,8 @@ fun WorkspaceDetailScreen(
         val app = showDetailScreen!!
         val cacheKey = app.iconCacheKey
 
-        AppLongPressDialog(
+        AppLongPressPopup(
+            expanded = { true },
             app = app,
             onOpen = { onLaunchAction(app.action) },
             onSettings = if (!app.isPrivateProfile && !app.isWorkProfile) {
