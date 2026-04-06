@@ -1,7 +1,6 @@
 package org.elnix.dragonlauncher.settings.bases
 
 import android.content.Context
-import org.elnix.dragonlauncher.settings.putIfNonDefault
 import org.json.JSONObject
 
 /**

@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.models.BackupResult
-import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
 
 @Composable
 fun rememberSettingsExportLauncher(
-    selectedStoresForExport: Set<DataStoreName>
+    selectedStoresForExport: Set<DatastoreProvider>
 ): ManagedActivityResultLauncher<String, Uri?> {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -67,7 +67,7 @@ fun rememberSettingsExportLauncher(
 
 @Composable
 fun rememberSafeSettingsExportLauncher(
-    selectedStoresForExport: Set<DataStoreName>
+    selectedStoresForExport: Set<DatastoreProvider>
 ): ManagedActivityResultLauncher<String, Uri?> {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()

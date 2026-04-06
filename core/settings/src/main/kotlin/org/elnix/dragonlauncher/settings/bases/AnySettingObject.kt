@@ -11,7 +11,7 @@ import android.content.Context
  *
  * @property key Unique identifier shared with [BaseSettingObject].
  */
-interface AnySettingObject {
+internal interface AnySettingObject {
     val key: String
 
     /**

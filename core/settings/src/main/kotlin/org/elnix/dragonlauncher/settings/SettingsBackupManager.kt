@@ -5,14 +5,15 @@ import android.net.Uri
 import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.elnix.dragonlauncher.logging.logD
-import org.elnix.dragonlauncher.logging.logE
-import org.elnix.dragonlauncher.logging.logI
-import org.elnix.dragonlauncher.logging.logW
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.logging.logD
+import org.elnix.dragonlauncher.logging.logE
+import org.elnix.dragonlauncher.logging.logI
+import org.elnix.dragonlauncher.logging.logW
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.bases.JsonArraySettingsStore
 import org.elnix.dragonlauncher.settings.bases.JsonObjectSettingsStore
 import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
@@ -96,12 +97,12 @@ object SettingsBackupManager {
 
     /**
      * Exports only the requested stores.
-     * @param requestedStores List of DataStoreName objects
+     * @param requestedStores List of _root_ide_package_.org.elnix.dragonlauncher.settings.bases.DatastoreProvider objects
      */
     suspend fun exportSettings(
         ctx: Context,
         uri: Uri,
-        requestedStores: Set<DataStoreName>
+        requestedStores: Set<DatastoreProvider>
     ) {
         val json = JSONObject()
 
@@ -129,12 +130,12 @@ object SettingsBackupManager {
      *
      * @param ctx Context used for accessing DataStores
      * @param json Parsed JSONObject containing backup data
-     * @param requestedStores List of DataStoreName objects specifying which stores to restore
+     * @param requestedStores List of _root_ide_package_.org.elnix.dragonlauncher.settings.bases.DatastoreProvider objects specifying which stores to restore
      */
     suspend fun importSettingsFromJson(
         ctx: Context,
         json: JSONObject,
-        requestedStores: Set<DataStoreName>
+        requestedStores: Set<DatastoreProvider>
     ) {
         logD(BACKUP_TAG) { json.toString() }
 

@@ -2,7 +2,7 @@ package org.elnix.dragonlauncher.settings.stores
 
 import org.elnix.dragonlauncher.enumsui.LockMethod
 import org.elnix.dragonlauncher.settings.DataStoreName
-import org.elnix.dragonlauncher.settings.Settings
+import org.elnix.dragonlauncher.settings.bases.Settings
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
 

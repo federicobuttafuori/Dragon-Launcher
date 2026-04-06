@@ -48,6 +48,7 @@ import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.WELCOME_TAG
 import org.elnix.dragonlauncher.models.BackupResult
 import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
@@ -103,7 +104,7 @@ fun WelcomeScreen(
         }
     }
 
-    var selectedStoresForImport by remember { mutableStateOf(setOf<DataStoreName>()) }
+    var selectedStoresForImport by remember { mutableStateOf(setOf<DatastoreProvider>()) }
     var importJson by remember { mutableStateOf<JSONObject?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
 

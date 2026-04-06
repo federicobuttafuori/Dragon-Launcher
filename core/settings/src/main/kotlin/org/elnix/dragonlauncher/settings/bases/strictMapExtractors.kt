@@ -1,13 +1,13 @@
-package org.elnix.dragonlauncher.settings
+package org.elnix.dragonlauncher.settings.bases
 
 import androidx.compose.ui.graphics.Color
-import org.elnix.dragonlauncher.logging.logE
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.ANGLE_LINE_TAG
+import org.elnix.dragonlauncher.logging.logE
 
 
-fun getBooleanStrict(
+internal fun getBooleanStrict(
     raw: Any?,
     def: Boolean
 ): Boolean {
@@ -24,7 +24,7 @@ fun getBooleanStrict(
     } ?: def
 }
 
-fun getIntStrict(
+internal fun getIntStrict(
     raw: Any?,
     def: Int
 ): Int {
@@ -36,7 +36,7 @@ fun getIntStrict(
     } ?: def
 }
 
-fun getFloatStrict(
+internal fun getFloatStrict(
     raw: Any?,
     def: Float
 ): Float {
@@ -48,7 +48,7 @@ fun getFloatStrict(
     } ?: def
 }
 
-fun getLongStrict(
+internal fun getLongStrict(
     raw: Any?,
     def: Long
 ): Long {
@@ -61,7 +61,7 @@ fun getLongStrict(
 }
 
 
-fun getDoubleStrict(
+internal fun getDoubleStrict(
     raw: Any?,
     def: Double
 ): Double {
@@ -73,7 +73,7 @@ fun getDoubleStrict(
     } ?: def
 }
 
-fun getStringStrict(
+internal fun getStringStrict(
     raw: Any?,
     def: String
 ): String {
@@ -85,7 +85,7 @@ fun getStringStrict(
 }
 
 
-fun getSwipeActionSerializableStrict(
+internal fun getSwipeActionSerializableStrict(
     raw: Any?,
     def: SwipeActionSerializable
 ): SwipeActionSerializable {
@@ -95,7 +95,7 @@ fun getSwipeActionSerializableStrict(
     } ?: def
 }
 
-fun getStringSetStrict(
+internal fun getStringSetStrict(
     raw: Any?,
     def: Set<String>
 ): Set<String> {
@@ -122,7 +122,7 @@ fun getStringSetStrict(
     } ?: def
 }
 
-fun getStringListStrict(
+internal fun getStringListStrict(
     raw: Any?,
     def: List<String>
 ): List<String> {
@@ -148,7 +148,7 @@ private fun Collection<*>.flattenStrings(): List<String> = flatMap { item ->
     }
 }.filter { it.isNotBlank() }
 
-fun <E : Enum<E>> getEnumStrict(
+internal fun <E : Enum<E>> getEnumStrict(
     raw: Any?,
     def: E,
     enumClass: Class<E>
@@ -161,7 +161,7 @@ fun <E : Enum<E>> getEnumStrict(
 /**
  * Decodes a list of enum from a string, comma separated statements
  */
-fun <E : Enum<E>> getEnumListStrict(
+internal fun <E : Enum<E>> getEnumListStrict(
     raw: Any?,
     def: List<E>,
     enumClass: Class<E>
@@ -187,7 +187,7 @@ fun <E : Enum<E>> getEnumListStrict(
 }
 
 
-fun getColorStrict(
+internal fun getColorStrict(
     raw: Any?,
     def: Color
 ): Color {
@@ -206,7 +206,7 @@ fun getColorStrict(
     } ?: def
 }
 
-fun MutableMap<String, Any>.putIfNonDefault(
+internal fun MutableMap<String, Any>.putIfNonDefault(
     key: String,
     value: Any?,
     def: Any?

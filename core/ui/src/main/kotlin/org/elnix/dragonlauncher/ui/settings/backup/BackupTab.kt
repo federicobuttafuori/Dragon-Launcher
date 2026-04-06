@@ -45,6 +45,7 @@ import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.models.BackupResult
 import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
 import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
@@ -81,7 +82,7 @@ fun BackupTab(onBack: () -> Unit) {
 
 
     val selectedStores = remember(backupStores) {
-        mutableStateMapOf<DataStoreName, Boolean>().apply {
+        mutableStateMapOf<DatastoreProvider, Boolean>().apply {
             backupableStores.forEach { put(it.key, it.value.dataStoreName.value in backupStores) }
         }
     }
@@ -107,8 +108,8 @@ fun BackupTab(onBack: () -> Unit) {
         getFilePathFromUri(ctx, uri)
     }
 
-    var selectedStoresForExport by remember { mutableStateOf(setOf<DataStoreName>()) }
-    var selectedStoresForImport by remember { mutableStateOf(setOf<DataStoreName>()) }
+    var selectedStoresForExport by remember { mutableStateOf(setOf<DatastoreProvider>()) }
+    var selectedStoresForImport by remember { mutableStateOf(setOf<DatastoreProvider>()) }
     var importJson by remember { mutableStateOf<JSONObject?>(null) }
     var showImportDialog by remember { mutableStateOf(false) }
     var showExportDialog by remember { mutableStateOf(false) }
