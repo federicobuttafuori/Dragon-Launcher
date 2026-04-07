@@ -41,7 +41,7 @@ import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.enumsui.DrawerToolbar
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.theme.AppObjectsColors
-import org.elnix.dragonlauncher.ui.components.TextDivider
+import org.elnix.dragonlauncher.ui.dragon.text.TextDivider
 import org.elnix.dragonlauncher.ui.dragon.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.base.asState
 import sh.calvin.reorderable.ReorderableItem

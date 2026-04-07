@@ -73,23 +73,23 @@ import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
 import org.elnix.dragonlauncher.theme.AppObjectsColors
-import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
-import org.elnix.dragonlauncher.ui.components.ExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.colors.ColorPickerRow
+import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSection
 import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
 import org.elnix.dragonlauncher.ui.dragon.components.DragonButton
 import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
-import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
-import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
+import org.elnix.dragonlauncher.ui.dragon.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.dragon.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
-import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.dragon.components.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
 import org.elnix.dragonlauncher.ui.base.modifiers.conditional
-import org.elnix.dragonlauncher.ui.remembers.ExpandableSectionState
-import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSectionState
+import org.elnix.dragonlauncher.ui.dragon.expandable.rememberExpandableSection
 import org.elnix.dragonlauncher.theme.getSystemColorScheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

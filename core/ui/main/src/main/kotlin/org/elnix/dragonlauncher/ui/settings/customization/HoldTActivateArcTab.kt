@@ -48,7 +48,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.dialogs.HoldSettingsOrderDialog
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
-import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
+import org.elnix.dragonlauncher.ui.dragon.components.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.customobjects.EditCustomObjectBlock
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold

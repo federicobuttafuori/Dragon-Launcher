@@ -30,6 +30,7 @@ import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.theme.AppObjectsColors
 import org.elnix.dragonlauncher.ui.dragon.components.DragonRow
 import org.elnix.dragonlauncher.ui.base.asState
+import org.elnix.dragonlauncher.ui.dragon.dialogs.CustomAlertDialog
 import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
 import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
 import org.elnix.dragonlauncher.ui.dragon.text.TextWithDescription

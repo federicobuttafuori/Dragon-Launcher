@@ -60,6 +60,7 @@ import org.elnix.dragonlauncher.ui.dragon.components.DragonTooltip
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
 import org.elnix.dragonlauncher.ui.composition.LocalShowLabelsInAddPointDialog
+import org.elnix.dragonlauncher.ui.dragon.dialogs.CustomAlertDialog
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable

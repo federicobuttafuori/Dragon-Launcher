@@ -41,8 +41,9 @@ import org.elnix.dragonlauncher.enumsui.BackupSelectStoresButtons.SELECT_ALL
 import org.elnix.dragonlauncher.settings.stores.HoldToActivateArcSettingsStore
 import org.elnix.dragonlauncher.ui.dragon.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.dragon.components.DragonRow
-import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.dragon.generic.MultiSelectConnectedButtonRow
 import org.elnix.dragonlauncher.ui.base.asState
+import org.elnix.dragonlauncher.ui.dragon.dialogs.CustomAlertDialog
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -157,7 +158,7 @@ fun HoldSettingsOrderDialog(
 
                             DragonRow(
                                 onClick = {
-                                     entry.isSelected.value = !isSelected
+                                    entry.isSelected.value = !isSelected
                                 },
                                 modifier = Modifier
                                     .scale(scale)

@@ -39,8 +39,8 @@ import org.elnix.dragonlauncher.settings.stores.UiSettingsStore.appLabelOverlayS
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore.showLaunchingAppIcon
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore.showLaunchingAppLabel
 import org.elnix.dragonlauncher.ui.components.AppPreviewTitle
-import org.elnix.dragonlauncher.ui.components.ExpandableSection
-import org.elnix.dragonlauncher.ui.components.TextDivider
+import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.text.TextDivider
 import org.elnix.dragonlauncher.ui.dragon.components.DragonColumnGroup
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
@@ -49,7 +49,7 @@ import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.composition.LocalIcons
 import org.elnix.dragonlauncher.ui.composition.LocalNavController
-import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.expandable.rememberExpandableSection
 
 
 @Composable

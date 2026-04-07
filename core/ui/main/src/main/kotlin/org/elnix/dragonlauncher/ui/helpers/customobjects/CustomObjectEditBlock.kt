@@ -19,11 +19,11 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.CustomGlow
 import org.elnix.dragonlauncher.common.serializables.CustomObjectBlockProperties
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
+import org.elnix.dragonlauncher.ui.dragon.colors.ColorPickerRow
 import org.elnix.dragonlauncher.ui.dialogs.ShapePickerDialog
 import org.elnix.dragonlauncher.ui.helpers.ShapeRow
-import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.dragon.components.SliderWithLabel
+import org.elnix.dragonlauncher.ui.dragon.components.SwitchRow
 
 @Composable
 fun EditCustomObjectBlock(

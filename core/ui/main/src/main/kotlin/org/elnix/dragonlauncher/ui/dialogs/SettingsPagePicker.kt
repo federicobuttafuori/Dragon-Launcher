@@ -21,6 +21,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.navigaton.routeResId
 import org.elnix.dragonlauncher.common.navigaton.settingsRoutes
 import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
+import org.elnix.dragonlauncher.ui.dragon.dialogs.CustomAlertDialog
 
 @Composable
 fun SettingsPagePicker(

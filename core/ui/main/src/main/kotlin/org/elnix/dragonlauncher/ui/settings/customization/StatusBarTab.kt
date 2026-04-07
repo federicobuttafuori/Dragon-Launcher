@@ -21,13 +21,13 @@ import org.elnix.dragonlauncher.common.serializables.MainScreenLayerJson
 import org.elnix.dragonlauncher.settings.stores.StatusBarJsonSettingsStore
 import org.elnix.dragonlauncher.settings.stores.StatusBarSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
-import org.elnix.dragonlauncher.ui.components.ExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSection
 import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
-import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.dragon.components.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.composition.LocalMainScreenLayers
-import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.expandable.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.statusbar.EditStatusBar
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import org.elnix.dragonlauncher.ui.statusbar.showStatusBar

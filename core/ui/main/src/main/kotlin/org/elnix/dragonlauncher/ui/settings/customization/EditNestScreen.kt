@@ -49,13 +49,13 @@ import org.elnix.dragonlauncher.enumsui.NestEditMode.MIN_ANGLE
 import org.elnix.dragonlauncher.enumsui.NestEditMode.RADIUS
 import org.elnix.dragonlauncher.settings.stores.SwipeMapSettingsStore
 import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
-import org.elnix.dragonlauncher.ui.components.generic.ActionRow
+import org.elnix.dragonlauncher.ui.dragon.generic.ActionRow
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.defaultDragDistance
 import org.elnix.dragonlauncher.ui.dialogs.HapticFeedBackEditorButtonWithPlayTest
 import org.elnix.dragonlauncher.ui.dialogs.HapticFeedbackEditor
-import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.ui.helpers.SwitchRow
+import org.elnix.dragonlauncher.ui.dragon.components.SliderWithLabel
+import org.elnix.dragonlauncher.ui.dragon.components.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.nests.circlesSettingsOverlay
 import org.elnix.dragonlauncher.ui.remembers.rememberSwipeDefaultParams
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold

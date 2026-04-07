@@ -32,6 +32,7 @@ import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
 import org.elnix.dragonlauncher.theme.AppObjectsColors
 import org.elnix.dragonlauncher.ui.dragon.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.dragon.components.DragonRow
+import org.elnix.dragonlauncher.ui.dragon.dialogs.CustomAlertDialog
 
 
 @Composable
@@ -120,15 +121,15 @@ fun <T : ADBCommands> AdbCommandPickerDialog(
                         toast = !toast
                     }
                 ) {
-                     Checkbox(
-                         checked = toast,
-                         onCheckedChange = {
-                             toast = it
-                         }
-                     )
+                    Checkbox(
+                        checked = toast,
+                        onCheckedChange = {
+                            toast = it
+                        }
+                    )
 
                     Text(stringResource(R.string.show_toast))
-                 }
+                }
             }
         })
 }

@@ -37,8 +37,8 @@ import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.dummySwipePoint
 import org.elnix.dragonlauncher.enumsui.WorkspaceViewMode
 import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
-import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
-import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
+import org.elnix.dragonlauncher.ui.dragon.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.dragon.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.dialogs.AppAliasesDialog
 import org.elnix.dragonlauncher.ui.dialogs.AppLongPressRow

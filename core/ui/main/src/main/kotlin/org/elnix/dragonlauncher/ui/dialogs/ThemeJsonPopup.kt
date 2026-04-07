@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.elnix.dragonlauncher.ui.dragon.dialogs.CustomAlertDialog
 import org.json.JSONObject
 
 @Composable

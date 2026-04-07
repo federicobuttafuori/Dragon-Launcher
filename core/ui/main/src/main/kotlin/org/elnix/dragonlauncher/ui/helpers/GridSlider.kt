@@ -25,6 +25,7 @@ import org.elnix.dragonlauncher.common.serializables.AppModel
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.base.asState
+import org.elnix.dragonlauncher.ui.dragon.components.SliderWithLabel
 
 @Composable
 fun GridSizeSlider(apps: List<AppModel>) {

@@ -47,9 +47,9 @@ import org.elnix.dragonlauncher.enumsui.drawerActionIcon
 import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.settings.stores.DrawerSettingsStore
 import org.elnix.dragonlauncher.ui.base.asState
-import org.elnix.dragonlauncher.ui.components.ExpandableSection
-import org.elnix.dragonlauncher.ui.components.TextDivider
-import org.elnix.dragonlauncher.ui.components.settings.DrawerActionSelector
+import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.text.TextDivider
+import org.elnix.dragonlauncher.ui.dragon.settings.DrawerActionSelector
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.dialogs.DrawerToolbarsOrderDialog
@@ -59,7 +59,7 @@ import org.elnix.dragonlauncher.ui.helpers.ShapeRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
+import org.elnix.dragonlauncher.ui.dragon.expandable.rememberExpandableSection
 
 
 @Composable

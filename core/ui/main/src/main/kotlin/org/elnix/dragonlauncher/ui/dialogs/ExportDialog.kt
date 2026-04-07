@@ -31,7 +31,7 @@ import org.elnix.dragonlauncher.settings.backupableStores
 import org.elnix.dragonlauncher.settings.bases.BaseSettingsStore
 import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.dragon.components.ValidateCancelButtons
-import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.dragon.generic.MultiSelectConnectedButtonRow
 
 @Composable
 fun ExportSettingsDialog(

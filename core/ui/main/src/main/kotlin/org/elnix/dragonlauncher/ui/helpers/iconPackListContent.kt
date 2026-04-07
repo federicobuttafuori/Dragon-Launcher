@@ -35,7 +35,7 @@ import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.IconPackInfo
 import org.elnix.dragonlauncher.common.serializables.dummyAppModel
-import org.elnix.dragonlauncher.ui.components.Spacer
+import org.elnix.dragonlauncher.ui.base.components.Spacer
 import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
 import org.elnix.dragonlauncher.ui.dragon.components.DragonRow
 import org.elnix.dragonlauncher.ui.dragon.text.TextWithDescription

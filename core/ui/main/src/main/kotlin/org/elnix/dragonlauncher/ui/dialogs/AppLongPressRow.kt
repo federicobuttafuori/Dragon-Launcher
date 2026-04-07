@@ -49,7 +49,7 @@ import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.appIcon
-import org.elnix.dragonlauncher.ui.components.Spacer
+import org.elnix.dragonlauncher.ui.base.components.Spacer
 import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
 import org.elnix.dragonlauncher.ui.composition.LocalIconShape
 
