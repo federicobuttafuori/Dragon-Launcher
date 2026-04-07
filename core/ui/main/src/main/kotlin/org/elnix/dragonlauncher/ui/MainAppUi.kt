@@ -4,7 +4,6 @@ import android.Manifest
 import android.R.attr.versionCode
 import android.annotation.SuppressLint
 import android.content.ComponentName
-import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,8 +11,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -42,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -112,23 +114,7 @@ import org.elnix.dragonlauncher.ui.actions.launchSwipeAction
 import org.elnix.dragonlauncher.ui.base.UiConstants
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
-import org.elnix.dragonlauncher.ui.dialogs.FilePickerDialog
-import org.elnix.dragonlauncher.ui.dialogs.GoogleLockingWarning
-import org.elnix.dragonlauncher.ui.dialogs.MainScreeLayersOrderScreen
-import org.elnix.dragonlauncher.ui.dialogs.PinUnlockDialog
-import org.elnix.dragonlauncher.ui.dialogs.ShizukuUnavailableDialog
-import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
-import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
-import org.elnix.dragonlauncher.ui.dialogs.rememberMainScreenLayerOrder
-import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
-import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
-import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
-import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
-import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
-import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
-import org.elnix.dragonlauncher.ui.navigation.collapseDownAnimation
-import org.elnix.dragonlauncher.ui.navigation.raiseUpAnimation
-import org.elnix.dragonlauncher.ui.navigation.settingComposable
+import org.elnix.dragonlauncher.ui.base.components.Spacer
 import org.elnix.dragonlauncher.ui.composition.LocalAngleLineObject
 import org.elnix.dragonlauncher.ui.composition.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
@@ -147,8 +133,24 @@ import org.elnix.dragonlauncher.ui.composition.LocalShizukuViewModel
 import org.elnix.dragonlauncher.ui.composition.LocalShowLabelsInAddPointDialog
 import org.elnix.dragonlauncher.ui.composition.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.composition.LocalStatusBarElements
+import org.elnix.dragonlauncher.ui.dialogs.FilePickerDialog
+import org.elnix.dragonlauncher.ui.dialogs.GoogleLockingWarning
+import org.elnix.dragonlauncher.ui.dialogs.MainScreeLayersOrderScreen
+import org.elnix.dragonlauncher.ui.dialogs.PinUnlockDialog
+import org.elnix.dragonlauncher.ui.dialogs.ShizukuUnavailableDialog
+import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
+import org.elnix.dragonlauncher.ui.dialogs.rememberMainScreenLayerOrder
+import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
+import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
+import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
+import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
+import org.elnix.dragonlauncher.ui.helpers.SetDefaultLauncherBanner
+import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
+import org.elnix.dragonlauncher.ui.navigation.collapseDownAnimation
+import org.elnix.dragonlauncher.ui.navigation.raiseUpAnimation
+import org.elnix.dragonlauncher.ui.navigation.settingComposable
 import org.elnix.dragonlauncher.ui.remembers.rememberDecodedObject
-import org.elnix.dragonlauncher.ui.settings.permissions.PermissionsTab
 import org.elnix.dragonlauncher.ui.settings.backup.BackupTab
 import org.elnix.dragonlauncher.ui.settings.customization.AngleLineTab
 import org.elnix.dragonlauncher.ui.settings.customization.AppearanceTab
@@ -167,6 +169,7 @@ import org.elnix.dragonlauncher.ui.settings.debug.LogsTab
 import org.elnix.dragonlauncher.ui.settings.debug.SettingsDebugTab
 import org.elnix.dragonlauncher.ui.settings.extensions.ExtensionsTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
+import org.elnix.dragonlauncher.ui.settings.permissions.PermissionsTab
 import org.elnix.dragonlauncher.ui.settings.wellbeing.WellbeingTab
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceDetailScreen
 import org.elnix.dragonlauncher.ui.settings.workspace.WorkspaceListScreen
@@ -659,23 +662,8 @@ fun MainAppUi(
                 currentRoute != ROUTES.WELCOME
 
 
-    val autoBackupLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        if (uri != null) {
-            ctx.contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
 
-            hasAutoBackupPermission = true
 
-            scope.launch {
-                BackupSettingsStore.autoBackupUri.set(ctx, uri.toString())
-                BackupSettingsStore.autoBackupEnabled.set(ctx, true)
-            }
-        }
-    }
 
     val containerColor by animateColorAsState(
         if (currentRoute in transparentScreens) {
@@ -796,18 +784,6 @@ fun MainAppUi(
         LocalShowLabelsInAddPointDialog provides showTooltipsOnAddPointDialog
     ) {
         Scaffold(
-            topBar = {
-                Column {
-                    if (showSetAsDefaultBanner) {
-                        SetDefaultLauncherBanner()
-                    }
-                    if (showReselectAutoBackupFile) {
-                        ReselectAutoBackupBanner {
-                            autoBackupLauncher.launch("dragonlauncher-auto-backup.json")
-                        }
-                    }
-                }
-            },
             floatingActionButton = {
                 if (colorTestMode) {
                     FloatingActionButton(
@@ -968,6 +944,23 @@ fun MainAppUi(
                             onLaunchAction = ::launchAction
                         )
                     }
+                }
+            }
+        }
+
+        if (showSetAsDefaultBanner || showReselectAutoBackupFile) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Spacer()
+                AnimatedVisibility (showSetAsDefaultBanner) {
+                    SetDefaultLauncherBanner()
+                }
+                AnimatedVisibility (showReselectAutoBackupFile) {
+                    ReselectAutoBackupBanner()
                 }
             }
         }

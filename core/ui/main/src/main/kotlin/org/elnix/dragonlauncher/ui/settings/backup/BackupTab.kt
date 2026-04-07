@@ -3,8 +3,6 @@ package org.elnix.dragonlauncher.ui.settings.backup
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,6 +58,7 @@ import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
+import org.elnix.dragonlauncher.ui.remembers.rememberAutoBackupLauncher
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsExportLauncher
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsImportLauncher
 import org.json.JSONObject
@@ -115,6 +114,7 @@ fun BackupTab(onBack: () -> Unit) {
 
 
     val settingsExportLauncher = rememberSettingsExportLauncher(selectedStoresForExport)
+    val autoBackupLauncher = rememberAutoBackupLauncher()
 
     val settingsImportLauncher = rememberSettingsImportLauncher(
         onJsonReady = { json ->
@@ -123,41 +123,6 @@ fun BackupTab(onBack: () -> Unit) {
         }
     )
 
-
-    val autoBackupLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        if (uri != null) {
-            try {
-                ctx.contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-                // Proceed only if successful
-                scope.launch {
-                    BackupSettingsStore.autoBackupUri.set(ctx, uri.toString())
-                    BackupSettingsStore.autoBackupEnabled.set(ctx, true)
-                }
-                backupViewModel.setResult(
-                    BackupResult(
-                        export = true,
-                        error = false,
-                        title = "Auto-backup enabled"
-                    )
-                )
-            } catch (e: SecurityException) {
-                // Fallback: Store non-persistable URI or notify user
-                backupViewModel.setResult(
-                    BackupResult(
-                        export = true,
-                        error = true,
-                        title = "Backup saved (limited persistence)"
-                    )
-                )
-                logE(BACKUP_TAG, e) { "Persistable permission not available for URI: $uri" }
-            }
-        }
-    }
 
 
     // ──────── UI ───────────────────────────────────────

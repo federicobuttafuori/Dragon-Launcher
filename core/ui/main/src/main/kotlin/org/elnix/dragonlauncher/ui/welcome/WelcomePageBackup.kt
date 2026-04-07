@@ -1,8 +1,5 @@
 package org.elnix.dragonlauncher.ui.welcome
 
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,20 +24,16 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.logging.logE
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
-import org.elnix.dragonlauncher.models.BackupResult
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
-import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
+import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
-import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.remembers.rememberAutoBackupLauncher
 
 @Composable
 fun WelcomePageBackup() {
     val ctx = LocalContext.current
-    val backupViewModel = LocalBackupViewModel.current
     val scope = rememberCoroutineScope()
 
 
@@ -48,41 +41,7 @@ fun WelcomePageBackup() {
     val autoBackupUriString by BackupSettingsStore.autoBackupUri.asStateNull()
     val autoBackupUri = autoBackupUriString?.toUri()
 
-
-    val autoBackupLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        if (uri != null) {
-            try {
-                ctx.contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-                // Proceed only if successful
-                scope.launch {
-                    BackupSettingsStore.autoBackupUri.set(ctx, uri.toString())
-                    BackupSettingsStore.autoBackupEnabled.set(ctx, true)
-                }
-                backupViewModel.setResult(
-                    BackupResult(
-                        export = true,
-                        error = false,
-                        title = "Auto-backup enabled"
-                    )
-                )
-            } catch (e: SecurityException) {
-                // Fallback: Store non-persistable URI or notify user
-                backupViewModel.setResult(
-                    BackupResult(
-                        export = true,
-                        error = true,
-                        title = "Backup saved (limited persistence)"
-                    )
-                )
-                logE(BACKUP_TAG, e) { "Persistable permission not available for URI: $uri" }
-            }
-        }
-    }
+    val autoBackupLauncher = rememberAutoBackupLauncher()
 
     Column(
         modifier = Modifier.fillMaxSize(),
