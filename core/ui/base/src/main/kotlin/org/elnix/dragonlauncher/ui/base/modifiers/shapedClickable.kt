@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.Role
 import org.elnix.dragonlauncher.ui.base.UiConstants
@@ -28,18 +29,7 @@ fun Modifier.shapedClickable(
 ): Modifier {
 
     val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val shapeRound by animateDpAsState(
-        targetValue = if (isPressed || isSelected)
-            UiConstants.PRESSED_DRAGON_SHAPE_CORNER_DP
-        else
-            UiConstants.DRAGON_SHAPE_CORNER_DP,
-        label = "shape_anim"
-    )
-
-
-    val shape = RoundedCornerShape(shapeRound)
+    val shape = provideClickableShape(interactionSource, isSelected)
 
     val onclickWithOptionalHaptic = if (hapticFeedback) {
         withHaptic(HapticFeedbackType.LongPress) {
@@ -56,4 +46,19 @@ fun Modifier.shapedClickable(
             onClick = onclickWithOptionalHaptic,
             onLongClick = onLongClick
         )
+}
+
+@Composable
+fun provideClickableShape(interactionSource: MutableInteractionSource, isSelected: Boolean = false): Shape {
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val shapeRound by animateDpAsState(
+        targetValue = if (isPressed || isSelected)
+            UiConstants.PRESSED_DRAGON_SHAPE_CORNER_DP
+        else
+            UiConstants.DRAGON_SHAPE_CORNER_DP,
+        label = "shape_anim"
+    )
+
+    return RoundedCornerShape(shapeRound)
 }

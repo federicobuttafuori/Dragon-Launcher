@@ -5,6 +5,7 @@ package org.elnix.dragonlauncher.ui.welcome
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import `in`.hridayan.shapeindicators.ShapeIndicatorDefaults
 import `in`.hridayan.shapeindicators.ShapeIndicatorRow
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
@@ -52,8 +53,9 @@ import org.elnix.dragonlauncher.models.BackupResult
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
 import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
-import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
+import org.elnix.dragonlauncher.ui.base.modifiers.provideClickableShape
 import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsImportLauncher
 import org.json.JSONObject
 
@@ -183,11 +185,18 @@ fun WelcomeScreen(
             ShapeIndicatorRow(
                 pagerState = pagerState,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                shuffleShapes = true
+                shuffleShapes = true,
+                overflow = ShapeIndicatorDefaults.overflow(maxVisibleItems = 6)
             )
         }
 
         if (pagerState.currentPage < 5) {
+
+
+            val interactionSource = remember { MutableInteractionSource() }
+            val shape = provideClickableShape(interactionSource)
+
+
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -199,7 +208,8 @@ fun WelcomeScreen(
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
-                shape = CircleShape
+                interactionSource = interactionSource,
+                shape = shape
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
