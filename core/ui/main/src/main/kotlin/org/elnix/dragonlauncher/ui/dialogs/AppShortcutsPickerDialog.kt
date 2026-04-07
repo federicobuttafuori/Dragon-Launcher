@@ -32,7 +32,7 @@ import org.elnix.dragonlauncher.common.utils.ImageUtils.loadDrawableAsBitmap
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.appIcon
 import org.elnix.dragonlauncher.common.utils.resolveShape
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
+import org.elnix.dragonlauncher.ui.composition.LocalIconShape
 
 @Composable
 fun AppShortcutPickerDialog(

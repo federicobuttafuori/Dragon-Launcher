@@ -57,9 +57,9 @@ import org.elnix.dragonlauncher.ui.dialogs.HapticFeedbackEditor
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.nests.circlesSettingsOverlay
-import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
+import org.elnix.dragonlauncher.ui.remembers.rememberSwipeDefaultParams
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalNests
+import org.elnix.dragonlauncher.ui.composition.LocalNests
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -89,7 +89,7 @@ fun NestEditingScreen(
 
     val angleColor = MaterialTheme.colorScheme.tertiary
 
-    val drawParams = swipeDefaultParams(
+    val drawParams = rememberSwipeDefaultParams(
         backgroundColor = MaterialTheme.colorScheme.background
     )
 

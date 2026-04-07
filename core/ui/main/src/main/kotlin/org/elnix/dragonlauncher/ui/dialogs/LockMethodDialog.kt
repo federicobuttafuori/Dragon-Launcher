@@ -32,7 +32,7 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
 import org.elnix.dragonlauncher.ui.helpers.findFragmentActivity
-import org.elnix.dragonlauncher.ui.helpers.text.TextWithDescription
+import org.elnix.dragonlauncher.ui.dragon.text.TextWithDescription
 
 @Suppress("VariableNeverRead")
 @SuppressLint("LocalContextGetResourceValueCall")

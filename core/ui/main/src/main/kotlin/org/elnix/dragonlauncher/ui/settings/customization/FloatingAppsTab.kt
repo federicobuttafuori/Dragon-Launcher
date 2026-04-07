@@ -101,7 +101,7 @@ import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SmallShapeRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
-import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalFloatingAppsViewModel
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 import kotlin.math.atan2
 import kotlin.math.cos

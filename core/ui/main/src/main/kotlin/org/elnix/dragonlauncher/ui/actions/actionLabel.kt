@@ -10,7 +10,7 @@ import org.elnix.dragonlauncher.common.navigaton.routeResId
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.utils.PackageManagerCompat
 import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
-import org.elnix.dragonlauncher.ui.remembers.LocalNests
+import org.elnix.dragonlauncher.ui.composition.LocalNests
 
 @Composable
 fun actionLabel(action: SwipeActionSerializable): String {

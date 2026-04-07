@@ -5,10 +5,10 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import org.elnix.dragonlauncher.common.points.SwipeDrawParams
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.utils.UiCircle
 import org.elnix.dragonlauncher.common.utils.circles.computePointPosition
+import org.elnix.dragonlauncher.ui.helpers.nests.points.SwipeDrawParams
 
 fun DrawScope.circlesSettingsOverlay(
     drawParams: SwipeDrawParams,

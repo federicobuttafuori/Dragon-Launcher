@@ -55,8 +55,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.base.theme.DefaultExtraColors
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.definedOrNull
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.definedOrNull
 import org.elnix.dragonlauncher.enumsui.ColorSelectorModes
 import org.elnix.dragonlauncher.enumsui.DefaultThemes
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.AMOLED
@@ -86,11 +86,11 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.helpers.text.AutoResizeableText
+import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.remembers.ExpandableSectionState
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
-import org.elnix.dragonlauncher.ui.theme.getSystemColorScheme
+import org.elnix.dragonlauncher.theme.getSystemColorScheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Suppress("AssignedValueIsNeverRead")

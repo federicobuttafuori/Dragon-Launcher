@@ -21,9 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
-import org.elnix.dragonlauncher.common.serializables.Workspace
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
 
 @Composable
 fun WorkspacePickerDialog(

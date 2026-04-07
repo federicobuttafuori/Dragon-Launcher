@@ -66,12 +66,12 @@ import org.elnix.dragonlauncher.ui.base.asStateNull
 import org.elnix.dragonlauncher.ui.helpers.CustomDim
 import org.elnix.dragonlauncher.ui.helpers.HoldToActivateArc
 import org.elnix.dragonlauncher.ui.helpers.WallpaperDim
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
-import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
-import org.elnix.dragonlauncher.ui.remembers.LocalNests
-import org.elnix.dragonlauncher.ui.remembers.LocalPoints
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalFloatingAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalHoldCustomObject
+import org.elnix.dragonlauncher.ui.composition.LocalMainScreenLayers
+import org.elnix.dragonlauncher.ui.composition.LocalNests
+import org.elnix.dragonlauncher.ui.composition.LocalPoints
 import org.elnix.dragonlauncher.ui.remembers.rememberHoldToOpenSettings
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar
 

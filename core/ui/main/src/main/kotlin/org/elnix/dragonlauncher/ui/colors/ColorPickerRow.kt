@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.semiTransparentIfDisabled
-import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
+import org.elnix.dragonlauncher.base.ColorUtils.semiTransparentIfDisabled
+import org.elnix.dragonlauncher.base.ColorUtils.toHexWithAlpha
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.pasteClipboard
 import org.elnix.dragonlauncher.common.utils.showToast

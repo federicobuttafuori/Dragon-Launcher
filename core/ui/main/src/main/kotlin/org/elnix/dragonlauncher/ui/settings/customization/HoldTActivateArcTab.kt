@@ -52,7 +52,7 @@ import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.customobjects.EditCustomObjectBlock
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalHoldCustomObject
+import org.elnix.dragonlauncher.ui.composition.LocalHoldCustomObject
 
 
 @Composable

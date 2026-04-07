@@ -18,7 +18,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.ui.UiConstants
 import org.elnix.dragonlauncher.ui.base.withHaptic
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
-import org.elnix.dragonlauncher.ui.helpers.text.AutoResizeableText
+import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

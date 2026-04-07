@@ -80,8 +80,8 @@ import org.elnix.dragonlauncher.ui.helpers.CustomActionSelector
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.modifiers.conditional
-import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
-import org.elnix.dragonlauncher.ui.remembers.LocalStatusBarElements
+import org.elnix.dragonlauncher.ui.composition.LocalMainScreenLayers
+import org.elnix.dragonlauncher.ui.composition.LocalStatusBarElements
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 

@@ -26,9 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
-import org.elnix.dragonlauncher.common.utils.colors.randomColor
-import org.elnix.dragonlauncher.common.utils.colors.toHexWithAlpha
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.randomColor
+import org.elnix.dragonlauncher.base.ColorUtils.toHexWithAlpha
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction
 import org.elnix.dragonlauncher.enumsui.ColorPickerButtonAction.COPY

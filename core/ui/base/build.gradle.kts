@@ -82,9 +82,9 @@ dependencies {
 //
 //
 //
-//    implementation(project(":core:base"))
-//    implementation(project(":core:models"))
-//    implementation(project(":core:common"))
+    implementation(project(":core:base"))
+    implementation(project(":core:ui:composition"))
+    implementation(project(":core:common"))
 //    implementation(project(":core:enumsui"))
 //    implementation(project(":core:logging"))
 //    implementation(project(":core:services"))

@@ -75,16 +75,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.logging.logD
-import org.elnix.dragonlauncher.logging.logE
 import org.elnix.dragonlauncher.common.utils.Constants
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.FONT_PROVIDER
-import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.logging.logD
+import org.elnix.dragonlauncher.logging.logE
 import org.elnix.dragonlauncher.services.ExtensionManager
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
-import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
+import org.elnix.dragonlauncher.theme.fontNameToFont
+import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.base.asState
+import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import java.io.File
 import java.io.FileOutputStream
@@ -783,36 +784,6 @@ fun FontRow(
             }
         }
     }
-}
-
-fun fontNameToFont(name: String, ctx: Context? = null): FontFamily {
-    val cleanName = name.substringBefore(" (")
-    val base = when (cleanName) {
-        "Serif" -> FontFamily.Serif
-        "SansSerif" -> FontFamily.SansSerif
-        "Monospace" -> FontFamily.Monospace
-        "Cursive" -> FontFamily.Cursive
-        "Default" -> FontFamily.Default
-        else -> null
-    }
-    if (base != null) return base
-    if (ctx != null) {
-        try {
-            val extDir = File(ctx.getExternalFilesDir(null), "fonts")
-            val ttf = File(extDir, "$cleanName.ttf")
-            val otf = File(extDir, "$cleanName.otf")
-            val fontFile = when {
-                ttf.exists() -> ttf
-                otf.exists() -> otf
-                else -> null
-            }
-            if (fontFile != null) {
-                return FontFamily(androidx.compose.ui.text.font.Font(fontFile))
-            }
-        } catch (_: Exception) {
-        }
-    }
-    return FontFamily.Default
 }
 
 

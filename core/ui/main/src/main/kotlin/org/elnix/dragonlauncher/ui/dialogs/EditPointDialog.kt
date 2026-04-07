@@ -39,7 +39,7 @@ import org.elnix.dragonlauncher.base.theme.LocalExtraColors
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.definedOrNull
+import org.elnix.dragonlauncher.base.ColorUtils.definedOrNull
 import org.elnix.dragonlauncher.enumsui.SelectedUnselectedViewMode
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.actionColor
@@ -55,8 +55,8 @@ import org.elnix.dragonlauncher.ui.components.generic.MultiSelectConnectedButton
 import org.elnix.dragonlauncher.ui.components.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.helpers.ShapeRow
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalDefaultPoint
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalDefaultPoint
 
 
 @Composable

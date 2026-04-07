@@ -22,8 +22,8 @@ import androidx.compose.material3.ToggleButtonColors
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
-import org.elnix.dragonlauncher.ui.remembers.LocalUseCustomColorChannels
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.ui.composition.LocalUseCustomColorChannels
 
 object AppObjectsColors {
 

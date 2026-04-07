@@ -9,7 +9,7 @@ import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.logging.logE
 import org.elnix.dragonlauncher.logging.logW
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.SHIZUKU_TAG
-import org.elnix.dragonlauncher.common.utils.OutputLine
+import org.elnix.dragonlauncher.shizuku.OutputLine
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuRemoteProcess
 import java.io.BufferedReader

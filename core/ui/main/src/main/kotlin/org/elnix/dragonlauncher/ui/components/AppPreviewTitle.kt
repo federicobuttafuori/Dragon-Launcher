@@ -30,8 +30,8 @@ import org.elnix.dragonlauncher.common.serializables.applyColorAction
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.ui.actions.actionColor
 import org.elnix.dragonlauncher.ui.actions.actionLabel
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
-import org.elnix.dragonlauncher.ui.remembers.LocalIcons
+import org.elnix.dragonlauncher.ui.composition.LocalIconShape
+import org.elnix.dragonlauncher.ui.composition.LocalIcons
 
 @Composable
 fun AppPreviewTitle(

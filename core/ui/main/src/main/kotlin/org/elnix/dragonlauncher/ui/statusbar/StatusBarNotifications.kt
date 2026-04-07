@@ -29,8 +29,8 @@ import org.elnix.dragonlauncher.common.serializables.StatusBarSerializable
 import org.elnix.dragonlauncher.common.serializables.dummyAppModel
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.services.DragonNotificationListenerService
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
-import org.elnix.dragonlauncher.ui.remembers.LocalIcons
+import org.elnix.dragonlauncher.ui.composition.LocalIconShape
+import org.elnix.dragonlauncher.ui.composition.LocalIcons
 
 @Composable
 fun StatusBarNotifications(

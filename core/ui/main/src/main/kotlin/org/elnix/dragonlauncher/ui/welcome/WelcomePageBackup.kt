@@ -35,7 +35,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
 import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
-import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
 
 @Composable
 fun WelcomePageBackup() {

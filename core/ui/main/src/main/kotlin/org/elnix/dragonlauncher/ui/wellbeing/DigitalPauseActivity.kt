@@ -83,7 +83,7 @@ import kotlinx.coroutines.delay
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.formatDuration
 import org.elnix.dragonlauncher.common.utils.hasUsageStatsPermission
-import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
+import org.elnix.dragonlauncher.theme.DragonLauncherTheme
 import java.util.Calendar
 import kotlin.random.Random
 

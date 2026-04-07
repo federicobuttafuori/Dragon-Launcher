@@ -51,7 +51,7 @@ import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.appIcon
 import org.elnix.dragonlauncher.ui.components.Spacer
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
+import org.elnix.dragonlauncher.ui.composition.LocalIconShape
 
 private data class DialogEntry(
     val label: String,

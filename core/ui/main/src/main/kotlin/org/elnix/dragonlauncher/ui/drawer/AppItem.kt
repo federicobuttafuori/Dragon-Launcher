@@ -42,7 +42,7 @@ import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.actions.appIcon
 import org.elnix.dragonlauncher.ui.components.dragon.DragonDropDownMenu
 import org.elnix.dragonlauncher.ui.modifiers.conditional
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
+import org.elnix.dragonlauncher.ui.composition.LocalIconShape
 
 @Composable
 fun AppItemHorizontal(

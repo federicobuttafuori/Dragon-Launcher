@@ -53,13 +53,13 @@ import org.elnix.dragonlauncher.ui.dialogs.rememberLineObjectsOrder
 import org.elnix.dragonlauncher.ui.helpers.customobjects.actionLine
 import org.elnix.dragonlauncher.ui.helpers.nests.actionsInCircle
 import org.elnix.dragonlauncher.ui.helpers.nests.circlesSettingsOverlay
-import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
-import org.elnix.dragonlauncher.ui.remembers.LocalAngleLineObject
-import org.elnix.dragonlauncher.ui.remembers.LocalEndLineObject
-import org.elnix.dragonlauncher.ui.remembers.LocalLineObject
-import org.elnix.dragonlauncher.ui.remembers.LocalNests
-import org.elnix.dragonlauncher.ui.remembers.LocalPoints
-import org.elnix.dragonlauncher.ui.remembers.LocalStartLineObject
+import org.elnix.dragonlauncher.ui.remembers.rememberSwipeDefaultParams
+import org.elnix.dragonlauncher.ui.composition.LocalAngleLineObject
+import org.elnix.dragonlauncher.ui.composition.LocalEndLineObject
+import org.elnix.dragonlauncher.ui.composition.LocalLineObject
+import org.elnix.dragonlauncher.ui.composition.LocalNests
+import org.elnix.dragonlauncher.ui.composition.LocalPoints
+import org.elnix.dragonlauncher.ui.composition.LocalStartLineObject
 import org.elnix.dragonlauncher.ui.remembers.rememberSweepAngle
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -370,7 +370,7 @@ fun MainScreenOverlay(
             }
         }
 
-        val drawParams = swipeDefaultParams(points = points)
+        val drawParams = rememberSwipeDefaultParams(points = points)
 
 
         // Main drawing canva (the lines, circles and selected actions

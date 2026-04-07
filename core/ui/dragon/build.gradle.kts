@@ -82,6 +82,9 @@ dependencies {
 
 
     implementation(project(":core:ui:base"))
+    implementation(project(":core:ui:theme"))
+    implementation(project(":core:ui:composition"))
+
     implementation(project(":core:base"))
     implementation(project(":core:models"))
     implementation(project(":core:common"))

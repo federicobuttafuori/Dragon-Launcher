@@ -57,7 +57,7 @@ import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.CustomHapticFeedbackSerializable
 import org.elnix.dragonlauncher.common.serializables.hapticFeedbackSerializablePresets
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.HAPTIC_TAG
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.pasteClipboard
 import org.elnix.dragonlauncher.common.utils.performCustomHaptic

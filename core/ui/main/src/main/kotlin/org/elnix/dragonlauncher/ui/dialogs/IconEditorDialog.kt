@@ -53,8 +53,8 @@ import org.elnix.dragonlauncher.common.serializables.IconType
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
 import org.elnix.dragonlauncher.common.utils.ImageUtils.uriToBase64
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.definedOrNull
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.definedOrNull
 import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.colors.ColorPickerRow
@@ -64,8 +64,8 @@ import org.elnix.dragonlauncher.ui.components.ValidateCancelButtons
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.ShapeRow
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalIconShape
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalIconShape
 
 @Composable
 fun IconEditorDialog(

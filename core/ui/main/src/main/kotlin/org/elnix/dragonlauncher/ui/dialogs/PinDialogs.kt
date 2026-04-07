@@ -61,7 +61,7 @@ import androidx.compose.ui.window.DialogProperties
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.common.serializables.allShapesWithoutRandom
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.semiTransparentIfDisabled
+import org.elnix.dragonlauncher.base.ColorUtils.semiTransparentIfDisabled
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.common.utils.vibrate
 import org.elnix.dragonlauncher.settings.stores.BehaviorSettingsStore

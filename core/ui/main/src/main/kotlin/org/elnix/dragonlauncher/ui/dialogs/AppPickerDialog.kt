@@ -70,8 +70,8 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.AppDrawerSearch
 import org.elnix.dragonlauncher.ui.helpers.AppGrid
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
-import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalAppLifecycleViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

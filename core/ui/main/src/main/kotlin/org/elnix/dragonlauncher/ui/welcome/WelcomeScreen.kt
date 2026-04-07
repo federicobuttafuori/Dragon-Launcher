@@ -53,7 +53,7 @@ import org.elnix.dragonlauncher.settings.SettingsBackupManager
 import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.stores.PrivateSettingsStore
 import org.elnix.dragonlauncher.ui.dialogs.ImportSettingsDialog
-import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsImportLauncher
 import org.json.JSONObject
 

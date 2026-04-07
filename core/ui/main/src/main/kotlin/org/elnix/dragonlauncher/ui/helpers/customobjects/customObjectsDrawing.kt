@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.serializables.CustomObjectSerializable
-import org.elnix.dragonlauncher.ui.helpers.nests.glowOverlay
 
 fun DrawScope.customObject(
     customObject: CustomObjectSerializable,

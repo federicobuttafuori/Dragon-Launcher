@@ -60,7 +60,7 @@ import org.elnix.dragonlauncher.ui.helpers.GradientBigButton
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsExportLauncher
 import org.elnix.dragonlauncher.ui.remembers.rememberSettingsImportLauncher
 import org.json.JSONObject

@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.WallpaperHelper
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.enumsui.WallpaperEditMode
 import org.elnix.dragonlauncher.enumsui.WallpaperTarget

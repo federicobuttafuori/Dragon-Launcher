@@ -103,9 +103,3 @@ val LightDragonColorScheme: ColorScheme = lightColorScheme(
     inverseOnSurface = Color.White,
     inversePrimary = Color(0xFF7B2EB8)
 )
-
-/* ───────────────────────── Shared action colors ───────────────────────── */
-
-val copyColor = Color(0xFFE19807)
-val moveColor = Color(0xFF14E7EE)
-val addRemoveCirclesColor = Color(0xFF00D950)

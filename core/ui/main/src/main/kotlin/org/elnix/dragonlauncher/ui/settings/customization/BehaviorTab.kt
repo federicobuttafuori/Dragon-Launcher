@@ -46,8 +46,8 @@ import org.elnix.dragonlauncher.ui.helpers.CustomActionSelector
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalNavController
+import org.elnix.dragonlauncher.ui.composition.LocalAppLifecycleViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalNavController
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 
 

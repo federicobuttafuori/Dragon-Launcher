@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
-import org.elnix.dragonlauncher.common.utils.colors.randomColor
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.randomColor
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.SliderWithLabel
 

@@ -116,8 +116,8 @@ import org.elnix.dragonlauncher.ui.helpers.WallpaperDim
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.modifiers.settingsGroup
 import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
-import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalAppLifecycleViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
 import kotlin.math.abs
 import kotlin.math.pow
 

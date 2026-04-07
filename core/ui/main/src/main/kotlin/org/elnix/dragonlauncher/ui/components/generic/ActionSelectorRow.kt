@@ -33,7 +33,7 @@ import org.elnix.dragonlauncher.ui.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.dialogs.CustomAlertDialog
-import org.elnix.dragonlauncher.ui.helpers.text.TextWithDescription
+import org.elnix.dragonlauncher.ui.dragon.text.TextWithDescription
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 
 

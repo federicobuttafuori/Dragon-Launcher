@@ -18,8 +18,6 @@ import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Angle
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.End
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Line
 import org.elnix.dragonlauncher.enumsui.AngleLineObjects.Start
-import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowLine
-import org.elnix.dragonlauncher.ui.helpers.nests.drawNeonGlowShapePath
 import kotlin.math.abs
 
 fun DrawScope.actionLine(

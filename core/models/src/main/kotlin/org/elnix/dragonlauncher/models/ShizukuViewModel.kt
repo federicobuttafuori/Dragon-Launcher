@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.common.utils.OutputLine
+import org.elnix.dragonlauncher.shizuku.OutputLine
 import org.elnix.dragonlauncher.shizuku.ShellCommandExecutor
 import org.elnix.dragonlauncher.shizuku.ShizukuPermissionHandler
 

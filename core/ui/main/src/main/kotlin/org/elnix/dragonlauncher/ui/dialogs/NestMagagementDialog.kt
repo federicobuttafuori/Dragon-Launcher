@@ -49,8 +49,8 @@ import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.ui.colors.AppObjectsColors
 import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.nests.actionsInCircle
-import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
-import org.elnix.dragonlauncher.ui.remembers.LocalNests
+import org.elnix.dragonlauncher.ui.remembers.rememberSwipeDefaultParams
+import org.elnix.dragonlauncher.ui.composition.LocalNests
 
 @Composable
 fun NestManagementDialog(
@@ -148,7 +148,7 @@ private fun NestManagementItem(
 
     val canEditName = onNameChange != null
 
-    val drawParams = swipeDefaultParams(
+    val drawParams = rememberSwipeDefaultParams(
         backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
         nests = nests
     )

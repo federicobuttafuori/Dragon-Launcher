@@ -133,12 +133,12 @@ import org.elnix.dragonlauncher.ui.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.helpers.EditValueTextField
 import org.elnix.dragonlauncher.ui.helpers.nests.actionsInCircle
 import org.elnix.dragonlauncher.ui.helpers.nests.circlesSettingsOverlay
-import org.elnix.dragonlauncher.ui.helpers.nests.glowOverlay
-import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
+import org.elnix.dragonlauncher.ui.helpers.customobjects.glowOverlay
+import org.elnix.dragonlauncher.ui.remembers.rememberSwipeDefaultParams
 import org.elnix.dragonlauncher.ui.helpers.settings.fullScreenStatusBarsPaddings
 import org.elnix.dragonlauncher.ui.modifiers.shapedClickable
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalDefaultPoint
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalDefaultPoint
 import java.math.RoundingMode
 import java.util.UUID
 import kotlin.math.abs
@@ -633,7 +633,7 @@ fun SettingsScreen(
     }
 
 
-    val baseDrawParams = swipeDefaultParams(
+    val baseDrawParams = rememberSwipeDefaultParams(
         points = points,
         nests = nests,
         backgroundColor = MaterialTheme.colorScheme.background

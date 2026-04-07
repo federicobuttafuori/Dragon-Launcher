@@ -13,7 +13,7 @@ import org.elnix.dragonlauncher.settings.stores.DebugSettingsStore
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
 import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceUnlockScreen
-import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
+import org.elnix.dragonlauncher.theme.DragonLauncherTheme
 
 class PrivateSpaceUnlockActivity : AppCompatActivity() {
 

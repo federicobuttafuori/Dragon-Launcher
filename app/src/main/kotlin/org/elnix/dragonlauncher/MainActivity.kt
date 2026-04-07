@@ -75,13 +75,13 @@ import org.elnix.dragonlauncher.ui.MainAppUi
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
 import org.elnix.dragonlauncher.ui.dialogs.CrashScreen
-import org.elnix.dragonlauncher.ui.remembers.LocalAppLifecycleViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalBackupViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalFloatingAppsViewModel
-import org.elnix.dragonlauncher.ui.remembers.LocalNavController
-import org.elnix.dragonlauncher.ui.remembers.LocalShizukuViewModel
-import org.elnix.dragonlauncher.ui.theme.DragonLauncherTheme
+import org.elnix.dragonlauncher.ui.composition.LocalAppLifecycleViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalFloatingAppsViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalNavController
+import org.elnix.dragonlauncher.ui.composition.LocalShizukuViewModel
+import org.elnix.dragonlauncher.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 import java.util.UUID
 

@@ -58,8 +58,8 @@ import org.elnix.dragonlauncher.ui.components.dragon.DragonIconButton
 import org.elnix.dragonlauncher.ui.components.dragon.DragonRow
 import org.elnix.dragonlauncher.ui.components.dragon.DragonTooltip
 import org.elnix.dragonlauncher.ui.base.asState
-import org.elnix.dragonlauncher.ui.helpers.text.AutoResizeableText
-import org.elnix.dragonlauncher.ui.remembers.LocalShowLabelsInAddPointDialog
+import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
+import org.elnix.dragonlauncher.ui.composition.LocalShowLabelsInAddPointDialog
 
 @Suppress("AssignedValueIsNeverRead")
 @Composable

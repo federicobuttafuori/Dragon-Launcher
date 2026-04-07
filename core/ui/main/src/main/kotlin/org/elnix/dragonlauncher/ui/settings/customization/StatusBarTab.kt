@@ -26,7 +26,7 @@ import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSlider
 import org.elnix.dragonlauncher.ui.helpers.SwitchRow
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalMainScreenLayers
+import org.elnix.dragonlauncher.ui.composition.LocalMainScreenLayers
 import org.elnix.dragonlauncher.ui.remembers.rememberExpandableSection
 import org.elnix.dragonlauncher.ui.statusbar.EditStatusBar
 import org.elnix.dragonlauncher.ui.statusbar.StatusBar

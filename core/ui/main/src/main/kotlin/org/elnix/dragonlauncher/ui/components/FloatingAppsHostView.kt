@@ -28,7 +28,7 @@ import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.utils.resolveShape
 import org.elnix.dragonlauncher.ui.actions.ActionIcon
 import org.elnix.dragonlauncher.ui.helpers.nests.actionsInCircle
-import org.elnix.dragonlauncher.ui.helpers.nests.swipeDefaultParams
+import org.elnix.dragonlauncher.ui.remembers.rememberSwipeDefaultParams
 import org.elnix.dragonlauncher.ui.modifiers.conditional
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 import kotlin.math.min
@@ -119,7 +119,7 @@ fun FloatingAppsHostView(
         } else {
 
             val sizeDp = with(LocalDensity.current) { sizePx.toDp() }
-            val drawParams = swipeDefaultParams()
+            val drawParams = rememberSwipeDefaultParams()
 
             val editPoint = SwipePointSerializable(
                 circleNumber = 0,

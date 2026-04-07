@@ -65,7 +65,7 @@ import org.elnix.dragonlauncher.common.utils.Constants.URLs.GITHUB_REPO_RELEASES
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.MAILTO_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.REDDIT_LINK
 import org.elnix.dragonlauncher.common.utils.Constants.URLs.WEBLATE_LINK
-import org.elnix.dragonlauncher.common.utils.colors.ColorUtils.alphaMultiplier
+import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
 import org.elnix.dragonlauncher.common.utils.getVersionCode
 import org.elnix.dragonlauncher.common.utils.openUrl
@@ -80,7 +80,7 @@ import org.elnix.dragonlauncher.ui.helpers.settings.ContributorItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingItemWithExternalOpen
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsItem
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.remembers.LocalNavController
+import org.elnix.dragonlauncher.ui.composition.LocalNavController
 
 
 @SuppressLint("LocalContextGetResourceValueCall")
