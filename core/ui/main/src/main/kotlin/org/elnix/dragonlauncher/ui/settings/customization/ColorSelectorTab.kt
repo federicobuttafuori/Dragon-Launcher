@@ -1,6 +1,8 @@
 package org.elnix.dragonlauncher.ui.settings.customization
 
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Ease
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,10 +56,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.elnix.dragonlauncher.base.theme.DefaultExtraColors
-import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.base.ColorUtils.alphaMultiplier
 import org.elnix.dragonlauncher.base.ColorUtils.definedOrNull
+import org.elnix.dragonlauncher.base.theme.DefaultExtraColors
+import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.enumsui.ColorSelectorModes
 import org.elnix.dragonlauncher.enumsui.DefaultThemes
 import org.elnix.dragonlauncher.enumsui.DefaultThemes.AMOLED
@@ -69,31 +72,30 @@ import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.stores.ColorModesSettingsStore
 import org.elnix.dragonlauncher.settings.stores.ColorSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
+import org.elnix.dragonlauncher.theme.AppObjectsColors
+import org.elnix.dragonlauncher.theme.getSystemColorScheme
 import org.elnix.dragonlauncher.ui.base.UiConstants.DragonShape
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
-import org.elnix.dragonlauncher.theme.AppObjectsColors
-import org.elnix.dragonlauncher.ui.dragon.colors.ColorPickerRow
-import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSection
+import org.elnix.dragonlauncher.ui.base.modifiers.conditional
 import org.elnix.dragonlauncher.ui.components.burger.BurgerAction
 import org.elnix.dragonlauncher.ui.components.burger.BurgerListAction
-import org.elnix.dragonlauncher.ui.dragon.components.DragonButton
-import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
-import org.elnix.dragonlauncher.ui.dragon.generic.MultiSelectConnectedButtonRow
-import org.elnix.dragonlauncher.ui.dragon.generic.ShowLabels
 import org.elnix.dragonlauncher.ui.components.settings.SettingsColorPicker
 import org.elnix.dragonlauncher.ui.components.settings.SettingsSwitchRow
-import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.dragon.colors.ColorPickerRow
+import org.elnix.dragonlauncher.ui.dragon.components.DragonButton
+import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
 import org.elnix.dragonlauncher.ui.dragon.components.SwitchRow
-import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
-import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
-import org.elnix.dragonlauncher.ui.base.modifiers.conditional
+import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
+import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSection
 import org.elnix.dragonlauncher.ui.dragon.expandable.ExpandableSectionState
 import org.elnix.dragonlauncher.ui.dragon.expandable.rememberExpandableSection
-import org.elnix.dragonlauncher.theme.getSystemColorScheme
+import org.elnix.dragonlauncher.ui.dragon.generic.MultiSelectConnectedButtonRow
+import org.elnix.dragonlauncher.ui.dragon.generic.ShowLabels
+import org.elnix.dragonlauncher.ui.dragon.text.AutoResizeableText
+import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Suppress("AssignedValueIsNeverRead")
 @Composable
 fun ColorSelectorTab(
     onBack: (() -> Unit)
@@ -428,9 +430,8 @@ fun ColorSelectorTab(
             scope.launch {
                 ColorSettingsStore.resetAll(ctx)
             }
-        }
-    ) {
-        item {
+        },
+        content = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -528,21 +529,16 @@ fun ColorSelectorTab(
                     }
                 }
             }
-        }
 
+            HorizontalDivider()
 
-        item { HorizontalDivider(color = MaterialTheme.colorScheme.outline) }
-
-        item {
             SettingsSwitchRow(
                 setting = UiSettingsStore.useCustomColorChannels,
                 title = stringResource(R.string.use_custom_color_channels),
                 description = stringResource(R.string.use_custom_color_channels_desc)
             )
-        }
 
-        item {
-            if (colorTestMode) {
+            AnimatedVisibility(colorTestMode) {
                 DragonButton(
                     onClick = { showExitTestValidation = true },
                     modifier = Modifier.fillMaxWidth()
@@ -550,361 +546,379 @@ fun ColorSelectorTab(
                     Text(stringResource(R.string.exit_test_mode))
                 }
             }
-        }
 
-        if (defaultTheme == CUSTOM) {
 
-            item {
-                @Suppress("DEPRECATION")
-                ButtonGroup(
-                    Modifier.fillMaxWidth(),
+            AnimatedVisibility(defaultTheme == CUSTOM) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DragonButton(
-                        onClick = { showResetValidation = true }
+                    @Suppress("DEPRECATION")
+                    ButtonGroup(
+                        Modifier.fillMaxWidth(),
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Restore,
-                            contentDescription = stringResource(R.string.reset),
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .padding(5.dp)
-                        )
-
-                        AutoResizeableText(stringResource(R.string.reset_to_default_colors))
-                    }
-
-                    Box {
-                        DragonIconButton(
-                            onClick = { showBurgerMenu = true },
-                            colors = AppObjectsColors.iconButtonColors(
-                                backgroundColor = MaterialTheme.colorScheme.primary.copy(0.5f)
-                            ),
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.open_burger_menu)
-                        )
-
-                        DropdownMenu(
-                            expanded = showBurgerMenu,
-                            onDismissRequest = { showBurgerMenu = false },
-                            containerColor = Color.Transparent,
-                            shadowElevation = 0.dp,
-                            tonalElevation = 0.dp
+                        DragonButton(
+                            onClick = { showResetValidation = true }
                         ) {
-                            BurgerListAction(
-                                actions = listOf(
-                                    BurgerAction(
-                                        onClick = {
-                                            showRandomColorsValidation = true
-                                            showBurgerMenu = false
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.Shuffle, null)
-                                        Text(stringResource(R.string.make_every_colors_random))
-                                    },
-                                    BurgerAction(
-                                        onClick = {
-                                            showAllColorsValidation = true
-                                            showBurgerMenu = false
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.SelectAll, null)
-                                        Text(stringResource(R.string.make_all_colors_identical))
-                                    },
-                                    BurgerAction(
-                                        onClick = {
-                                            scope.launch {
-                                                ColorSettingsStore.backupColors(ctx)
-                                                ColorModesSettingsStore.colorTestMode.set(ctx, true)
-                                                onBack() // Go back to main screen
-                                            }
-                                        }
-                                    ) {
-                                        Icon(Icons.Default.Colorize, null)
-                                        Text(stringResource(R.string.test_colors))
-                                    }
-                                )
+                            Icon(
+                                imageVector = Icons.Default.Restore,
+                                contentDescription = stringResource(R.string.reset),
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .padding(5.dp)
                             )
+
+                            AutoResizeableText(stringResource(R.string.reset_to_default_colors))
+                        }
+
+                        Box {
+                            DragonIconButton(
+                                onClick = { showBurgerMenu = true },
+                                colors = AppObjectsColors.iconButtonColors(
+                                    backgroundColor = MaterialTheme.colorScheme.primary.copy(0.5f)
+                                ),
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.open_burger_menu)
+                            )
+
+                            DropdownMenu(
+                                expanded = showBurgerMenu,
+                                onDismissRequest = { showBurgerMenu = false },
+                                containerColor = Color.Transparent,
+                                shadowElevation = 0.dp,
+                                tonalElevation = 0.dp
+                            ) {
+                                BurgerListAction(
+                                    actions = listOf(
+                                        BurgerAction(
+                                            onClick = {
+                                                showRandomColorsValidation = true
+                                                showBurgerMenu = false
+                                            }
+                                        ) {
+                                            Icon(Icons.Default.Shuffle, null)
+                                            Text(stringResource(R.string.make_every_colors_random))
+                                        },
+                                        BurgerAction(
+                                            onClick = {
+                                                showAllColorsValidation = true
+                                                showBurgerMenu = false
+                                            }
+                                        ) {
+                                            Icon(Icons.Default.SelectAll, null)
+                                            Text(stringResource(R.string.make_all_colors_identical))
+                                        },
+                                        BurgerAction(
+                                            onClick = {
+                                                scope.launch {
+                                                    ColorSettingsStore.backupColors(ctx)
+                                                    ColorModesSettingsStore.colorTestMode.set(ctx, true)
+                                                    onBack() // Go back to main screen
+                                                }
+                                            }
+                                        ) {
+                                            Icon(Icons.Default.Colorize, null)
+                                            Text(stringResource(R.string.test_colors))
+                                        }
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+
+
+                    AnimatedVisibility(selectedDefaultTheme == DARK || selectedDefaultTheme == AMOLED) {
+                        SwitchRow(
+                            state = selectedDefaultTheme == AMOLED,
+                            title = stringResource(R.string.amoled_theme),
+                            description = stringResource(R.string.use_pure_black_background)
+                        ) {
+                            val theme = if (it) {
+                                AMOLED
+                            } else DARK
+
+                            scope.launch {
+                                ColorModesSettingsStore.defaultTheme.set(ctx, theme)
+                            }
+                        }
+
+                    }
+
+                    // Only show the dynamic colors switch when in SYSTEM view
+                    AnimatedVisibility(selectedDefaultTheme == SYSTEM) {
+                        SettingsSwitchRow(
+                            setting = ColorModesSettingsStore.dynamicColor,
+                            title = stringResource(R.string.dynamic_colors),
+                            description = stringResource(R.string.dynamic_colors_desc)
+                        )
+                    }
+
+
+                    MultiSelectConnectedButtonRow(
+                        entries = ColorSelectorModes.entries,
+                        showLabels = ShowLabels.Always,
+                        isChecked = { it == selectedCustomView }
+                    ) { selectedCustomView = it }
+
+
+                    AnimatedContent(selectedCustomView) {
+                        when (it) {
+                            ColorSelectorModes.NORMAL -> {
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    colorsGroup(
+                                        expandableSectionState = primarySectionState,
+                                        colors = primaryColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = secondarySectionState,
+                                        colors = secondaryColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = tertiarySectionState,
+                                        colors = tertiaryColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = backgroundSectionState,
+                                        colors = backgroundColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = errorSectionState,
+                                        colors = errorColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = outlineSectionState,
+                                        colors = outlineColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = surfaceContainerSectionState,
+                                        colors = surfaceContainerColors
+                                    )
+
+                                    colorsGroup(
+                                        expandableSectionState = fixedSectionState,
+                                        colors = fixedColors
+                                    )
+                                }
+                            }
+
+
+                            ColorSelectorModes.CUSTOM -> {
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.angleLineColor,
+                                            defaultColor = angleLineColor.definedOrNull() ?: DefaultExtraColors.angleLine,
+                                            label = stringResource(R.string.angle_line_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.circleColor,
+                                            defaultColor = circleColor.definedOrNull() ?: DefaultExtraColors.circle,
+                                            label = stringResource(R.string.circle_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.launchAppColor,
+                                            defaultColor = launchAppColor.definedOrNull() ?: DefaultExtraColors.launchApp,
+                                            label = stringResource(R.string.launch_app_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.openUrlColor,
+                                            defaultColor = openUrlColor.definedOrNull() ?: DefaultExtraColors.openUrl,
+                                            label = stringResource(R.string.open_url_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.notificationShadeColor,
+                                            defaultColor = notificationShadeColor.definedOrNull() ?: DefaultExtraColors.notificationShade,
+                                            label = stringResource(R.string.notification_shade_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.controlPanelColor,
+                                            defaultColor = controlPanelColor.definedOrNull() ?: DefaultExtraColors.controlPanel,
+                                            label = stringResource(R.string.control_panel_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.openAppDrawerColor,
+                                            defaultColor = openAppDrawerColor.definedOrNull() ?: DefaultExtraColors.openAppDrawer,
+                                            label = stringResource(R.string.open_app_drawer_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.launcherSettingsColor,
+                                            defaultColor = launcherSettingsColor.definedOrNull() ?: DefaultExtraColors.launcherSettings,
+                                            label = stringResource(R.string.launcher_settings_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.lockColor,
+                                            defaultColor = lockColor.definedOrNull() ?: DefaultExtraColors.lock,
+                                            label = stringResource(R.string.lock_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.openFileColor,
+                                            defaultColor = openFileColor.definedOrNull() ?: DefaultExtraColors.openFile,
+                                            label = stringResource(R.string.open_file_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.reloadColor,
+                                            defaultColor = reloadColor.definedOrNull() ?: DefaultExtraColors.reload,
+                                            label = stringResource(R.string.reload_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.openRecentAppsColor,
+                                            defaultColor = openRecentAppsColor.definedOrNull() ?: DefaultExtraColors.openRecentApps,
+                                            label = stringResource(R.string.open_recent_apps_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.openCircleNestColor,
+                                            defaultColor = openCircleNest.definedOrNull() ?: DefaultExtraColors.openCircleNest,
+                                            label = stringResource(R.string.open_circle_nest_color)
+                                        )
+                                    }
+
+                                    item {
+                                        SettingsColorPicker(
+                                            settingObject = ColorSettingsStore.goParentNestColor,
+                                            defaultColor = goParentCircle.definedOrNull() ?: DefaultExtraColors.goParentNest,
+                                            label = stringResource(R.string.go_parent_nest_color)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            }
-
-            item {
-                MultiSelectConnectedButtonRow(
-                    entries = ColorSelectorModes.entries,
-                    showLabels = ShowLabels.Always,
-                    isChecked = { it == selectedCustomView }
-                ) { selectedCustomView = it }
-            }
-
-            if (selectedCustomView == ColorSelectorModes.NORMAL) {
-                colorsGroup(
-                    expandableSectionState = primarySectionState,
-                    colors = primaryColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = secondarySectionState,
-                    colors = secondaryColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = tertiarySectionState,
-                    colors = tertiaryColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = backgroundSectionState,
-                    colors = backgroundColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = errorSectionState,
-                    colors = errorColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = outlineSectionState,
-                    colors = outlineColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = surfaceContainerSectionState,
-                    colors = surfaceContainerColors
-                )
-
-                colorsGroup(
-                    expandableSectionState = fixedSectionState,
-                    colors = fixedColors
-                )
-            } else {
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.angleLineColor,
-                        defaultColor = angleLineColor.definedOrNull() ?: DefaultExtraColors.angleLine,
-                        label = stringResource(R.string.angle_line_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.circleColor,
-                        defaultColor = circleColor.definedOrNull() ?: DefaultExtraColors.circle,
-                        label = stringResource(R.string.circle_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.launchAppColor,
-                        defaultColor = launchAppColor.definedOrNull() ?: DefaultExtraColors.launchApp,
-                        label = stringResource(R.string.launch_app_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.openUrlColor,
-                        defaultColor = openUrlColor.definedOrNull() ?: DefaultExtraColors.openUrl,
-                        label = stringResource(R.string.open_url_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.notificationShadeColor,
-                        defaultColor = notificationShadeColor.definedOrNull() ?: DefaultExtraColors.notificationShade,
-                        label = stringResource(R.string.notification_shade_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.controlPanelColor,
-                        defaultColor = controlPanelColor.definedOrNull() ?: DefaultExtraColors.controlPanel,
-                        label = stringResource(R.string.control_panel_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.openAppDrawerColor,
-                        defaultColor = openAppDrawerColor.definedOrNull() ?: DefaultExtraColors.openAppDrawer,
-                        label = stringResource(R.string.open_app_drawer_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.launcherSettingsColor,
-                        defaultColor = launcherSettingsColor.definedOrNull() ?: DefaultExtraColors.launcherSettings,
-                        label = stringResource(R.string.launcher_settings_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.lockColor,
-                        defaultColor = lockColor.definedOrNull() ?: DefaultExtraColors.lock,
-                        label = stringResource(R.string.lock_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.openFileColor,
-                        defaultColor = openFileColor.definedOrNull() ?: DefaultExtraColors.openFile,
-                        label = stringResource(R.string.open_file_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.reloadColor,
-                        defaultColor = reloadColor.definedOrNull() ?: DefaultExtraColors.reload,
-                        label = stringResource(R.string.reload_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.openRecentAppsColor,
-                        defaultColor = openRecentAppsColor.definedOrNull() ?: DefaultExtraColors.openRecentApps,
-                        label = stringResource(R.string.open_recent_apps_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.openCircleNestColor,
-                        defaultColor = openCircleNest.definedOrNull() ?: DefaultExtraColors.openCircleNest,
-                        label = stringResource(R.string.open_circle_nest_color)
-                    )
-                }
-
-                item {
-                    SettingsColorPicker(
-                        settingObject = ColorSettingsStore.goParentNestColor,
-                        defaultColor = goParentCircle.definedOrNull() ?: DefaultExtraColors.goParentNest,
-                        label = stringResource(R.string.go_parent_nest_color)
-                    )
-                }
-
-            }
-        }
 
 
-        if (selectedDefaultTheme == DARK || selectedDefaultTheme == AMOLED) {
-            item {
-                SwitchRow(
-                    state = selectedDefaultTheme == AMOLED,
-                    title = stringResource(R.string.amoled_theme),
-                    description = stringResource(R.string.use_pure_black_background)
-                ) {
-                    val theme = if (it) {
-                        AMOLED
-                    } else DARK
 
-                    scope.launch {
-                        ColorModesSettingsStore.defaultTheme.set(ctx, theme)
-                    }
-                }
-            }
-        }
-
-        // Only show the dynamic colors switch when in SYSTEM view
-        if (selectedDefaultTheme == SYSTEM) {
-            item {
-                SettingsSwitchRow(
-                    setting = ColorModesSettingsStore.dynamicColor,
-                    title = stringResource(R.string.dynamic_colors),
-                    description = stringResource(R.string.dynamic_colors_desc)
-                )
-            }
-        }
-    }
-
-    if (showResetValidation) {
-        UserValidation(
-            title = stringResource(R.string.reset_to_default_colors),
-            message = stringResource(R.string.reset_to_default_colors_explanation),
-            onDismiss = { showResetValidation = false }
-        ) {
-            scope.launch {
-                ColorSettingsStore.resetAll(ctx)
-                showResetValidation = false
-            }
-        }
-    }
-    if (showRandomColorsValidation) {
-        UserValidation(
-            title = stringResource(R.string.make_every_colors_random),
-            message = stringResource(R.string.make_every_colors_random_explanation),
-            onDismiss = { showRandomColorsValidation = false }
-        ) {
-            scope.launch {
-                ColorSettingsStore.setAllRandomColors(ctx)
-                showRandomColorsValidation = false
-            }
-        }
-    }
-
-
-    if (showAllColorsValidation) {
-        var applyColor by remember { mutableStateOf(Color.Black) }
-        AlertDialog(
-            onDismissRequest = { showAllColorsValidation = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
+                if (showResetValidation) {
+                    UserValidation(
+                        title = stringResource(R.string.reset_to_default_colors),
+                        message = stringResource(R.string.reset_to_default_colors_explanation),
+                        onDismiss = { showResetValidation = false }
+                    ) {
                         scope.launch {
-                            ColorSettingsStore.setAllSameColors(ctx, applyColor)
-                            showAllColorsValidation = false
+                            ColorSettingsStore.resetAll(ctx)
+                            showResetValidation = false
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(CircleShape)
-                        .padding(5.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.apply),
-                        color = MaterialTheme.colorScheme.primary
+                    }
+                }
+                if (showRandomColorsValidation) {
+                    UserValidation(
+                        title = stringResource(R.string.make_every_colors_random),
+                        message = stringResource(R.string.make_every_colors_random_explanation),
+                        onDismiss = { showRandomColorsValidation = false }
+                    ) {
+                        scope.launch {
+                            ColorSettingsStore.setAllRandomColors(ctx)
+                            showRandomColorsValidation = false
+                        }
+                    }
+                }
+
+
+                if (showAllColorsValidation) {
+                    var applyColor by remember { mutableStateOf(Color.Black) }
+                    AlertDialog(
+                        onDismissRequest = { showAllColorsValidation = false },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    scope.launch {
+                                        ColorSettingsStore.setAllSameColors(ctx, applyColor)
+                                        showAllColorsValidation = false
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(CircleShape)
+                                    .padding(5.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.apply),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        title = {
+                            ColorPickerRow(
+                                currentColor = applyColor,
+                                label = stringResource(R.string.color_mode_all),
+                                backgroundColor = MaterialTheme.colorScheme.surface.alphaMultiplier(0.7f)
+                            ) { applyColor = it ?: Color.Black }
+                        },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        shape = DragonShape
                     )
                 }
-            },
-            title = {
-                ColorPickerRow(
-                    currentColor = applyColor,
-                    label = stringResource(R.string.color_mode_all),
-                    backgroundColor = MaterialTheme.colorScheme.surface.alphaMultiplier(0.7f)
-                ) { applyColor = it ?: Color.Black }
-            },
-            containerColor = MaterialTheme.colorScheme.surface,
-            shape = DragonShape
-        )
-    }
 
-    if (showExitTestValidation) {
-        UserValidation(
-            title = stringResource(R.string.exit_test_mode),
-            message = stringResource(R.string.exit_test_mode_message),
-            onDismiss = {
-                scope.launch {
-                    ColorModesSettingsStore.colorTestMode.set(ctx, false)
-                    showExitTestValidation = false
-                }
-            },
-            onValidate = {
-                scope.launch {
-                    ColorSettingsStore.restoreColors(ctx)
-                    ColorModesSettingsStore.colorTestMode.set(ctx, false)
-                    showExitTestValidation = false
+                if (showExitTestValidation) {
+                    UserValidation(
+                        title = stringResource(R.string.exit_test_mode),
+                        message = stringResource(R.string.exit_test_mode_message),
+                        onDismiss = {
+                            scope.launch {
+                                ColorModesSettingsStore.colorTestMode.set(ctx, false)
+                                showExitTestValidation = false
+                            }
+                        },
+                        onValidate = {
+                            scope.launch {
+                                ColorSettingsStore.restoreColors(ctx)
+                                ColorModesSettingsStore.colorTestMode.set(ctx, false)
+                                showExitTestValidation = false
+                            }
+                        }
+                    )
                 }
             }
-        )
-    }
+        }
+    )
 }
 
 private data class ColorEdit(

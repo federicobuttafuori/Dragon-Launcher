@@ -36,8 +36,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.base.modifiers.conditional
+import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
 
 @OptIn(ExperimentalLayoutApi::class)
 @Suppress("AssignedValueIsNeverRead")
@@ -55,8 +55,8 @@ fun SettingsScaffold(
     titleContent: @Composable (ColumnScope.() -> Unit)? = null,
     bottomContent: @Composable (ColumnScope.() -> Unit)? = null,
     bottomPadding: Dp = 400.dp,
-    content: @Composable (ColumnScope.() -> Unit)? = null,
     scrollableContent: Boolean = false,
+    content: @Composable (ColumnScope.() -> Unit)? = null,
     lazyContent: (LazyListScope.() -> Unit)? = null
 ) {
 

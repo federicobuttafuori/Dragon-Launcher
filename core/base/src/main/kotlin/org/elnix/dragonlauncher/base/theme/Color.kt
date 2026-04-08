@@ -59,7 +59,7 @@ val DarkDragonColorScheme: ColorScheme = darkColorScheme(
     surfaceVariant = Color(0xFF0F0A17),
     onSurfaceVariant = Color(0xFFD6CCE6),
 
-    error = Color(0xFFCF6679),
+    error = Color(0xFFFF0000),
     onError = Color.Black,
 
     outline = Color(0xCCFFFFFF),
