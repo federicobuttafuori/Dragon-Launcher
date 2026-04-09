@@ -41,14 +41,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import org.elnix.dragonlauncher.common.R
-import org.elnix.dragonlauncher.logging.logD
-import org.elnix.dragonlauncher.logging.logE
-import org.elnix.dragonlauncher.logging.logI
-import org.elnix.dragonlauncher.logging.logW
 import org.elnix.dragonlauncher.common.navigaton.ROUTES
 import org.elnix.dragonlauncher.common.serializables.SwipeActionSerializable
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
-import org.elnix.dragonlauncher.logging.AsyncInitializer
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.PRIVATE_SPACE_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.STARTUP_TAG
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.TAG
@@ -59,8 +54,13 @@ import org.elnix.dragonlauncher.common.utils.PrivateSpaceUtils
 import org.elnix.dragonlauncher.common.utils.SamsungWorkspaceIntegration
 import org.elnix.dragonlauncher.common.utils.WidgetHostProvider
 import org.elnix.dragonlauncher.common.utils.showToast
+import org.elnix.dragonlauncher.logging.logD
+import org.elnix.dragonlauncher.logging.logE
+import org.elnix.dragonlauncher.logging.logI
+import org.elnix.dragonlauncher.logging.logW
 import org.elnix.dragonlauncher.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.models.BackupViewModel
+import org.elnix.dragonlauncher.models.DragonLogViewModel
 import org.elnix.dragonlauncher.models.FloatingAppsViewModel
 import org.elnix.dragonlauncher.models.ShizukuViewModel
 import org.elnix.dragonlauncher.settings.SettingsBackupManager
@@ -71,17 +71,18 @@ import org.elnix.dragonlauncher.settings.stores.SwipeSettingsStore
 import org.elnix.dragonlauncher.settings.stores.UiSettingsStore
 import org.elnix.dragonlauncher.shizuku.ShellCommandExecutor
 import org.elnix.dragonlauncher.shizuku.ShizukuPermissionHandler
+import org.elnix.dragonlauncher.theme.DragonLauncherTheme
 import org.elnix.dragonlauncher.ui.MainAppUi
 import org.elnix.dragonlauncher.ui.base.asState
 import org.elnix.dragonlauncher.ui.base.asStateNull
-import org.elnix.dragonlauncher.ui.dialogs.CrashScreen
 import org.elnix.dragonlauncher.ui.composition.LocalAppLifecycleViewModel
 import org.elnix.dragonlauncher.ui.composition.LocalAppsViewModel
 import org.elnix.dragonlauncher.ui.composition.LocalBackupViewModel
+import org.elnix.dragonlauncher.ui.composition.LocalDragonLogViewModel
 import org.elnix.dragonlauncher.ui.composition.LocalFloatingAppsViewModel
 import org.elnix.dragonlauncher.ui.composition.LocalNavController
 import org.elnix.dragonlauncher.ui.composition.LocalShizukuViewModel
-import org.elnix.dragonlauncher.theme.DragonLauncherTheme
+import org.elnix.dragonlauncher.ui.dialogs.CrashScreen
 import org.elnix.dragonlauncher.ui.widgets.LauncherWidgetHolder
 import java.util.UUID
 
@@ -90,6 +91,7 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
     private val appLifecycleViewModel: AppLifecycleViewModel by viewModels()
     private val backupViewModel: BackupViewModel by viewModels()
     private val floatingAppsViewModel: FloatingAppsViewModel by viewModels()
+    private val dragonLogViewModel: DragonLogViewModel by viewModels()
 
     private var navControllerHolder = mutableStateOf<NavHostController?>(null)
 
@@ -311,9 +313,6 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
 
         super.onCreate(savedInstanceState)
         logI(STARTUP_TAG) { "MainActivity.onCreate started" }
-
-        // Initialize logging & other background tasks asynchronously
-        AsyncInitializer.init(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             try {
@@ -538,6 +537,7 @@ class MainActivity : FragmentActivity(), WidgetHostProvider {
                         LocalAppsViewModel provides appsViewModel,
                         LocalAppLifecycleViewModel provides appLifecycleViewModel,
                         LocalFloatingAppsViewModel provides floatingAppsViewModel,
+                        LocalDragonLogViewModel provides dragonLogViewModel,
                         LocalShizukuViewModel provides shizukuViewModel,
 
                         LocalNavController provides navController,

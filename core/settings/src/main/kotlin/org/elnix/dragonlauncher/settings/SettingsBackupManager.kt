@@ -12,6 +12,7 @@ import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.logging.logE
 import org.elnix.dragonlauncher.logging.logI
+import org.elnix.dragonlauncher.logging.logV
 import org.elnix.dragonlauncher.logging.logW
 import org.elnix.dragonlauncher.settings.bases.DatastoreProvider
 import org.elnix.dragonlauncher.settings.bases.JsonArraySettingsStore
@@ -30,7 +31,7 @@ object SettingsBackupManager {
      */
     suspend fun triggerBackup(ctx: Context) {
         if (!BackupSettingsStore.autoBackupEnabled.get(ctx)) {
-            logW(BACKUP_TAG) { "Auto-backup disabled" }
+            logV(BACKUP_TAG) { "Auto-backup disabled" }
             return
         }
 

@@ -1,9 +1,10 @@
 package org.elnix.dragonlauncher.settings.stores
 
+import android.util.Log
 import org.elnix.dragonlauncher.settings.DataStoreName
-import org.elnix.dragonlauncher.settings.bases.Settings
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
+import org.elnix.dragonlauncher.settings.bases.Settings
 
 object DebugSettingsStore : MapSettingsStore() {
     override val name: String = "Debug"
@@ -81,12 +82,18 @@ object DebugSettingsStore : MapSettingsStore() {
         default = false
     )
 
-
-
-    val backupStores = Settings.stringSet(
-        key = "backupStores",
+    val snackBarLogLevel = Settings.int(
+        key = "snackBarLogLevel",
         dataStoreName = dataStoreName,
-        default = DataStoreName.entries.map { it.value }.toSet()
+        default = Log.ERROR,
+        allowedRange = 2..7
+    )
+
+    val filesLogLevel = Settings.int(
+        key = "filesLogLevel",
+        dataStoreName = dataStoreName,
+        default = Log.DEBUG,
+        allowedRange = 2..7
     )
 
     override val ALL: List<BaseSettingObject<*,*>>
@@ -103,6 +110,7 @@ object DebugSettingsStore : MapSettingsStore() {
             this.enableLogging,
             this.privateSpaceDebugInfo,
             this.disableExtensionSignatureCheck,
-            this.backupStores
+            this.snackBarLogLevel,
+            this.filesLogLevel
         )
     }

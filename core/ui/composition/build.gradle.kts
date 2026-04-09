@@ -61,5 +61,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(project(":core:common"))
+    implementation(project(":core:logging"))
     implementation(project(":core:models"))
 }

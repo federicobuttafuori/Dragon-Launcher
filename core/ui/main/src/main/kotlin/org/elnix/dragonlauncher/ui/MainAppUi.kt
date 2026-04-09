@@ -96,6 +96,7 @@ import org.elnix.dragonlauncher.enumsui.DrawerToolbar
 import org.elnix.dragonlauncher.enumsui.LockMethod
 import org.elnix.dragonlauncher.logging.logD
 import org.elnix.dragonlauncher.logging.logE
+import org.elnix.dragonlauncher.logging.logV
 import org.elnix.dragonlauncher.logging.logW
 import org.elnix.dragonlauncher.settings.stores.AngleLineSettingsStore
 import org.elnix.dragonlauncher.settings.stores.BackupSettingsStore
@@ -143,6 +144,7 @@ import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.rememberMainScreenLayerOrder
 import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
+import org.elnix.dragonlauncher.ui.helpers.LauncherSnackbarHost
 import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
 import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
 import org.elnix.dragonlauncher.ui.helpers.SecurityHelper
@@ -168,6 +170,7 @@ import org.elnix.dragonlauncher.ui.settings.customization.ThemesTab
 import org.elnix.dragonlauncher.ui.settings.customization.WallpaperTab
 import org.elnix.dragonlauncher.ui.settings.debug.DebugTab
 import org.elnix.dragonlauncher.ui.settings.debug.LogsTab
+import org.elnix.dragonlauncher.ui.settings.debug.LogsViewerScreen
 import org.elnix.dragonlauncher.ui.settings.debug.SettingsDebugTab
 import org.elnix.dragonlauncher.ui.settings.extensions.ExtensionsTab
 import org.elnix.dragonlauncher.ui.settings.language.LanguageTab
@@ -288,7 +291,6 @@ fun MainAppUi(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var lastRoute by remember { mutableStateOf(ROUTES.MAIN) }
-
 
 
     val autoBackupEnabled by BackupSettingsStore.autoBackupEnabled.asState()
@@ -634,7 +636,9 @@ fun MainAppUi(
                     launchAction(homeAction)
                 }
 
-                else -> { popBackMainScreen() }
+                else -> {
+                    popBackMainScreen()
+                }
             }
         }
     }
@@ -694,10 +698,12 @@ fun MainAppUi(
     val elementsJson by StatusBarJsonSettingsStore.jsonSetting.asState()
 
     val elements by remember(elementsJson) {
-        val decoded = StatusBarJson.decodeStatusBarElements(elementsJson)
-        logW(STATUS_BAR_TAG) { "Element: $elementsJson, decoded: $decoded" }
 
-        derivedStateOf { decoded }
+        derivedStateOf {
+            StatusBarJson.decodeStatusBarElements(elementsJson).also {
+                logV(STATUS_BAR_TAG) { "Element: $elementsJson, decoded: $it" }
+            }
+        }
     }
 
     /* ───────────── Decodes the angle lines things ───────────── */
@@ -795,6 +801,9 @@ fun MainAppUi(
                     }
                 }
             },
+            snackbarHost = {
+                LauncherSnackbarHost()
+            },
             contentWindowInsets = WindowInsets(),
             containerColor = containerColor,
         ) { paddingValues ->
@@ -875,13 +884,13 @@ fun MainAppUi(
                     settingComposable(SETTINGS.PERMISSIONS) { PermissionsTab { popBackToAdvSettingsRoot() } }
                     settingComposable(SETTINGS.BEHAVIOR) { BehaviorTab(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.DRAWER) { DrawerTab(::popBackToAdvSettingsRoot) }
-                    settingComposable(SETTINGS.LOGS) { LogsTab(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.LANGUAGE) { LanguageTab(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.BACKUP) { BackupTab(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.CHANGELOGS) { ChangelogsScreen(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.EXTENSIONS) { ExtensionsTab(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.WELLBEING) { WellbeingTab(::popBackToAdvSettingsRoot) }
                     settingComposable(SETTINGS.DEBUG) { DebugTab(::popBackToAdvSettingsRoot) }
+                    settingComposable(SETTINGS.LOGS) { LogsTab(::popBackToDebug) }
                     settingComposable(SETTINGS.SETTINGS_JSON) { SettingsDebugTab(::popBackToDebug) }
 
                     // All the appearance sub-settings
@@ -895,6 +904,17 @@ fun MainAppUi(
                     settingComposable(SETTINGS.HOLD_TO_ACTIVATE_ARC) { HoldToActivateArcTab(::popBackToAppearance) }
                     settingComposable(SETTINGS.MAINS_SCREEN_LAYERS) { MainScreeLayersOrderScreen(::popBackToAppearance) }
 
+                    settingComposable(
+                        route = SETTINGS.LOGS_VIEWER_SCREEN,
+                        arguments = listOf(navArgument("filename") { type = NavType.StringType }),
+                    ) { backStack ->
+                        LogsViewerScreen(
+                            filename = backStack.arguments!!.getString("filename")!!,
+                            onBack = {
+                                goSettings(SETTINGS.LOGS)
+                            }
+                        )
+                    }
 
                     settingComposable(
                         route = EDIT_SCREENS.NESTS_EDIT,
@@ -955,10 +975,10 @@ fun MainAppUi(
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Spacer()
-                AnimatedVisibility (showSetAsDefaultBanner) {
+                AnimatedVisibility(showSetAsDefaultBanner) {
                     SetDefaultLauncherBanner()
                 }
-                AnimatedVisibility (showReselectAutoBackupFile) {
+                AnimatedVisibility(showReselectAutoBackupFile) {
                     ReselectAutoBackupBanner()
                 }
             }

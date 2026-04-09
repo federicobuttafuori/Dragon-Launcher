@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.timber)
+
 
     implementation(project(":core:logging"))
     implementation(project(":core:common"))

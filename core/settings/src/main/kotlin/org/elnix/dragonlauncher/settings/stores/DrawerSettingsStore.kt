@@ -4,6 +4,8 @@ import org.elnix.dragonlauncher.common.serializables.IconShape
 import org.elnix.dragonlauncher.enumsui.DrawerActions
 import org.elnix.dragonlauncher.enumsui.DrawerToolbar
 import org.elnix.dragonlauncher.settings.DataStoreName
+import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
+import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
 import org.elnix.dragonlauncher.settings.bases.Settings.boolean
 import org.elnix.dragonlauncher.settings.bases.Settings.enum
 import org.elnix.dragonlauncher.settings.bases.Settings.float
@@ -11,8 +13,6 @@ import org.elnix.dragonlauncher.settings.bases.Settings.int
 import org.elnix.dragonlauncher.settings.bases.Settings.shape
 import org.elnix.dragonlauncher.settings.bases.Settings.string
 import org.elnix.dragonlauncher.settings.bases.Settings.stringSet
-import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
-import org.elnix.dragonlauncher.settings.bases.MapSettingsStore
 
 
 object DrawerSettingsStore : MapSettingsStore() {
@@ -287,7 +287,7 @@ object DrawerSettingsStore : MapSettingsStore() {
             this.showSearchBar,
             this.showRecentlyUsedApps,
             this.recentlyUsedAppsCount,
-            this.recentlyUsedPackages,
+//            this.recentlyUsedPackages, // Don't put it in the ALL value, this way it won't be backup, and the onSetting changed wont trigger on new app launch
             this.categoryGridWidth,
             this.categoryGridCells,
             this.showCategoryName,

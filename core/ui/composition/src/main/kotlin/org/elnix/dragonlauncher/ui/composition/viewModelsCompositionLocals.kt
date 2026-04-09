@@ -1,6 +1,7 @@
 package org.elnix.dragonlauncher.ui.composition
 
 import androidx.compose.runtime.compositionLocalOf
+import org.elnix.dragonlauncher.models.DragonLogViewModel
 import org.elnix.dragonlauncher.models.AppLifecycleViewModel
 import org.elnix.dragonlauncher.models.AppsViewModel
 import org.elnix.dragonlauncher.models.BackupViewModel
@@ -22,4 +23,8 @@ val LocalFloatingAppsViewModel = compositionLocalOf<FloatingAppsViewModel> {
 }
 val LocalShizukuViewModel = compositionLocalOf<ShizukuViewModel> {
     error("No LocalShizukuViewModel bar provided")
+}
+
+val LocalDragonLogViewModel = compositionLocalOf<DragonLogViewModel> {
+    error("No LocalDragonLogViewModel bar provided")
 }

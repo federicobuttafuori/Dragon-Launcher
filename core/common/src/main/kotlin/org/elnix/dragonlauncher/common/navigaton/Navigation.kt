@@ -29,6 +29,7 @@ object SETTINGS {
     const val HOLD_TO_ACTIVATE_ARC = "settings/advanced/hold_to_activate"
     const val MAINS_SCREEN_LAYERS = "settings/advanced/main_screen_layers"
     const val WIDGETS_FLOATING_APPS = "settings/advanced/widgets_floating_apps/{id}"
+    const val LOGS_VIEWER_SCREEN = "settings/advanced/debug/logs/viewer/{filename}"
 
 }
 

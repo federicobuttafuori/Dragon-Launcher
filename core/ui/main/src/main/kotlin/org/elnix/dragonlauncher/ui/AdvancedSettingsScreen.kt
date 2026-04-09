@@ -244,15 +244,6 @@ fun AdvancedSettingsScreen(
             }
         }
 
-        item {
-            SettingsItem(
-                title = stringResource(R.string.logs),
-                icon = Icons.AutoMirrored.Filled.Notes
-            ) {
-                navController.navigate(SETTINGS.LOGS)
-            }
-        }
-
 
         item { TextDivider(stringResource(R.string.about)) }
 

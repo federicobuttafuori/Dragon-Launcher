@@ -16,7 +16,13 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class FileLoggingTree(ctx: Context) : Timber.Tree() {
+class FileLoggingTree(
+    ctx: Context,
+    private val onHighPriorityLog: (level: Int, message: String) -> Unit
+) : Timber.Tree() {
+
+    var snackBarLogLevel = Log.ERROR
+    var filesLogsLevel = Log.DEBUG
 
     private val logDir = File(ctx.filesDir, "logs").apply { if (!exists()) mkdirs() }
     private val logQueue = ConcurrentLinkedQueue<String>()
@@ -45,20 +51,16 @@ class FileLoggingTree(ctx: Context) : Timber.Tree() {
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        if (priority < Log.INFO) return
-
-        val timestamp = dateFormatter.format(Date())
-        val priorityStr = when (priority) {
-            Log.VERBOSE -> "V"
-            Log.DEBUG -> "D"
-            Log.INFO -> "I"
-            Log.WARN -> "W"
-            Log.ERROR -> "E"
-            Log.ASSERT -> "A"
-            else -> "?"
+        if (priority >= snackBarLogLevel) {
+            onHighPriorityLog(priority,message)
         }
 
-        val logLine = "[$timestamp] $priorityStr/${tag ?: "NoTag"}: $message"
+        if (priority < filesLogsLevel) return
+
+        val timestamp = dateFormatter.format(Date())
+        val priorityChar = priority.logLevelChar
+
+        val logLine = "[$timestamp] $priorityChar/${tag ?: "NoTag"}: $message"
         val fullLog = if (t != null) "$logLine\n${Log.getStackTraceString(t)}" else logLine
 
         logQueue.add(fullLog)

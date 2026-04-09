@@ -50,9 +50,8 @@ fun CrashScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeContent)
-            .padding(16.dp)
             .background(Color.Black)
+            .windowInsetsPadding(WindowInsets.safeContent)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -96,6 +95,7 @@ fun CrashScreen(
 
 
             Button(
+                modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     settingsExportLauncher.launch("panic_backup.json")
                 }
@@ -104,6 +104,7 @@ fun CrashScreen(
             }
 
             Button(
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onDismiss
             ) {
                 Text(stringResource(R.string.access_app))

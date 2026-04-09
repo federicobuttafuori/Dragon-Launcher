@@ -27,7 +27,7 @@ fun DragonButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    needValidation: Boolean = false,
+    needConfirm: Boolean = false,
     confirmText: String = stringResource(R.string.are_you_sure),
     colors: ButtonColors = AppObjectsColors.buttonColors(),
     content: @Composable RowScope.() -> Unit,
@@ -38,7 +38,7 @@ fun DragonButton(
     Button(
         modifier = modifier,
         onClick = withHaptic {
-            if (needValidation) showConfirmPopup = true
+            if (needConfirm) showConfirmPopup = true
             else onClick()
         },
         shapes = UiConstants.dragonShapes(),

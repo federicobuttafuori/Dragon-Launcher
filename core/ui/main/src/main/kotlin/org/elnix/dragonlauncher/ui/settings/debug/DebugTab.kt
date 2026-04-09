@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -105,13 +106,25 @@ fun DebugTab(
         }
 
         item {
+            SettingsItem(
+                title = stringResource(R.string.logs),
+                icon = Icons.AutoMirrored.Filled.Notes
+            ) {
+                navController.navigate(SETTINGS.LOGS)
+            }
+        }
+
+        item {
+            SettingsItem(
+                title = "Settings debug json",
+                icon = Icons.Default.Settings
+            ) {
+                navController.navigate(SETTINGS.SETTINGS_JSON)
+            }
+        }
+
+        item {
             ExpandableSection(uiDebugSectionState) {
-                SettingsItem(
-                    title = "Settings debug json",
-                    icon = Icons.Default.Settings
-                ) {
-                    navController.navigate(SETTINGS.SETTINGS_JSON)
-                }
 
                 SettingsSwitchRow(
                     setting = PrivateSettingsStore.hasSeenWelcome,

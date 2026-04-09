@@ -10,8 +10,6 @@ import org.elnix.dragonlauncher.common.serializables.CircleNest
 import org.elnix.dragonlauncher.common.serializables.SwipeJson
 import org.elnix.dragonlauncher.common.serializables.SwipePointSerializable
 import org.elnix.dragonlauncher.common.serializables.defaultSwipePointsValues
-import org.elnix.dragonlauncher.common.utils.Constants.Logging.SWIPE_TAG
-import org.elnix.dragonlauncher.logging.logI
 import org.elnix.dragonlauncher.settings.DataStoreName
 import org.elnix.dragonlauncher.settings.bases.BaseSettingObject
 import org.elnix.dragonlauncher.settings.bases.JsonObjectSettingsStore
@@ -50,7 +48,6 @@ object SwipeSettingsStore : JsonObjectSettingsStore() {
 
     suspend fun savePoints(ctx: Context, points: List<SwipePointSerializable>) {
         ctx.resolveDataStore(dataStoreName).edit { prefs ->
-            logI(SWIPE_TAG) { "Encoding points: $points"}
             prefs[POINTS] = SwipeJson.encodePoints(points)
         }
     }
