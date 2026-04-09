@@ -144,6 +144,7 @@ import org.elnix.dragonlauncher.ui.dialogs.WidgetPickerDialog
 import org.elnix.dragonlauncher.ui.dialogs.rememberMainScreenLayerOrder
 import org.elnix.dragonlauncher.ui.dragon.dialogs.UserValidation
 import org.elnix.dragonlauncher.ui.drawer.AppDrawerScreen
+import org.elnix.dragonlauncher.ui.helpers.FpsCounterGraph
 import org.elnix.dragonlauncher.ui.helpers.LauncherSnackbarHost
 import org.elnix.dragonlauncher.ui.helpers.PrivateSpaceStateDebugScreen
 import org.elnix.dragonlauncher.ui.helpers.ReselectAutoBackupBanner
@@ -299,6 +300,8 @@ fun MainAppUi(
 
     var startDestination by remember { mutableStateOf(SETTINGS.ROOT) }
 
+
+    val showFps by DebugSettingsStore.showFps.asState()
 
     /* ───────────── Lock gate state ───────────── */
     val lockMethod by PrivateSettingsStore.lockMethod.asState()
@@ -982,6 +985,10 @@ fun MainAppUi(
                     ReselectAutoBackupBanner()
                 }
             }
+        }
+
+        if (showFps) {
+            FpsCounterGraph()
         }
 
         if (showFilePicker != null) {

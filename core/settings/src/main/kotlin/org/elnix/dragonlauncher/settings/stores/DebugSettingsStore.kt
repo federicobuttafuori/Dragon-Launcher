@@ -96,6 +96,12 @@ object DebugSettingsStore : MapSettingsStore() {
         allowedRange = 2..7
     )
 
+    val showFps = Settings.boolean(
+        key = "showFps",
+        dataStoreName = dataStoreName,
+        default = false
+    )
+
     override val ALL: List<BaseSettingObject<*,*>>
         get() = listOf(
             this.debugEnabled,
@@ -111,6 +117,7 @@ object DebugSettingsStore : MapSettingsStore() {
             this.privateSpaceDebugInfo,
             this.disableExtensionSignatureCheck,
             this.snackBarLogLevel,
-            this.filesLogLevel
+            this.filesLogLevel,
+            this.showFps
         )
     }

@@ -146,6 +146,12 @@ fun DebugTab(
                     description = "If disabled, it won't appear if Dragon isn't the default launcher"
                 )
 
+                SettingsSwitchRow(
+                    setting = DebugSettingsStore.showFps,
+                    title = "Show FPS",
+                    description = "Display a FPS graph on top of everything"
+                )
+
                 DragonButton(
                     onClick = {
                         scope.launch {
