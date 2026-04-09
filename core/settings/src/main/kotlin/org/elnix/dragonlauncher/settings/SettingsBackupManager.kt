@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.BACKUP_TAG
 import org.elnix.dragonlauncher.common.utils.getFilePathFromUri
+import org.elnix.dragonlauncher.common.utils.getVersionNameAndCode
 import org.elnix.dragonlauncher.common.utils.hasUriReadWritePermission
 import org.elnix.dragonlauncher.common.utils.showToast
 import org.elnix.dragonlauncher.logging.logD
@@ -107,12 +108,14 @@ object SettingsBackupManager {
             val settingsStore = entry.value
 
             if (dataStoreName.backupKey in requestedStores.map { it.backupKey }) {
-//                logW(BACKUP_TAG) { "$dataStoreName ,backup : ${settingsStore.exportForBackup(ctx)}" }
                 settingsStore.exportForBackup(ctx)?.let {
                     json.put(dataStoreName.backupKey, it)
                 }
             }
         }
+
+        json.put("app_version", ctx.getVersionNameAndCode())
+
         return json
     }
 

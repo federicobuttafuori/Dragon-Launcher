@@ -21,7 +21,6 @@ import android.provider.AlarmClock
 import android.provider.CalendarContract
 import android.provider.Settings
 import android.widget.Toast
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.net.toUri
 import org.elnix.dragonlauncher.common.R
 import org.elnix.dragonlauncher.common.utils.Constants.Logging.STATUS_BAR_TAG
@@ -420,7 +419,9 @@ fun openCalendar(ctx: Context) {
     }
 }
 
-
+/**
+ * @return the current app version code (e.g. `46`)
+ */
 fun Context.getVersionCode(): Int =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         packageManager.getPackageInfo(packageName, 0).longVersionCode.toInt()
@@ -429,20 +430,56 @@ fun Context.getVersionCode(): Int =
         packageManager.getPackageInfo(packageName, 0).versionCode
     }
 
+/**
+ * @return the current app version name (e.g. `2.7.0-Glowel`)
+ */
 fun Context.getVersionName(): String =
     packageManager.getPackageInfo(packageName, 0).versionName ?: "unknown"
 
+/**
+ * @return the current app version name and code formatted (e.g. `2.7.0-Glowel (46)`)
+ */
+fun Context.getVersionNameAndCode(): String =
+    "${getVersionName()} (${getVersionCode()})"
+
+/**
+ * Checks if the current build is a beta version flavor
+ * Actually, it just checks if the version name contains  `beta`
+ *
+ * @return [Boolean] whether the build is a beta or not
+ */
 fun Context.isBetaVersion(): Boolean =
     getVersionName().contains("beta")
 
+
+/**
+ * Takes a timestamp [Long] and return the formatted date in `MMM dd, yyyy HH:mm:ss` format
+ * It uis used by the logs tab and the backup tab to format file dates in a readable output
+ *
+ * @return [String] the formatted [this] timestamp
+ */
 fun Long.formatDateTime(): String {
     return SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.getDefault())
         .format(Date(this))
 }
-fun Context.today(format: String = "MMM dd, yyyy"): String =
+
+/**
+ * Today - returns the today's date, formatted in the given format
+ *
+ * @param format the date format
+ * @return [String] today's date
+ */
+fun today(format: String = "MMM dd, yyyy"): String =
     SimpleDateFormat(format, Locale.getDefault()).format(Date())
 
 
+/**
+ * Format duration
+ * Takes a timestamp and format it into a duration in hours, minutes and seconds
+ * Depending on the duration, the minutes and hours may or may not be displayed (e.g. if under 60 min, no hours)
+ *
+ * @return [String] the formatted duration
+ */
 fun Long.formatDuration(): String {
     return when {
         this >= 60 -> {
@@ -465,32 +502,6 @@ fun Long.formatDuration(): String {
 //        else -> "${seconds / 2592000}mo ago"
 //    }
 //}
-
-
-/**
- * Binds a value to a nullable single-argument lambda, returning a parameterless lambda.
- *
- * If the receiver lambda is non-null, this returns a new `() -> Unit` that,
- * when invoked, calls the original lambda with the provided [value].
- * If the receiver is null, this returns null.
- *
- * Useful when an API expects a `() -> Unit` callback but you have a
- * nullable `(T) -> Unit` and a value to supply in advance.
- *
- * Example:
- * ```
- * val onClick: ((Int) -> Unit)? = { println(it) }
- * val bound = onClick.bind(42)
- * bound?.invoke() // prints 42
- * ```
- *
- * @param T the parameter type of the original lambda
- * @param value the value to pass to the lambda when invoked
- * @return a parameterless lambda invoking the original lambda with [value],
- *         or null if the receiver lambda is null
- */
-fun <T> ((T) -> Unit)?.bind(value: T): (() -> Unit)? =
-    this?.let { { it(value) } }
 
 /**
  * Returns `true` if this string represents an empty JSON object.
@@ -524,9 +535,9 @@ val String?.isNotBlankJson: Boolean
     get() = !isBlankJson
 
 
-fun <T> SnapshotStateList<T>.move(from: Int, to: Int) {
-    if (from == to) return
-    if (from in 0 until size && to in 0 until size) {
-        add(to, removeAt(from))
-    }
-}
+//fun <T> SnapshotStateList<T>.move(from: Int, to: Int) {
+//    if (from == to) return
+//    if (from in 0 until size && to in 0 until size) {
+//        add(to, removeAt(from))
+//    }
+//}

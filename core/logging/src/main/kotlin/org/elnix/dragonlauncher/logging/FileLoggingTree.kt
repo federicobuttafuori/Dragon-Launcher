@@ -21,7 +21,7 @@ class FileLoggingTree(
     private val onHighPriorityLog: (level: Int, message: String) -> Unit
 ) : Timber.Tree() {
 
-    var snackBarLogLevel = Log.ERROR
+    var snackBarLogLevel = 7 // No Logging
     var filesLogsLevel = Log.DEBUG
 
     private val logDir = File(ctx.filesDir, "logs").apply { if (!exists()) mkdirs() }

@@ -25,7 +25,7 @@ class DragonLogViewModel(
     private val _isLoggingEnabled = MutableStateFlow(true)
     val isLoggingEnabled = _isLoggingEnabled.asStateFlow()
 
-    private val _snackBarLogLevel = MutableStateFlow(Log.ERROR)
+    private val _snackBarLogLevel = MutableStateFlow(7) // No Logging
     val snackBarLogLevel = _snackBarLogLevel.asStateFlow()
     private val _filesLogsLevel = MutableStateFlow(Log.DEBUG)
     val filesLogsLevel = _filesLogsLevel.asStateFlow()

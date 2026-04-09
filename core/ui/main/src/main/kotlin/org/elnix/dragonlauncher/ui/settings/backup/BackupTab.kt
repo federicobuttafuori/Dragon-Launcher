@@ -263,7 +263,7 @@ fun BackupTab(onBack: () -> Unit) {
             onConfirm = { selectedStores ->
                 showExportDialog = false
                 selectedStoresForExport = selectedStores.keys
-                settingsExportLauncher.launch("backup-${ctx.today()}.json")
+                settingsExportLauncher.launch("backup-${today()}.json")
             }
         )
     }

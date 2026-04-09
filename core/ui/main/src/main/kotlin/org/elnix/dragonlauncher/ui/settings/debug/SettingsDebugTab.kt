@@ -24,9 +24,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.elnix.dragonlauncher.common.utils.copyToClipboard
+import org.elnix.dragonlauncher.settings.SettingsBackupManager
 import org.elnix.dragonlauncher.settings.allStores
-import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
 import org.elnix.dragonlauncher.ui.dialogs.ExportSettingsDialog
+import org.elnix.dragonlauncher.ui.dragon.components.DragonIconButton
 import org.elnix.dragonlauncher.ui.helpers.MonospaceScrollableText
 import org.elnix.dragonlauncher.ui.helpers.settings.SettingsScaffold
 import org.json.JSONObject
@@ -46,14 +47,7 @@ fun SettingsDebugTab(
     fun loadSettings() {
         settingsJson = null
         scope.launch {
-            val json = JSONObject()
-
-            selectedStores.forEach { store ->
-                store.value.exportForBackup(ctx)?.let {
-                    json.put(store.key.backupKey, it)
-                }
-            }
-            settingsJson = json
+            settingsJson = SettingsBackupManager.createJsonToExport(ctx, selectedStores.keys)
         }
     }
 

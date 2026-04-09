@@ -173,7 +173,7 @@ fun ThemesTab(
                     modifier = Modifier.heightIn(max = 1000.dp)
                 ) {
                     downLoadUploadButton(false) {
-                        settingsExportLauncher.launch("dragon_launcher_theme-${ctx.today()}.json")
+                        settingsExportLauncher.launch("dragon_launcher_theme-${today()}.json")
                     }
                     downLoadUploadButton(true) {
                         settingsImportLauncher.launch(
